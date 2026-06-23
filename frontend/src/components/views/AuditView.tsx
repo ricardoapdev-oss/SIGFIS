@@ -1,0 +1,178 @@
+'use client';
+
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Shield, Search, Filter, Eye, Edit, Trash2, CheckCircle, XCircle, LogIn, LogOut, Clock } from 'lucide-react';
+import { api, User, AuditLog, AuditAction } from '@/lib/api';
+import { formatDateTime } from '@/lib/labels';
+
+interface Props { user: User }
+
+const actionConfig: Record<AuditAction, { label: string; color: string; icon: React.ReactNode }> = {
+  CREATE:  { label: 'Criação',    color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20', icon: <Edit className="h-3 w-3" /> },
+  UPDATE:  { label: 'Alteração', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20',          icon: <Edit className="h-3 w-3" /> },
+  DELETE:  { label: 'Exclusão',  color: 'text-red-400 bg-red-500/10 border-red-500/20',             icon: <Trash2 className="h-3 w-3" /> },
+  VIEW:    { label: 'Consulta',  color: 'text-zinc-400 bg-zinc-800 border-zinc-700',                icon: <Eye className="h-3 w-3" /> },
+  APPROVE: { label: 'Aprovação', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20', icon: <CheckCircle className="h-3 w-3" /> },
+  REJECT:  { label: 'Rejeição',  color: 'text-red-400 bg-red-500/10 border-red-500/20',             icon: <XCircle className="h-3 w-3" /> },
+  LOGIN:   { label: 'Login',     color: 'text-blue-400 bg-blue-500/10 border-blue-500/20',          icon: <LogIn className="h-3 w-3" /> },
+  LOGOUT:  { label: 'Logout',    color: 'text-zinc-400 bg-zinc-800 border-zinc-700',                icon: <LogOut className="h-3 w-3" /> },
+};
+
+const entityLabel: Record<string, string> = {
+  Contract: 'Contrato', Process: 'Processo', Measurement: 'Medição', Occurrence: 'Ocorrência',
+  Alteration: 'Aditivo', Communication: 'Comunicado', User: 'Usuário', Session: 'Sessão',
+};
+
+export function AuditView({ user }: Props) {
+  const queryClient = useQueryClient();
+  const isAdmin = user.role === 'ADMIN';
+  const [search, setSearch] = useState('');
+  const [actionFilter, setActionFilter] = useState<AuditAction | ''>('');
+  const [entityFilter, setEntityFilter] = useState('');
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['audit-logs'],
+    queryFn: () => api.audit.list(),
+    enabled: !!user,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.audit.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['audit-logs'] }),
+  });
+
+  const logs: AuditLog[] = (data as any)?.logs || [];
+
+  const filtered = logs.filter(l => {
+    const q = search.toLowerCase();
+    const matchSearch = !q || l.userName.toLowerCase().includes(q) || l.entityLabel.toLowerCase().includes(q) || l.entity.toLowerCase().includes(q);
+    const matchAction = !actionFilter || l.action === actionFilter;
+    const matchEntity = !entityFilter || l.entity === entityFilter;
+    return matchSearch && matchAction && matchEntity;
+  });
+
+  const entities = [...new Set(logs.map(l => l.entity))];
+  const actions = [...new Set(logs.map(l => l.action))];
+
+  return (
+    <div className="space-y-6 max-w-7xl mx-auto">
+
+      {/* Header */}
+      <div className="flex justify-between items-start">
+        <div>
+          <h2 className="text-base font-semibold text-white flex items-center gap-2">
+            <Shield className="h-4 w-4 text-emerald-400" /> Trilha de Auditoria
+          </h2>
+          <p className="text-xs text-zinc-500 mt-0.5">Registro imutável de todas as ações do sistema · Soft delete ativo</p>
+        </div>
+        <div className="flex items-center gap-2 text-[10px] text-zinc-500 bg-zinc-900/40 border border-zinc-800 px-3 py-1.5 rounded-lg">
+          <Clock className="h-3 w-3" />
+          {logs.length} eventos registrados
+        </div>
+      </div>
+
+      {/* Política de retenção */}
+      <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-4 text-[10px] text-zinc-400 flex flex-wrap gap-4">
+        <span><strong className="text-emerald-400">Soft Delete:</strong> Nenhum registro é apagado fisicamente.</span>
+        <span><strong className="text-emerald-400">Imutável:</strong> Histórico de alterações preservado indefinidamente.</span>
+        <span><strong className="text-emerald-400">Rastreabilidade:</strong> Quem fez · Quando · O quê.</span>
+        <span><strong className="text-emerald-400">Conformidade:</strong> Lei 13.303/2016 · CGU · TCU.</span>
+      </div>
+
+      {/* Filtros */}
+      <div className="flex flex-wrap gap-3">
+        <div className="relative flex-1 min-w-48">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
+          <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Buscar por usuário, entidade..."
+            className="w-full bg-zinc-900/40 border border-zinc-800 rounded-lg pl-9 pr-4 py-2 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/50" />
+        </div>
+        <select value={actionFilter} onChange={e => setActionFilter(e.target.value as any)}
+          className="bg-zinc-900/40 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:outline-none cursor-pointer">
+          <option value="">Todas as ações</option>
+          {actions.map(a => <option key={a} value={a}>{actionConfig[a]?.label || a}</option>)}
+        </select>
+        <select value={entityFilter} onChange={e => setEntityFilter(e.target.value)}
+          className="bg-zinc-900/40 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:outline-none cursor-pointer">
+          <option value="">Todas as entidades</option>
+          {entities.map(e => <option key={e} value={e}>{entityLabel[e] || e}</option>)}
+        </select>
+      </div>
+
+      {/* Timeline */}
+      {isLoading ? (
+        <div className="space-y-3">{[...Array(5)].map((_, i) => <div key={i} className="h-16 bg-zinc-900/40 rounded-xl animate-pulse" />)}</div>
+      ) : filtered.length > 0 ? (
+        <div className="relative">
+          <div className="absolute left-5 top-0 bottom-0 w-px bg-zinc-800" />
+          <div className="space-y-3">
+            {filtered.map((log) => {
+              const cfg = actionConfig[log.action];
+              return (
+                <div key={log.id} className="relative pl-12">
+                  {/* Timeline dot */}
+                  <div className={`absolute left-3.5 top-4 h-3 w-3 rounded-full border-2 border-zinc-950 ${cfg?.color.split(' ').find(c => c.startsWith('bg-')) || 'bg-zinc-700'}`} />
+
+                  <div className="bg-zinc-900/20 border border-zinc-900 hover:border-zinc-800 p-4 rounded-xl transition-colors">
+                    <div className="flex flex-wrap justify-between items-start gap-3">
+                      <div className="flex items-start gap-3">
+                        {/* Action badge */}
+                        <span className={`text-[9px] font-bold px-2 py-1 rounded-lg border flex items-center gap-1 shrink-0 ${cfg?.color || ''}`}>
+                          {cfg?.icon} {cfg?.label || log.action}
+                        </span>
+                        <div>
+                          <p className="text-xs font-semibold text-zinc-300">{log.entityLabel}</p>
+                          <p className="text-[10px] text-zinc-500 mt-0.5">
+                            <span className="text-zinc-400 font-medium">{entityLabel[log.entity] || log.entity}</span>
+                            {log.entityId && <span className="text-zinc-600"> · ID: {log.entityId}</span>}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 shrink-0">
+                        <div className="text-right">
+                          <p className="text-[11px] font-semibold text-zinc-300">{log.userName}</p>
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded border text-zinc-500 bg-zinc-800 border-zinc-700">{log.userRole}</span>
+                          <p className="text-[10px] text-zinc-600 mt-0.5">{formatDateTime(log.createdAt)}</p>
+                        </div>
+                        {isAdmin && (
+                          <button
+                            onClick={() => { if (confirm('Excluir este registro de auditoria permanentemente?')) deleteMutation.mutate(log.id); }}
+                            disabled={deleteMutation.isPending}
+                            title="Excluir registro"
+                            className="p-1.5 text-red-500/50 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer disabled:opacity-40 mt-0.5">
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Changes */}
+                    {log.changes && Object.keys(log.changes).length > 0 && (
+                      <div className="mt-3 bg-zinc-950/60 border border-zinc-900 rounded-lg p-3 space-y-1">
+                        <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Alterações</p>
+                        {Object.entries(log.changes).map(([field, { from, to }]) => (
+                          <div key={field} className="flex items-center gap-2 text-[10px]">
+                            <span className="text-zinc-500 uppercase font-bold">{field}:</span>
+                            <span className="bg-red-500/10 text-red-400 px-1.5 py-0.5 rounded line-through">{String(from)}</span>
+                            <span className="text-zinc-600">→</span>
+                            <span className="bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded">{String(to)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        <div className="bg-zinc-900/10 border border-zinc-900 rounded-xl p-10 text-center">
+          <Shield className="h-10 w-10 text-zinc-700 mx-auto mb-3" />
+          <p className="text-sm text-zinc-500">Nenhum evento encontrado com os filtros selecionados.</p>
+        </div>
+      )}
+    </div>
+  );
+}
