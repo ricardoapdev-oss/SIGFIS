@@ -1382,10 +1382,12 @@ function handleLocalFallback(endpoint: string, options: RequestInit = {}, origin
   if (endpoint.match(/^\/users\/[^/]+\/status$/) && method === 'PATCH') {
     if (user.role !== 'ADMIN' && user.role !== 'GESTOR') throw new Error('Acesso negado');
     const id = endpoint.split('/')[2];
+    const target = db.users.find(u => u.id === id);
+    if (!target) throw new Error('Usuário não encontrado');
+    if (target.role === 'ADMIN' && user.role !== 'ADMIN') throw new Error('Apenas o ADMIN pode alterar o status de outro ADMIN');
     const body = JSON.parse(options.body as string);
-    const u = db.users.find(u => u.id === id);
-    if (u) { u.status = body.status; saveLocalDB(db); }
-    return u;
+    target.status = body.status; saveLocalDB(db);
+    return target;
   }
 
   if (endpoint.match(/^\/users\/[^/]+$/) && method === 'DELETE') {

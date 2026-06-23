@@ -57,6 +57,12 @@ export function UsersView({ user }: UsersViewProps) {
     return false;
   };
 
+  const canToggleStatus = (target: any) => {
+    if (user.role === 'ADMIN') return true;
+    if (user.role === 'GESTOR') return target.role !== 'ADMIN' && target.id !== user.id;
+    return false;
+  };
+
   const userList: any[] = users ?? [];
 
   const roleColor: Record<string, string> = {
@@ -133,7 +139,7 @@ export function UsersView({ user }: UsersViewProps) {
                   {(user.role === 'GESTOR' || user.role === 'ADMIN' || user.role === 'ALTA_GESTAO') && (
                     <td className="p-4 text-center">
                       <div className="flex items-center justify-center gap-1">
-                        {user.role === 'GESTOR' && u.id !== user.id && (
+                        {canToggleStatus(u) && (
                           <button
                             onClick={() => toggleStatusMutation.mutate({
                               id: u.id,
