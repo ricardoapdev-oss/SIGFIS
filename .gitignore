@@ -1,0 +1,16 @@
+# Environment files (never commit secrets)
+.env
+
+# Backend build artifacts and dependencies
+/backend/node_modules/
+/backend/dist/
+/backend/.env
+
+# Frontend (covered by frontend/.gitignore but listed for clarity)
+frontend/node_modules/
+frontend/.next/
+frontend/.env*
+
+# OS artifacts
+.DS_Store
+Thumbs.db
