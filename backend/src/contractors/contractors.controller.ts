@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, UseGuards } from '@nestjs/common';
 import { ContractorsService } from './contractors.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -21,8 +21,14 @@ export class ContractorsController {
   }
 
   @Post()
-  @Roles(UserRole.GESTOR)
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
   create(@Body() body: any) {
     return this.contractorsService.create(body);
+  }
+
+  @Patch(':id')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  update(@Param('id') id: string, @Body() body: any) {
+    return this.contractorsService.update(id, body);
   }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { ContractsService } from './contracts.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -26,14 +26,26 @@ export class ContractsController {
   }
 
   @Post()
-  @Roles(UserRole.GESTOR)
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
   create(@Body() body: any) {
     return this.contractsService.create(body);
   }
 
+  @Patch(':id')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  update(@Param('id') id: string, @Body() body: any) {
+    return this.contractsService.update(id, body);
+  }
+
   @Post(':id/assign-fiscal')
-  @Roles(UserRole.GESTOR)
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
   assignFiscal(@Param('id') id: string, @Body() body: any) {
     return this.contractsService.assignFiscal(id, body);
+  }
+
+  @Patch(':id/assignments/:assignmentId/deactivate')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  deactivateAssignment(@Param('id') id: string, @Param('assignmentId') assignmentId: string) {
+    return this.contractsService.deactivateAssignment(id, assignmentId);
   }
 }

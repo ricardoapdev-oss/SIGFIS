@@ -703,11 +703,15 @@ function processAlertResponse(alertId: string, response: ContractAlertResponse, 
   return alert;
 }
 
-// ── Requisição HTTP com Fallback ───────────────────────────────────────────────
+// ── Requisição HTTP ────────────────────────────────────────────────────────────
 
-// Em Docker: o browser chama /api/* e o Next.js server faz o proxy para o backend.
-// Em dev local sem backend: a conexão falha e o fallback para localStorage assume.
+// O frontend usa /api/* — o Next.js proxy (next.config.ts rewrites) encaminha
+// esses requests para o backend NestJS em localhost:3001 no servidor.
+// Isso funciona para todos os usuários da intranet sem hardcodar IPs.
 const BACKEND_URL = '/api';
+
+// Endpoints de CRUD real que devem ir direto ao backend (sem fallback localStorage)
+const REAL_CRUD_PREFIXES = ['/auth/', '/users', '/contractors', '/contracts', '/processes', '/occurrences', '/measurements', '/alterations', '/communications'];
 
 async function request(endpoint: string, options: RequestInit = {}) {
   const token = getStoredToken();
@@ -718,14 +722,53 @@ async function request(endpoint: string, options: RequestInit = {}) {
     if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.message || 'Erro na requisição'); }
     return await res.json();
   } catch (error: any) {
-    return handleLocalFallback(endpoint, options, error.message);
+    if (error.message === 'Não autorizado') throw error;
+    // Endpoints de CRUD real: propagam o erro sem fallback
+    const isRealEndpoint = REAL_CRUD_PREFIXES.some(p => endpoint.startsWith(p));
+    if (isRealEndpoint) throw new Error(error.message || 'Backend indisponível');
+    // Endpoints computados (dashboard, painel de risco, alertas, IA): fallback local
+    return await handleLocalFallback(endpoint, options, error.message);
   }
 }
 
-// ── Fallback Simulado ──────────────────────────────────────────────────────────
+// ── Fallback para Endpoints Computados ────────────────────────────────────────
+// Endpoints como /dashboard/gestor, /risk-panel e /alerts não existem no backend —
+// são calculados no cliente. Este fallback busca dados reais do backend e computa.
 
-function handleLocalFallback(endpoint: string, options: RequestInit = {}, originalError: string): any {
-  const db = getLocalDB();
+async function fetchLiveDB(): Promise<LocalDB> {
+  const token = getStoredToken();
+  const h: Record<string, string> = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+  const get = async (path: string) => {
+    try { const r = await fetch(`${BACKEND_URL}${path}`, { headers: h }); return r.ok ? r.json() : null; }
+    catch { return null; }
+  };
+  const [users, contractors, contracts, processes] = await Promise.all([
+    get('/users'), get('/contractors'), get('/contracts'), get('/processes'),
+  ]);
+  const local = getLocalDB(); // mantém alertas e fases locais como fallback
+  if (users && contracts) {
+    const assignments: FiscalAssignment[] = (contracts as any[]).flatMap((c: any) => c.fiscalAssignments || []);
+    const occurrences: Occurrence[]        = (contracts as any[]).flatMap((c: any) => c.occurrences || []);
+    const measurements: InspectionMeasurement[] = (contracts as any[]).flatMap((c: any) => c.measurements || []);
+    const alterations: ContractAlteration[]     = (contracts as any[]).flatMap((c: any) => c.alterations || []);
+    const processPhases: ProcessPhase[]         = (processes as any[]).flatMap((p: any) => p.phases || []);
+    return {
+      users: users || [], contractors: contractors || [],
+      contracts: contracts || [], processes: processes || [],
+      assignments, occurrences, measurements, alterations,
+      processPhases,
+      contractAlerts: local.contractAlerts || [],
+      communications: (contracts as any[]).flatMap((c: any) => c.communications || []),
+      auditLogs: local.auditLogs || [], aiInsights: local.aiInsights || [],
+    };
+  }
+  return local;
+}
+
+async function handleLocalFallback(endpoint: string, options: RequestInit = {}, originalError: string): Promise<any> {
+  // Para endpoints computados, tenta buscar dados reais do backend
+  const isComputed = ['/dashboard', '/risk-panel', '/pending-dashboard'].some(p => endpoint.startsWith(p));
+  const db = isComputed ? await fetchLiveDB() : getLocalDB();
   const user = getStoredUser();
   const method = options.method || 'GET';
 
@@ -1742,18 +1785,22 @@ export const api = {
     create: (data: any) => request('/contracts', { method: 'POST', body: JSON.stringify(data) }),
     assignFiscal: (id: string, data: any) => request(`/contracts/${id}/assign-fiscal`, { method: 'POST', body: JSON.stringify(data) }),
     stats: () => request('/contracts/stats'),
-    updateData: (id: string, data: any) => request(`/contracts/${id}/update-data`, { method: 'PATCH', body: JSON.stringify(data) }),
-    conclude: (id: string) => request(`/contracts/${id}/conclude`, { method: 'PATCH' }),
+    updateData: (id: string, data: any) => request(`/contracts/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    conclude: (id: string) => request(`/contracts/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'CONCLUDED' }) }),
     delete: (id: string) => request(`/contracts/${id}`, { method: 'DELETE' }),
+    deactivateAssignment: (contractId: string, assignmentId: string) =>
+      request(`/contracts/${contractId}/assignments/${assignmentId}/deactivate`, { method: 'PATCH' }),
   },
   processes: {
     list: () => request('/processes'),
     get: (id: string) => request(`/processes/${id}`),
     create: (data: any) => request('/processes', { method: 'POST', body: JSON.stringify(data) }),
     updateStatus: (id: string, status: string) => request(`/processes/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+    update: (id: string, data: any) => request(`/processes/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
     getPhases: (id: string) => request(`/processes/${id}/phases`),
+    addPhase: (id: string, data: any) => request(`/processes/${id}/phases`, { method: 'POST', body: JSON.stringify(data) }),
     updatePhase: (processId: string, phaseId: string, data: any) => request(`/processes/${processId}/phases/${phaseId}`, { method: 'PATCH', body: JSON.stringify(data) }),
-    updateData: (id: string, data: any) => request(`/processes/${id}/update-data`, { method: 'PATCH', body: JSON.stringify(data) }),
+    updateData: (id: string, data: any) => request(`/processes/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
     delete: (id: string) => request(`/processes/${id}`, { method: 'DELETE' }),
   },
   users: {

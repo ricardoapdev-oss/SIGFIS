@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { ProcessesService } from './processes.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -25,9 +25,38 @@ export class ProcessesController {
     return this.processesService.create(req.user.id, body);
   }
 
+  @Patch(':id')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  update(@Param('id') id: string, @Body() body: any) {
+    return this.processesService.update(id, body);
+  }
+
   @Patch(':id/status')
-  @Roles(UserRole.GESTOR)
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
   updateStatus(@Param('id') id: string, @Body() body: { status: string }) {
     return this.processesService.updateStatus(id, body.status);
+  }
+
+  @Delete(':id')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  delete(@Param('id') id: string) {
+    return this.processesService.delete(id);
+  }
+
+  @Get(':id/phases')
+  getPhases(@Param('id') id: string) {
+    return this.processesService.getPhases(id);
+  }
+
+  @Post(':id/phases')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  addPhase(@Param('id') id: string, @Body() body: any) {
+    return this.processesService.addPhase(id, body);
+  }
+
+  @Patch(':id/phases/:phaseId')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR, UserRole.FISCAL)
+  updatePhase(@Param('id') id: string, @Param('phaseId') phaseId: string, @Body() body: any) {
+    return this.processesService.updatePhase(id, phaseId, body);
   }
 }

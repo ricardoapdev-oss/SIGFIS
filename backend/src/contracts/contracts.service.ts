@@ -115,13 +115,37 @@ export class ContractsService {
         contractorId: data.contractorId,
         objectDescription: data.objectDescription,
         initialValue: data.initialValue,
-        currentValue: data.initialValue, // Inicialmente igual
+        currentValue: data.initialValue,
         signingDate: new Date(data.signingDate),
         startDate: new Date(data.startDate),
         endDate: new Date(data.endDate),
         status: ContractStatus.ACTIVE,
         managerId: data.managerId || null,
+        department: data.department || null,
+        observations: data.observations || null,
       },
+    });
+  }
+
+  async update(id: string, data: any) {
+    const contract = await this.prisma.contract.findUnique({ where: { id } });
+    if (!contract) throw new NotFoundException('Contrato não encontrado');
+
+    const updateData: any = {};
+    if (data.currentValue !== undefined) updateData.currentValue = data.currentValue;
+    if (data.endDate) updateData.endDate = new Date(data.endDate);
+    if (data.status) updateData.status = data.status as ContractStatus;
+    if (data.observations !== undefined) updateData.observations = data.observations;
+    if (data.department !== undefined) updateData.department = data.department;
+    if (data.objectDescription) updateData.objectDescription = data.objectDescription;
+
+    return this.prisma.contract.update({ where: { id }, data: updateData });
+  }
+
+  async deactivateAssignment(contractId: string, assignmentId: string) {
+    return this.prisma.fiscalAssignment.update({
+      where: { id: assignmentId },
+      data: { isActive: false, endDate: new Date() },
     });
   }
 

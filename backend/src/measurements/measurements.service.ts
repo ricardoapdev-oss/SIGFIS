@@ -136,4 +136,11 @@ export class MeasurementsService {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  async delete(id: string) {
+    const m = await this.prisma.inspectionMeasurement.findUnique({ where: { id } });
+    if (!m) throw new NotFoundException('Medição não encontrada');
+    await this.prisma.inspectionMeasurement.delete({ where: { id } });
+    return { ok: true };
+  }
 }

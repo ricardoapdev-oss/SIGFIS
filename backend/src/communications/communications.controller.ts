@@ -8,6 +8,11 @@ import { RolesGuard } from '../auth/roles.guard';
 export class CommunicationsController {
   constructor(private readonly communicationsService: CommunicationsService) {}
 
+  @Get('communications/all')
+  findAll(@Req() req) {
+    return this.communicationsService.findAll(req.user.id, req.user.role);
+  }
+
   @Get('contracts/:contractId/communications')
   findByContract(@Param('contractId') contractId: string, @Req() req) {
     return this.communicationsService.findByContract(contractId, req.user.id, req.user.role);

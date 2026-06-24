@@ -6,6 +6,25 @@ import { UserRole } from '@prisma/client';
 export class CommunicationsService {
   constructor(private prisma: PrismaService) {}
 
+  async findAll(userId: string, role: string) {
+    const where = role === UserRole.FISCAL
+      ? { contract: { fiscalAssignments: { some: { fiscalId: userId, isActive: true } } } }
+      : {};
+    return this.prisma.communication.findMany({
+      where,
+      include: {
+        sender: { select: { id: true, name: true, role: true } },
+        recipient: { select: { id: true, name: true } },
+        contract: { select: { id: true, contractNumber: true } },
+        replies: {
+          include: { sender: { select: { id: true, name: true, role: true } } },
+          orderBy: { createdAt: 'asc' },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   async findByContract(contractId: string, userId: string, role: string) {
     if (role === UserRole.FISCAL) {
       const isAssigned = await this.prisma.fiscalAssignment.findFirst({

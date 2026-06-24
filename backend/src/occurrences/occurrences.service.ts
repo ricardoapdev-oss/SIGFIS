@@ -103,4 +103,11 @@ export class OccurrencesService {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  async delete(id: string) {
+    const occ = await this.prisma.occurrence.findUnique({ where: { id } });
+    if (!occ) throw new NotFoundException('Ocorrência não encontrada');
+    await this.prisma.occurrence.delete({ where: { id } });
+    return { ok: true };
+  }
 }

@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Patch, Body, Param, Req, UseGuards } from '@nestjs/common';
 import { AlterationsService } from './alterations.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -16,19 +16,31 @@ export class AlterationsController {
   }
 
   @Post(':id/approve')
-  @Roles(UserRole.GESTOR)
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
   approve(@Param('id') id: string, @Req() req) {
     return this.alterationsService.approve(id, req.user.id);
   }
 
   @Post(':id/reject')
-  @Roles(UserRole.GESTOR)
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
   reject(@Param('id') id: string, @Req() req, @Body() body: any) {
     return this.alterationsService.reject(id, req.user.id, body);
+  }
+
+  @Patch(':id')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR, UserRole.FISCAL)
+  update(@Param('id') id: string, @Body() body: any) {
+    return this.alterationsService.update(id, body);
   }
 
   @Get('contract/:contractId')
   findByContract(@Param('contractId') contractId: string, @Req() req) {
     return this.alterationsService.findByContract(contractId, req.user.id, req.user.role);
+  }
+
+  @Delete(':id')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  delete(@Param('id') id: string) {
+    return this.alterationsService.delete(id);
   }
 }

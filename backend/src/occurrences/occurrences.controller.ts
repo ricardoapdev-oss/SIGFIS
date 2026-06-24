@@ -1,7 +1,9 @@
-import { Controller, Post, Get, Body, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, Param, Req, UseGuards } from '@nestjs/common';
 import { OccurrencesService } from './occurrences.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { UserRole } from '@prisma/client';
 
 @Controller('occurrences')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -21,5 +23,11 @@ export class OccurrencesController {
   @Get('contract/:contractId')
   findByContract(@Param('contractId') contractId: string, @Req() req) {
     return this.occurrencesService.findByContract(contractId, req.user.id, req.user.role);
+  }
+
+  @Delete(':id')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  delete(@Param('id') id: string) {
+    return this.occurrencesService.delete(id);
   }
 }

@@ -185,4 +185,18 @@ export class AlterationsService {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  async update(id: string, data: any) {
+    const alt = await this.prisma.contractAlteration.findUnique({ where: { id } });
+    if (!alt) throw new NotFoundException('Aditivo não encontrado');
+    const { id: _id, contractId: _cid, requesterId: _rid, reviewerId: _rvid, createdAt, updatedAt, ...updateData } = data;
+    return this.prisma.contractAlteration.update({ where: { id }, data: updateData });
+  }
+
+  async delete(id: string) {
+    const alt = await this.prisma.contractAlteration.findUnique({ where: { id } });
+    if (!alt) throw new NotFoundException('Aditivo não encontrado');
+    await this.prisma.contractAlteration.delete({ where: { id } });
+    return { ok: true };
+  }
 }
