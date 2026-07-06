@@ -52,10 +52,6 @@ export class CommunicationsService {
   }
 
   async create(userId: string, role: string, data: any) {
-    if (role === UserRole.ADMIN) {
-      throw new ForbiddenException('Perfil administrativo não pode enviar comunicados');
-    }
-
     const contract = await this.prisma.contract.findUnique({ where: { id: data.contractId } });
     if (!contract) throw new NotFoundException('Contrato não encontrado');
 
@@ -83,7 +79,15 @@ export class CommunicationsService {
       },
     });
 
-    // Marcar como lida se o próprio usuário a enviou
     return communication;
+  }
+
+  async complete(id: string) {
+    const comm = await this.prisma.communication.findUnique({ where: { id } });
+    if (!comm) throw new NotFoundException('Comunicado não encontrado');
+    return this.prisma.communication.update({
+      where: { id },
+      data: { isCompleted: true, completedAt: new Date() },
+    });
   }
 }

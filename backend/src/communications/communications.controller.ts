@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Req, Patch } from '@nestjs/common';
 import { CommunicationsService } from './communications.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -21,5 +21,10 @@ export class CommunicationsController {
   @Post('communications')
   create(@Req() req, @Body() body: any) {
     return this.communicationsService.create(req.user.id, req.user.role, body);
+  }
+
+  @Post('communications/:id/complete')
+  complete(@Param('id') id: string) {
+    return this.communicationsService.complete(id);
   }
 }

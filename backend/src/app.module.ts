@@ -11,6 +11,8 @@ import { OccurrencesModule } from './occurrences/occurrences.module';
 import { MeasurementsModule } from './measurements/measurements.module';
 import { AlterationsModule } from './alterations/alterations.module';
 import { CommunicationsModule } from './communications/communications.module';
+import { PaymentsModule } from './payments/payments.module';
+import { BackupModule } from './backup/backup.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { CommunicationsModule } from './communications/communications.module';
     MeasurementsModule,
     AlterationsModule,
     CommunicationsModule,
+    PaymentsModule,
+    BackupModule,
   ],
   controllers: [AppController],
   providers: [AppService],

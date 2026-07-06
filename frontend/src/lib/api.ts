@@ -91,17 +91,30 @@ export interface ContractAlert {
 
 export type PhaseStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'OVERDUE' | 'BLOCKED';
 
+export interface ChecklistItem { id: string; texto: string; concluido: boolean; }
+
 export interface ProcessPhase {
   id: string; processId: string; phaseNumber: number; name: string; status: PhaseStatus;
   plannedStart?: string; plannedEnd?: string; actualStart?: string; actualEnd?: string;
   responsibleId?: string; observations?: string; isActive: boolean; createdAt: string; updatedAt: string;
   responsible?: User;
+  descricao?: string;
+  responsavelSetor?: string;
+  documentoObrigatorio?: string;
+  prazoDias?: number;
+  pendenciaCritica?: string;
+  checklistItems?: ChecklistItem[];
+  bloqueiaAvancoSemConclusao?: boolean;
+  alertaAtivo?: boolean;
+  observacoes?: string;
 }
 
 export const PHASE_NAMES = [
-  'Planejamento da Contratação', 'Estudo Técnico Preliminar', 'Termo de Referência',
-  'Pesquisa de Preços', 'Aprovação', 'Licitação / Contratação Direta',
-  'Formalização Contratual', 'Execução Contratual', 'Encerramento',
+  'Solicitação da Área Demandante', 'Termo de Referência / Projeto Básico', 'Pesquisa de Preços / Cotações',
+  'Justificativa / Enquadramento Legal', 'Reserva / Saldo Orçamentário', 'Parecer Jurídico',
+  'Ratificação / Autorização da Autoridade', 'Empenho', 'Contrato / Instrumento Equivalente',
+  'Assinatura das Partes', 'Designação do Fiscal / Gestor', 'Publicação / Divulgação',
+  'Início da Execução', 'Entrega / Ateste / Encerramento',
 ];
 
 // ── Tipos de BI / Auditoria / IA ──────────────────────────────────────────────
@@ -498,6 +511,18 @@ function logAudit(db: any, user: User, action: string, entity: string, entityId:
   });
 }
 
+export function writeAuditLog(user: User, action: string, entity: string, entityId: string, entityLabel: string, changes?: Record<string, { from: any; to: any }>) {
+  if (typeof window === 'undefined') return;
+  const db = getLocalDB();
+  if (!db.auditLogs) db.auditLogs = [];
+  db.auditLogs.push({
+    id: `audit-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    userId: user.id, userName: user.name, userRole: user.role,
+    action: action as AuditAction, entity, entityId, entityLabel, changes: changes || {}, createdAt: new Date().toISOString(),
+  });
+  saveLocalDB(db);
+}
+
 function notifyActiveFiscais(db: LocalDB, contractId: string, title: string, message: string) {
   if (!db.contractAlerts) db.contractAlerts = [];
   const now = new Date().toISOString();
@@ -711,7 +736,7 @@ function processAlertResponse(alertId: string, response: ContractAlertResponse, 
 const BACKEND_URL = '/api';
 
 // Endpoints de CRUD real que devem ir direto ao backend (sem fallback localStorage)
-const REAL_CRUD_PREFIXES = ['/auth/', '/users', '/contractors', '/contracts', '/processes', '/occurrences', '/measurements', '/alterations', '/communications'];
+const REAL_CRUD_PREFIXES = ['/auth/', '/users', '/contractors', '/contracts', '/processes', '/occurrences', '/measurements', '/alterations', '/communications', '/payments'];
 
 async function request(endpoint: string, options: RequestInit = {}) {
   const token = getStoredToken();
@@ -735,39 +760,71 @@ async function request(endpoint: string, options: RequestInit = {}) {
 // Endpoints como /dashboard/gestor, /risk-panel e /alerts não existem no backend —
 // são calculados no cliente. Este fallback busca dados reais do backend e computa.
 
+// Cache de módulo: evita múltiplas chamadas simultâneas ao backend (TTL = 5 min)
+let _liveDBCache: { data: LocalDB; ts: number } | null = null;
+let _liveDBInFlight: Promise<LocalDB> | null = null;
+const LIVE_DB_TTL = 300_000;
+
 async function fetchLiveDB(): Promise<LocalDB> {
-  const token = getStoredToken();
-  const h: Record<string, string> = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
-  const get = async (path: string) => {
-    try { const r = await fetch(`${BACKEND_URL}${path}`, { headers: h }); return r.ok ? r.json() : null; }
-    catch { return null; }
-  };
-  const [users, contractors, contracts, processes] = await Promise.all([
-    get('/users'), get('/contractors'), get('/contracts'), get('/processes'),
-  ]);
-  const local = getLocalDB(); // mantém alertas e fases locais como fallback
-  if (users && contracts) {
-    const assignments: FiscalAssignment[] = (contracts as any[]).flatMap((c: any) => c.fiscalAssignments || []);
-    const occurrences: Occurrence[]        = (contracts as any[]).flatMap((c: any) => c.occurrences || []);
-    const measurements: InspectionMeasurement[] = (contracts as any[]).flatMap((c: any) => c.measurements || []);
-    const alterations: ContractAlteration[]     = (contracts as any[]).flatMap((c: any) => c.alterations || []);
-    const processPhases: ProcessPhase[]         = (processes as any[]).flatMap((p: any) => p.phases || []);
-    return {
-      users: users || [], contractors: contractors || [],
-      contracts: contracts || [], processes: processes || [],
-      assignments, occurrences, measurements, alterations,
-      processPhases,
-      contractAlerts: local.contractAlerts || [],
-      communications: (contracts as any[]).flatMap((c: any) => c.communications || []),
-      auditLogs: local.auditLogs || [], aiInsights: local.aiInsights || [],
-    };
-  }
-  return local;
+  const now = Date.now();
+  if (_liveDBCache && now - _liveDBCache.ts < LIVE_DB_TTL) return _liveDBCache.data;
+  if (_liveDBInFlight) return _liveDBInFlight;
+
+  _liveDBInFlight = (async () => {
+    try {
+      const token = getStoredToken();
+      const h: Record<string, string> = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+      const get = async (path: string) => {
+        try { const r = await fetch(`${BACKEND_URL}${path}`, { headers: h }); return r.ok ? r.json() : null; }
+        catch { return null; }
+      };
+      const [users, contractors, contracts, processes] = await Promise.all([
+        get('/users'), get('/contractors'), get('/contracts'), get('/processes'),
+      ]);
+      const local = getLocalDB();
+      let result: LocalDB;
+      if (users && contracts) {
+        const normContracts = (contracts as any[]).map((c: any) => ({
+          ...c,
+          initialValue: Number(c.initialValue) || 0,
+          currentValue: Number(c.currentValue) || 0,
+        }));
+        const normProcesses = (processes as any[] || []).map((p: any) => ({
+          ...p,
+          estimatedValue: Number(p.estimatedValue) || 0,
+        }));
+        const assignments: FiscalAssignment[] = normContracts.flatMap((c: any) => c.fiscalAssignments || []);
+        const occurrences: Occurrence[]        = normContracts.flatMap((c: any) => c.occurrences || []);
+        const measurements: InspectionMeasurement[] = normContracts.flatMap((c: any) =>
+          (c.measurements || []).map((m: any) => ({ ...m, measurementValue: Number(m.measurementValue) || 0 }))
+        );
+        const alterations: ContractAlteration[]     = normContracts.flatMap((c: any) => c.alterations || []);
+        const processPhases: ProcessPhase[]         = normProcesses.flatMap((p: any) => p.phases || []);
+        result = {
+          users: users || [], contractors: contractors || [],
+          contracts: normContracts, processes: normProcesses,
+          assignments, occurrences, measurements, alterations,
+          processPhases,
+          contractAlerts: local.contractAlerts || [],
+          communications: normContracts.flatMap((c: any) => c.communications || []),
+          auditLogs: local.auditLogs || [], aiInsights: local.aiInsights || [],
+          alerts: local.alerts || [], documents: local.documents || [],
+        };
+      } else {
+        result = local;
+      }
+      _liveDBCache = { data: result, ts: Date.now() };
+      return result;
+    } finally {
+      _liveDBInFlight = null;
+    }
+  })();
+  return _liveDBInFlight;
 }
 
 async function handleLocalFallback(endpoint: string, options: RequestInit = {}, originalError: string): Promise<any> {
   // Para endpoints computados, tenta buscar dados reais do backend
-  const isComputed = ['/dashboard', '/risk-panel', '/pending-dashboard'].some(p => endpoint.startsWith(p));
+  const isComputed = ['/dashboard', '/risk-panel', '/pending-dashboard', '/alerts'].some(p => endpoint.startsWith(p));
   const db = isComputed ? await fetchLiveDB() : getLocalDB();
   const user = getStoredUser();
   const method = options.method || 'GET';
@@ -785,15 +842,20 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
 
   if (!user) throw new Error('Não autorizado');
 
-  // Valida que o role do usuário em sessão coincide com o banco (previne elevação de privilégio via edição do localStorage)
-  const dbUser = db.users.find(u => u.id === user.id);
-  if (!dbUser || dbUser.role !== user.role) {
-    setStoredToken(null); setStoredUser(null);
-    throw new Error('Sessão inválida. Faça login novamente.');
-  }
-  if (dbUser.status !== 'ACTIVE') {
-    setStoredToken(null); setStoredUser(null);
-    throw new Error('Usuário inativo. Contate o administrador.');
+  const storedToken = getStoredToken();
+  const isRealBackendToken = storedToken && storedToken !== 'local-jwt-simulated';
+
+  if (!isRealBackendToken) {
+    // Modo offline: valida sessão contra seed local
+    const dbUser = db.users.find(u => u.id === user.id);
+    if (!dbUser || dbUser.role !== user.role) {
+      setStoredToken(null); setStoredUser(null);
+      throw new Error('Sessão inválida. Faça login novamente.');
+    }
+    if (dbUser.status !== 'ACTIVE') {
+      setStoredToken(null); setStoredUser(null);
+      throw new Error('Usuário inativo. Contate o administrador.');
+    }
   }
 
   // ── Alertas ──────────────────────────────────────────────────────────────────
@@ -980,7 +1042,10 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
     if (user.role !== 'GESTOR') throw new Error('Acesso negado');
     const body = JSON.parse(options.body as string);
     const nc: Contract = { id: `cnt-${Date.now()}`, contractNumber: body.contractNumber, processId: body.processId || undefined, contractorId: body.contractorId, objectDescription: body.objectDescription, initialValue: Number(body.initialValue), currentValue: Number(body.initialValue), signingDate: body.signingDate, startDate: body.startDate, endDate: body.endDate, status: 'ACTIVE', managerId: user.id };
-    db.contracts.push(nc); saveLocalDB(db); return nc;
+    db.contracts.push(nc);
+    const contractor = db.contractors.find(ct => ct.id === body.contractorId);
+    logAudit(db, user, 'CREATE', 'Contract', nc.id, `Contrato ${nc.contractNumber} cadastrado — ${contractor?.corporateName || ''}`, new Date().toISOString());
+    saveLocalDB(db); return nc;
   }
 
   if (endpoint.endsWith('/assign-fiscal') && method === 'POST') {
@@ -989,9 +1054,13 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
     const body = JSON.parse(options.body as string);
     const targetFiscal = db.users.find(u => u.id === body.fiscalId);
     if (!targetFiscal || targetFiscal.role !== 'FISCAL') throw new Error('O usuário informado não é um fiscal válido');
-    if (body.role === 'TITULAR' || body.role === 'SUBSTITUTO') db.assignments.forEach(a => { if (a.contractId === contractId && a.role === body.role) a.isActive = false; });
+    db.assignments.forEach(a => { if (a.contractId === contractId && a.role === body.role) a.isActive = false; });
     const na: FiscalAssignment = { id: `asg-${Date.now()}-${Math.random().toString(36).slice(2)}`, contractId, fiscalId: body.fiscalId, role: body.role, designationAct: body.designationAct, designationDate: body.designationDate, startDate: body.startDate, endDate: body.endDate || undefined, isActive: true };
-    db.assignments.push(na); saveLocalDB(db); return na;
+    db.assignments.push(na);
+    const ctr = db.contracts.find(c => c.id === contractId);
+    const roleLabel: Record<string, string> = { TITULAR: 'Titular', SUBSTITUTO: 'Substituto', SUPLENTE: 'Suplente' };
+    logAudit(db, user, 'UPDATE', 'Contract', contractId, `Fiscal designado: ${targetFiscal.name} (${roleLabel[body.role] || body.role}) — ${ctr?.contractNumber || ''}`, new Date().toISOString());
+    saveLocalDB(db); return na;
   }
 
   // ── Medições ──────────────────────────────────────────────────────────────────
@@ -1005,6 +1074,7 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
     db.measurements.push(nm);
     const c = db.contracts.find(c => c.id === body.contractId);
     db.alerts.push({ id: `al-${Date.now()}`, contractId: body.contractId, type: 'MEASUREMENT_PENDING', message: `Medição pendente de ${fmtCur(Number(body.measurementValue))} para o contrato ${c?.contractNumber}.`, targetRole: 'GESTOR', isRead: false, createdAt: new Date().toISOString() });
+    logAudit(db, user, 'CREATE', 'Contract', body.contractId, `Medição registrada: ${fmtDate(body.periodStart)}–${fmtDate(body.periodEnd)} | ${fmtCur(Number(body.measurementValue))} — ${c?.contractNumber || ''}`, new Date().toISOString());
     saveLocalDB(db); return nm;
   }
 
@@ -1013,9 +1083,10 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
     const id = endpoint.split('/')[2];
     const m = db.measurements.find(m => m.id === id);
     if (!m) throw new Error('Medição não encontrada');
+    const cMeas = db.contracts.find(c => c.id === m.contractId);
     m.status = 'APPROVED'; m.approvedById = user.id; m.approvalDate = new Date().toISOString();
-    // Dismiss related overdue alert
     db.contractAlerts.filter(a => a.type === 'MEASUREMENT_OVERDUE' && a.metadata?.measurementId === id).forEach(a => { a.status = 'DISMISSED'; a.updatedAt = new Date().toISOString(); });
+    logAudit(db, user, 'APPROVE', 'Contract', m.contractId, `Medição aprovada: ${fmtCur(m.measurementValue)} — ${cMeas?.contractNumber || ''}`, new Date().toISOString(), { status: { from: 'PENDING_GESTOR', to: 'APPROVED' } });
     saveLocalDB(db); return m;
   }
 
@@ -1025,7 +1096,9 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
     const body = JSON.parse(options.body as string);
     const m = db.measurements.find(m => m.id === id);
     if (!m) throw new Error('Medição não encontrada');
+    const cMeasR = db.contracts.find(c => c.id === m.contractId);
     m.status = 'REJECTED'; m.rejectionReason = body.reason;
+    logAudit(db, user, 'REJECT', 'Contract', m.contractId, `Medição reprovada: ${fmtCur(m.measurementValue)} — ${cMeasR?.contractNumber || ''}`, new Date().toISOString(), { status: { from: 'PENDING_GESTOR', to: 'REJECTED' } });
     saveLocalDB(db); return m;
   }
 
@@ -1038,10 +1111,11 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
     if (!hasAssignment) throw new Error('Você não possui atribuição ativa neste contrato');
     const no: Occurrence = { id: `occ-${Date.now()}-${Math.random().toString(36).slice(2)}`, contractId: body.contractId, fiscalId: user.id, title: body.title, description: body.description, severity: body.severity || 'MEDIUM', status: 'OPEN', createdAt: new Date().toISOString() };
     db.occurrences.push(no);
+    const cOcc = db.contracts.find(c => c.id === body.contractId);
     if (body.severity === 'HIGH' || body.severity === 'CRITICAL') {
-      const c = db.contracts.find(c => c.id === body.contractId);
-      db.alerts.push({ id: `al-${Date.now()}`, contractId: body.contractId, type: 'OCCURRENCE_CRITICAL', message: `Ocorrência ${body.severity} registrada: "${body.title}" — ${c?.contractNumber}.`, targetRole: 'GESTOR', isRead: false, createdAt: new Date().toISOString() });
+      db.alerts.push({ id: `al-${Date.now()}`, contractId: body.contractId, type: 'OCCURRENCE_CRITICAL', message: `Ocorrência ${body.severity} registrada: "${body.title}" — ${cOcc?.contractNumber}.`, targetRole: 'GESTOR', isRead: false, createdAt: new Date().toISOString() });
     }
+    logAudit(db, user, 'CREATE', 'Contract', body.contractId, `Ocorrência registrada: "${body.title}" (${body.severity || 'MEDIUM'}) — ${cOcc?.contractNumber || ''}`, new Date().toISOString());
     saveLocalDB(db); return no;
   }
 
@@ -1051,8 +1125,10 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
     const body = JSON.parse(options.body as string);
     const o = db.occurrences.find(o => o.id === id);
     if (!o) throw new Error('Ocorrência não encontrada');
+    const cOccR = db.contracts.find(c => c.id === o.contractId);
     o.status = 'RESOLVED'; o.resolutionDescription = body.resolutionDescription; o.resolvedById = user.id; o.resolvedAt = new Date().toISOString();
     db.contractAlerts.filter(a => a.type === 'OCCURRENCE_CRITICAL_OPEN' && a.metadata?.occurrenceId === id).forEach(a => { a.status = 'DISMISSED'; a.updatedAt = new Date().toISOString(); });
+    logAudit(db, user, 'UPDATE', 'Contract', o.contractId, `Ocorrência resolvida: "${o.title}" — ${cOccR?.contractNumber || ''}`, new Date().toISOString(), { status: { from: 'OPEN', to: 'RESOLVED' } });
     saveLocalDB(db); return o;
   }
 
@@ -1070,7 +1146,9 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
       if (current + valueChange > limit) throw new Error(`Limite de aditivo excedido. Permitido: ${fmtCur(limit)} (${isReform ? '50%' : '25%'})`);
     }
     const na: ContractAlteration = { id: `alt-${Date.now()}`, contractId: body.contractId, type: body.type, alterationNumber: body.alterationNumber, valueChange, newEndDate: body.newEndDate, justification: body.justification, status: 'PENDING_APPROVAL', requestedById: user.id, createdAt: new Date().toISOString() };
-    db.alterations.push(na); saveLocalDB(db); return na;
+    db.alterations.push(na);
+    logAudit(db, user, 'CREATE', 'Contract', body.contractId, `Aditivo solicitado: ${body.alterationNumber || body.type} ${valueChange !== 0 ? '| ' + fmtCur(valueChange) : ''} — ${contract.contractNumber}`, new Date().toISOString());
+    saveLocalDB(db); return na;
   }
 
   if (endpoint.endsWith('/approve') && endpoint.includes('/alterations/') && method === 'POST') {
@@ -1084,6 +1162,7 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
     c.currentValue = Number(c.currentValue) + Number(alt.valueChange);
     if (alt.newEndDate) { c.endDate = alt.newEndDate; db.contractAlerts.filter(a => a.contractId === c.id && (a.type === 'CONTRACT_EXPIRING_90' || a.type === 'CONTRACT_EXPIRING_180') && a.status === 'PENDING').forEach(a => { a.status = 'DISMISSED'; }); }
     db.contractAlerts.filter(a => a.type === 'ALTERATION_OVERDUE' && a.metadata?.alterationId === id).forEach(a => { a.status = 'DISMISSED'; });
+    logAudit(db, user, 'APPROVE', 'Contract', alt.contractId, `Aditivo aprovado: ${alt.alterationNumber || alt.type} ${alt.valueChange !== 0 ? '| ' + fmtCur(alt.valueChange) : ''} — ${c.contractNumber}`, new Date().toISOString(), { status: { from: 'PENDING_APPROVAL', to: 'APPROVED' } });
     saveLocalDB(db); return alt;
   }
 
@@ -1093,7 +1172,9 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
     const body = JSON.parse(options.body as string);
     const alt = db.alterations.find(a => a.id === id);
     if (!alt) throw new Error('Alteração não encontrada');
+    const cAltR = db.contracts.find(c => c.id === alt.contractId);
     alt.status = 'REJECTED'; alt.reviewedById = user.id; alt.reviewDate = new Date().toISOString(); alt.reviewNotes = body.reason;
+    logAudit(db, user, 'REJECT', 'Contract', alt.contractId, `Aditivo reprovado: ${alt.alterationNumber || alt.type} — ${cAltR?.contractNumber || ''}`, new Date().toISOString(), { status: { from: 'PENDING_APPROVAL', to: 'REJECTED' } });
     saveLocalDB(db); return alt;
   }
 
@@ -1769,6 +1850,8 @@ export const api = {
     delete: (id: string) => request(`/alterations/${id}`, { method: 'DELETE' }),
   },
   contractors: {
+    list: () => request('/contractors'),
+    create: (data: any) => request('/contractors', { method: 'POST', body: JSON.stringify(data) }),
     update: (id: string, data: any) => request(`/contractors/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   },
   assignments: {
@@ -1777,6 +1860,11 @@ export const api = {
   documents: {
     attach: (contractId: string, data: any) => request(`/contracts/${contractId}/documents`, { method: 'POST', body: JSON.stringify(data) }),
     delete: (id: string) => request(`/documents/${id}`, { method: 'DELETE' }),
+  },
+  payments: {
+    create: (data: any) => request('/payments', { method: 'POST', body: JSON.stringify(data) }),
+    listByContract: (contractId: string) => request(`/payments/contract/${contractId}`),
+    delete: (id: string) => request(`/payments/${id}`, { method: 'DELETE' }),
   },
   contracts: {
     list: () => request('/contracts'),

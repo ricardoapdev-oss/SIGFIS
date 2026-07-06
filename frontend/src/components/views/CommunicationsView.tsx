@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -33,7 +33,7 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
   const { data: fiscais } = useQuery({
     queryKey: ['fiscais'],
     queryFn: () => api.utils.getFiscais(),
-    enabled: !!user && user.role === 'GESTOR',
+    enabled: !!user && (user.role === 'GESTOR' || user.role === 'ADMIN'),
   });
 
   const { data: gestores } = useQuery({
@@ -106,12 +106,12 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
 
     return (
       <div key={comm.id} className={`border rounded-xl overflow-hidden transition-all ${
-        comm.isCompleted ? 'bg-zinc-900/10 border-zinc-800/50 opacity-75' : 'bg-zinc-900/20 border-zinc-900'
+        comm.isCompleted ? 'bg-gray-100/10 border-gray-300 opacity-75' : 'bg-gray-100/20 border-gray-200'
       }`}>
         {/* Header do comunicado */}
         <button
-          onClick={() => onNavigate ? onNavigate('details', comm.contractId) : setSelectedComm(isExpanded ? null : comm)}
-          className="w-full text-left p-5 flex justify-between items-start hover:bg-zinc-900/30 transition-colors"
+          onClick={() => setSelectedComm(isExpanded ? null : comm)}
+          className="w-full text-left p-5 flex justify-between items-start hover:bg-gray-100/30 transition-colors"
         >
           <div className="space-y-1">
             <div className="flex items-center gap-2">
@@ -125,53 +125,53 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
                 <span className="text-[9px] bg-violet-500/10 text-violet-400 border border-violet-500/20 px-2 py-0.5 rounded font-bold">COMUNICADO RECEBIDO</span>
               )}
               {comm.isCompleted && (
-                <span className="text-[9px] bg-zinc-800 text-zinc-500 border border-zinc-700 px-2 py-0.5 rounded font-bold flex items-center gap-1">
+                <span className="text-[9px] bg-gray-100 text-gray-500 border border-gray-300 px-2 py-0.5 rounded font-bold flex items-center gap-1">
                   <Archive className="h-2.5 w-2.5" /> Concluído
                 </span>
               )}
             </div>
-            <h4 className="text-xs font-bold text-white">{comm.subject}</h4>
-            <p className="text-[11px] text-zinc-500">
-              De: <span className="text-zinc-400 font-medium">{comm.sender?.name}</span>
-              {comm.recipient && <> → Para: <span className="text-zinc-400 font-medium">{comm.recipient.name}</span></>}
+            <h4 className="text-xs font-bold text-gray-900">{comm.subject}</h4>
+            <p className="text-[11px] text-gray-500">
+              De: <span className="text-gray-500 font-medium">{comm.sender?.name}</span>
+              {comm.recipient && <> → Para: <span className="text-gray-500 font-medium">{comm.recipient.name}</span></>}
               <span className="ml-2">• {formatDateTime(comm.createdAt)}</span>
             </p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
             {replies.length > 0 && (
-              <span className="text-[10px] text-zinc-500">{replies.length} resposta{replies.length > 1 ? 's' : ''}</span>
+              <span className="text-[10px] text-gray-500">{replies.length} resposta{replies.length > 1 ? 's' : ''}</span>
             )}
-            <ChevronRight className={`h-4 w-4 text-zinc-500 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+            <ChevronRight className={`h-4 w-4 text-gray-500 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
           </div>
         </button>
 
         {/* Corpo expandido */}
         {isExpanded && (
-          <div className="border-t border-zinc-900 p-5 space-y-4">
-            <p className="text-xs text-zinc-300 leading-relaxed bg-zinc-950 p-4 rounded-lg border border-zinc-900">
+          <div className="border-t border-gray-200 p-5 space-y-4">
+            <p className="text-xs text-gray-700 leading-relaxed bg-blue-50 p-4 rounded-lg border border-gray-200">
               {comm.message}
             </p>
 
             {/* Respostas */}
             {replies.length > 0 && (
-              <div className="space-y-3 pl-4 border-l-2 border-zinc-800">
+              <div className="space-y-3 pl-4 border-l-2 border-gray-300">
                 {replies.map((reply: any) => (
-                  <div key={reply.id} className="bg-zinc-950 p-3 rounded-lg border border-zinc-900">
-                    <p className="text-[10px] text-zinc-500 mb-1">
-                      <span className="text-zinc-400 font-medium">{reply.sender?.name}</span> • {formatDateTime(reply.createdAt)}
+                  <div key={reply.id} className="bg-blue-50 p-3 rounded-lg border border-gray-200">
+                    <p className="text-[10px] text-gray-500 mb-1">
+                      <span className="text-gray-500 font-medium">{reply.sender?.name}</span> • {formatDateTime(reply.createdAt)}
                     </p>
-                    <p className="text-xs text-zinc-300 leading-relaxed">{reply.message}</p>
+                    <p className="text-xs text-gray-700 leading-relaxed">{reply.message}</p>
                   </div>
                 ))}
               </div>
             )}
 
             {/* Ação: Concluir comunicado (apenas Gestor, apenas ativos) */}
-            {user.role === 'GESTOR' && !comm.isCompleted && (
-              <div className="bg-zinc-950/50 border border-zinc-800 rounded-xl p-3 flex items-center justify-between gap-3">
+            {(user.role === 'GESTOR' || user.role === 'ADMIN') && !comm.isCompleted && (
+              <div className="bg-blue-50/50 border border-gray-300 rounded-xl p-3 flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Encerrar Comunicado</p>
-                  <p className="text-[10px] text-zinc-500 mt-0.5">Marcar como concluído — será movido para a lista de comunicados arquivados</p>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Encerrar Comunicado</p>
+                  <p className="text-[10px] text-gray-500 mt-0.5">Marcar como concluído — será movido para a lista de comunicados arquivados</p>
                 </div>
                 <button
                   onClick={() => {
@@ -189,15 +189,15 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
             )}
 
             {/* Formulário de resposta — Fiscal responde, Gestor também (apenas ativos) */}
-            {!comm.isCompleted && (comm.recipientId === user.id || comm.senderId === user.id || user.role === 'GESTOR') && (
+            {!comm.isCompleted && (comm.recipientId === user.id || comm.senderId === user.id || user.role === 'GESTOR' || user.role === 'ADMIN') && (
               <div className="space-y-2">
-                <label className="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Responder</label>
+                <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider">Responder</label>
                 <textarea
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
                   rows={3}
                   placeholder="Escreva sua resposta..."
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
+                  className="w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
                 />
                 <button
                   disabled={!replyText.trim() || replyMutation.isPending}
@@ -220,9 +220,9 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
 
             {/* Indicação de comunicado concluído */}
             {comm.isCompleted && (
-              <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-3 flex items-center gap-3">
-                <Archive className="h-4 w-4 text-zinc-500 shrink-0" />
-                <p className="text-[10px] text-zinc-500">
+              <div className="bg-gray-100/60 border border-gray-300 rounded-xl p-3 flex items-center gap-3">
+                <Archive className="h-4 w-4 text-gray-500 shrink-0" />
+                <p className="text-[10px] text-gray-500">
                   Comunicado concluído em {comm.completedAt ? formatDateTime(comm.completedAt) : '—'}. As respostas não são mais possíveis.
                 </p>
               </div>
@@ -237,10 +237,10 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-base font-semibold text-white">Central de Comunicados</h2>
-          <p className="text-xs text-zinc-500 mt-0.5">Mensagens oficiais entre Gestor e Fiscais vinculadas aos contratos</p>
+          <h2 className="text-base font-semibold text-gray-900">Central de Comunicados</h2>
+          <p className="text-xs text-gray-500 mt-0.5">Mensagens oficiais entre Gestor e Fiscais vinculadas aos contratos</p>
         </div>
-        {(user.role === 'GESTOR' || user.role === 'ALTA_GESTAO') && (
+        {(user.role === 'GESTOR' || user.role === 'ALTA_GESTAO' || user.role === 'ADMIN') && (
           <button
             onClick={() => setIsNewOpen(true)}
             className="bg-emerald-500 hover:bg-emerald-400 text-zinc-950 px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
@@ -253,16 +253,16 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
 
       {/* Comunicados Ativos */}
       {activeComms.length === 0 && completedComms.length === 0 ? (
-        <div className="bg-zinc-900/10 border border-zinc-900 rounded-xl p-12 text-center">
-          <MessageSquare className="h-10 w-10 text-zinc-600 mx-auto mb-3" />
-          <p className="text-zinc-500 text-sm">Nenhum comunicado registrado.</p>
+        <div className="bg-gray-100/10 border border-gray-200 rounded-xl p-12 text-center">
+          <MessageSquare className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+          <p className="text-gray-500 text-sm">Nenhum comunicado registrado.</p>
         </div>
       ) : (
         <>
           {/* Lista de comunicados ativos */}
           {activeComms.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 inline-block" />
                 Comunicados Ativos ({activeComms.length})
               </h3>
@@ -275,7 +275,7 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
             <div className="space-y-3">
               <button
                 onClick={() => setShowCompleted(v => !v)}
-                className="flex items-center gap-2 text-xs font-bold text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer uppercase tracking-widest"
+                className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-700 transition-colors cursor-pointer uppercase tracking-widest"
               >
                 <Archive className="h-3.5 w-3.5" />
                 Comunicados Concluídos e Arquivados ({completedComms.length})
@@ -283,8 +283,8 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
               </button>
 
               {showCompleted && (
-                <div className="space-y-3 pl-4 border-l-2 border-zinc-800">
-                  <p className="text-[10px] text-zinc-600 italic">
+                <div className="space-y-3 pl-4 border-l-2 border-gray-300">
+                  <p className="text-[10px] text-gray-400 italic">
                     Comunicados encerrados pelo gestor. Mantidos para registro histórico.
                   </p>
                   {completedComms.map(renderComm)}
@@ -297,16 +297,16 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
 
       {/* Modal: Novo Comunicado */}
       {isNewOpen && (
-        <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-zinc-800 w-full max-w-lg rounded-2xl shadow-2xl p-6 relative">
+        <div className="fixed inset-0 bg-blue-50/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-gray-300 w-full max-w-lg rounded-2xl shadow-2xl p-6 relative">
             <button
               onClick={() => setIsNewOpen(false)}
-              className="absolute right-4 top-4 p-1 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+              className="absolute right-4 top-4 p-1 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer"
             >
               <X className="h-4 w-4" />
             </button>
-            <h3 className="text-sm font-bold text-white mb-2">Novo Comunicado Oficial</h3>
-            <p className="text-xs text-zinc-500 mb-5 border-b border-zinc-800 pb-3">Mensagem vinculada a um contrato específico.</p>
+            <h3 className="text-sm font-bold text-gray-900 mb-2">Novo Comunicado Oficial</h3>
+            <p className="text-xs text-gray-500 mb-5 border-b border-gray-300 pb-3">Mensagem vinculada a um contrato específico.</p>
 
             <form
               onSubmit={(e) => {
@@ -321,9 +321,9 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
               className="space-y-4"
             >
               <div>
-                <label className="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">Contrato de Referência</label>
+                <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">Contrato de Referência</label>
                 <select value={fContractId} onChange={(e) => setFContractId(e.target.value)} required
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-emerald-500/50">
+                  className="w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500/50">
                   <option value="">Selecione um contrato...</option>
                   {allContracts.map((c: any) => (
                     <option key={c.id} value={c.id}>{c.contractNumber} — {c.contractor?.tradeName || c.contractor?.corporateName}</option>
@@ -331,11 +331,11 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
                 </select>
               </div>
 
-              {user.role === 'GESTOR' && fiscais && (
+              {(user.role === 'GESTOR' || user.role === 'ADMIN') && fiscais && (
                 <div>
-                  <label className="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">Destinatário (Fiscal)</label>
+                  <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">Destinatário (Fiscal)</label>
                   <select value={fRecipientId} onChange={(e) => setFRecipientId(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-emerald-500/50">
+                    className="w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500/50">
                     <option value="">Todos os fiscais do contrato</option>
                     {(fiscais as any[]).map((f: any) => (
                       <option key={f.id} value={f.id}>{f.name}</option>
@@ -345,9 +345,9 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
               )}
               {user.role === 'ALTA_GESTAO' && (
                 <div>
-                  <label className="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">Destinatário (Gestor) *</label>
+                  <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">Destinatário (Gestor) *</label>
                   <select value={fRecipientId} onChange={(e) => setFRecipientId(e.target.value)} required
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-violet-500/50">
+                    className="w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-500/50">
                     <option value="">Selecione um Gestor...</option>
                     {(gestores as any[] ?? []).map((g: any) => (
                       <option key={g.id} value={g.id}>{g.name}</option>
@@ -357,16 +357,16 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
               )}
 
               <div>
-                <label className="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">Assunto</label>
+                <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">Assunto</label>
                 <input type="text" value={fSubject} onChange={(e) => setFSubject(e.target.value)} required
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
+                  className="w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
                   placeholder="Assunto do comunicado oficial..." />
               </div>
 
               <div>
-                <label className="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">Mensagem</label>
+                <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">Mensagem</label>
                 <textarea value={fMessage} onChange={(e) => setFMessage(e.target.value)} required rows={5}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
+                  className="w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
                   placeholder="Texto da comunicação oficial..." />
               </div>
 

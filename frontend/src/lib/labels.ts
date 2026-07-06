@@ -7,11 +7,11 @@ export const contractStatusLabel: Record<string, string> = {
 };
 
 export const contractStatusColor: Record<string, string> = {
-  DRAFT: 'bg-zinc-800 text-zinc-400 border-zinc-700',
-  ACTIVE: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  SUSPENDED: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  CONCLUDED: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  RESCINDED: 'bg-red-500/10 text-red-400 border-red-500/20',
+  DRAFT: 'bg-slate-100 text-slate-700 border-slate-300',
+  ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  SUSPENDED: 'bg-amber-50 text-amber-700 border-amber-200',
+  CONCLUDED: 'bg-blue-50 text-blue-700 border-blue-200',
+  RESCINDED: 'bg-red-50 text-red-700 border-red-200',
 };
 
 export const processStatusLabel: Record<string, string> = {
@@ -24,12 +24,12 @@ export const processStatusLabel: Record<string, string> = {
 };
 
 export const processStatusColor: Record<string, string> = {
-  PLANNING: 'bg-zinc-800 text-zinc-400 border-zinc-700',
-  LEGAL_REVIEW: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  BIDDING: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  CONTRACT_PREP: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  CONCLUDED: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  CANCELED: 'bg-red-500/10 text-red-400 border-red-500/20',
+  PLANNING: 'bg-slate-100 text-slate-700 border-slate-300',
+  LEGAL_REVIEW: 'bg-purple-50 text-purple-700 border-purple-200',
+  BIDDING: 'bg-blue-50 text-blue-700 border-blue-200',
+  CONTRACT_PREP: 'bg-amber-50 text-amber-700 border-amber-200',
+  CONCLUDED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  CANCELED: 'bg-red-50 text-red-700 border-red-200',
 };
 
 export const modalityLabel: Record<string, string> = {
@@ -48,10 +48,10 @@ export const measurementStatusLabel: Record<string, string> = {
 };
 
 export const measurementStatusColor: Record<string, string> = {
-  PENDING_FISCAL: 'bg-zinc-800 text-zinc-400 border-zinc-700',
-  PENDING_GESTOR: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  APPROVED: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  REJECTED: 'bg-red-500/10 text-red-400 border-red-500/20',
+  PENDING_FISCAL: 'bg-slate-100 text-slate-700 border-slate-300',
+  PENDING_GESTOR: 'bg-amber-50 text-amber-700 border-amber-200',
+  APPROVED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  REJECTED: 'bg-red-50 text-red-700 border-red-200',
 };
 
 export const occurrenceSeverityLabel: Record<string, string> = {
@@ -62,10 +62,10 @@ export const occurrenceSeverityLabel: Record<string, string> = {
 };
 
 export const occurrenceSeverityColor: Record<string, string> = {
-  LOW: 'bg-zinc-800 text-zinc-400 border-zinc-700',
-  MEDIUM: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  HIGH: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-  CRITICAL: 'bg-red-500/10 text-red-400 border-red-500/20',
+  LOW: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  MEDIUM: 'bg-amber-50 text-amber-700 border-amber-200',
+  HIGH: 'bg-orange-50 text-orange-700 border-orange-200',
+  CRITICAL: 'bg-red-50 text-red-700 border-red-200',
 };
 
 export const occurrenceStatusLabel: Record<string, string> = {
@@ -76,10 +76,10 @@ export const occurrenceStatusLabel: Record<string, string> = {
 };
 
 export const occurrenceStatusColor: Record<string, string> = {
-  OPEN: 'bg-red-500/10 text-red-400 border-red-500/20',
-  UNDER_REVIEW: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  RESOLVED: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  REJECTED: 'bg-zinc-800 text-zinc-400 border-zinc-700',
+  OPEN: 'bg-red-50 text-red-700 border-red-200',
+  UNDER_REVIEW: 'bg-amber-50 text-amber-700 border-amber-200',
+  RESOLVED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  REJECTED: 'bg-slate-100 text-slate-700 border-slate-300',
 };
 
 export const alterationTypeLabel: Record<string, string> = {
@@ -99,17 +99,16 @@ export const alterationStatusLabel: Record<string, string> = {
 };
 
 export const alterationStatusColor: Record<string, string> = {
-  DRAFT: 'bg-zinc-800 text-zinc-400 border-zinc-700',
-  PENDING_APPROVAL: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  APPROVED: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  REJECTED: 'bg-red-500/10 text-red-400 border-red-500/20',
+  DRAFT: 'bg-slate-100 text-slate-700 border-slate-300',
+  PENDING_APPROVAL: 'bg-amber-50 text-amber-700 border-amber-200',
+  APPROVED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  REJECTED: 'bg-red-50 text-red-700 border-red-200',
 };
 
 export const fiscalRoleLabel: Record<string, string> = {
   TITULAR: 'Titular',
   SUBSTITUTO: 'Substituto',
-  TECNICO: 'Técnico',
-  ADMINISTRATIVO: 'Administrativo',
+  SUPLENTE: 'Suplente',
 };
 
 export const userRoleLabel: Record<string, string> = {

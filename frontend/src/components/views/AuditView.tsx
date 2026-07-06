@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -12,11 +12,11 @@ const actionConfig: Record<AuditAction, { label: string; color: string; icon: Re
   CREATE:  { label: 'Criação',    color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20', icon: <Edit className="h-3 w-3" /> },
   UPDATE:  { label: 'Alteração', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20',          icon: <Edit className="h-3 w-3" /> },
   DELETE:  { label: 'Exclusão',  color: 'text-red-400 bg-red-500/10 border-red-500/20',             icon: <Trash2 className="h-3 w-3" /> },
-  VIEW:    { label: 'Consulta',  color: 'text-zinc-400 bg-zinc-800 border-zinc-700',                icon: <Eye className="h-3 w-3" /> },
+  VIEW:    { label: 'Consulta',  color: 'text-gray-500 bg-gray-100 border-gray-300',                icon: <Eye className="h-3 w-3" /> },
   APPROVE: { label: 'Aprovação', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20', icon: <CheckCircle className="h-3 w-3" /> },
   REJECT:  { label: 'Rejeição',  color: 'text-red-400 bg-red-500/10 border-red-500/20',             icon: <XCircle className="h-3 w-3" /> },
   LOGIN:   { label: 'Login',     color: 'text-blue-400 bg-blue-500/10 border-blue-500/20',          icon: <LogIn className="h-3 w-3" /> },
-  LOGOUT:  { label: 'Logout',    color: 'text-zinc-400 bg-zinc-800 border-zinc-700',                icon: <LogOut className="h-3 w-3" /> },
+  LOGOUT:  { label: 'Logout',    color: 'text-gray-500 bg-gray-100 border-gray-300',                icon: <LogOut className="h-3 w-3" /> },
 };
 
 const entityLabel: Record<string, string> = {
@@ -61,40 +61,40 @@ export function AuditView({ user }: Props) {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h2 className="text-base font-semibold text-white flex items-center gap-2">
+          <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
             <Shield className="h-4 w-4 text-emerald-400" /> Trilha de Auditoria
           </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">Registro imutável de todas as ações do sistema · Soft delete ativo</p>
+          <p className="text-xs text-gray-500 mt-0.5">Registro imutável de todas as ações do sistema · Soft delete ativo</p>
         </div>
-        <div className="flex items-center gap-2 text-[10px] text-zinc-500 bg-zinc-900/40 border border-zinc-800 px-3 py-1.5 rounded-lg">
+        <div className="flex items-center gap-2 text-[10px] text-gray-500 bg-gray-100/40 border border-gray-300 px-3 py-1.5 rounded-lg">
           <Clock className="h-3 w-3" />
           {logs.length} eventos registrados
         </div>
       </div>
 
       {/* Política de retenção */}
-      <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-4 text-[10px] text-zinc-400 flex flex-wrap gap-4">
+      <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-4 text-[10px] text-gray-500 flex flex-wrap gap-4">
         <span><strong className="text-emerald-400">Soft Delete:</strong> Nenhum registro é apagado fisicamente.</span>
         <span><strong className="text-emerald-400">Imutável:</strong> Histórico de alterações preservado indefinidamente.</span>
         <span><strong className="text-emerald-400">Rastreabilidade:</strong> Quem fez · Quando · O quê.</span>
-        <span><strong className="text-emerald-400">Conformidade:</strong> Lei 13.303/2016 · CGU · TCU.</span>
+        <span><strong className="text-emerald-400">Conformidade:</strong> Lei 13.303/2016 · Decreto 10.433/2024.</span>
       </div>
 
       {/* Filtros */}
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-48">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-500" />
           <input type="text" value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por usuário, entidade..."
-            className="w-full bg-zinc-900/40 border border-zinc-800 rounded-lg pl-9 pr-4 py-2 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/50" />
+            className="w-full bg-gray-100/40 border border-gray-300 rounded-lg pl-9 pr-4 py-2 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500/50" />
         </div>
         <select value={actionFilter} onChange={e => setActionFilter(e.target.value as any)}
-          className="bg-zinc-900/40 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:outline-none cursor-pointer">
+          className="bg-gray-100/40 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-700 focus:outline-none cursor-pointer">
           <option value="">Todas as ações</option>
           {actions.map(a => <option key={a} value={a}>{actionConfig[a]?.label || a}</option>)}
         </select>
         <select value={entityFilter} onChange={e => setEntityFilter(e.target.value)}
-          className="bg-zinc-900/40 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:outline-none cursor-pointer">
+          className="bg-gray-100/40 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-700 focus:outline-none cursor-pointer">
           <option value="">Todas as entidades</option>
           {entities.map(e => <option key={e} value={e}>{entityLabel[e] || e}</option>)}
         </select>
@@ -102,19 +102,19 @@ export function AuditView({ user }: Props) {
 
       {/* Timeline */}
       {isLoading ? (
-        <div className="space-y-3">{[...Array(5)].map((_, i) => <div key={i} className="h-16 bg-zinc-900/40 rounded-xl animate-pulse" />)}</div>
+        <div className="space-y-3">{[...Array(5)].map((_, i) => <div key={i} className="h-16 bg-gray-100/40 rounded-xl animate-pulse" />)}</div>
       ) : filtered.length > 0 ? (
         <div className="relative">
-          <div className="absolute left-5 top-0 bottom-0 w-px bg-zinc-800" />
+          <div className="absolute left-5 top-0 bottom-0 w-px bg-gray-100" />
           <div className="space-y-3">
             {filtered.map((log) => {
               const cfg = actionConfig[log.action];
               return (
                 <div key={log.id} className="relative pl-12">
                   {/* Timeline dot */}
-                  <div className={`absolute left-3.5 top-4 h-3 w-3 rounded-full border-2 border-zinc-950 ${cfg?.color.split(' ').find(c => c.startsWith('bg-')) || 'bg-zinc-700'}`} />
+                  <div className={`absolute left-3.5 top-4 h-3 w-3 rounded-full border-2 border-zinc-950 ${cfg?.color.split(' ').find(c => c.startsWith('bg-')) || 'bg-gray-200'}`} />
 
-                  <div className="bg-zinc-900/20 border border-zinc-900 hover:border-zinc-800 p-4 rounded-xl transition-colors">
+                  <div className="bg-gray-100/20 border border-gray-200 hover:border-gray-300 p-4 rounded-xl transition-colors">
                     <div className="flex flex-wrap justify-between items-start gap-3">
                       <div className="flex items-start gap-3">
                         {/* Action badge */}
@@ -122,18 +122,18 @@ export function AuditView({ user }: Props) {
                           {cfg?.icon} {cfg?.label || log.action}
                         </span>
                         <div>
-                          <p className="text-xs font-semibold text-zinc-300">{log.entityLabel}</p>
-                          <p className="text-[10px] text-zinc-500 mt-0.5">
-                            <span className="text-zinc-400 font-medium">{entityLabel[log.entity] || log.entity}</span>
-                            {log.entityId && <span className="text-zinc-600"> · ID: {log.entityId}</span>}
+                          <p className="text-xs font-semibold text-gray-700">{log.entityLabel}</p>
+                          <p className="text-[10px] text-gray-500 mt-0.5">
+                            <span className="text-gray-500 font-medium">{entityLabel[log.entity] || log.entity}</span>
+                            {log.entityId && <span className="text-gray-400"> · ID: {log.entityId}</span>}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3 shrink-0">
                         <div className="text-right">
-                          <p className="text-[11px] font-semibold text-zinc-300">{log.userName}</p>
-                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded border text-zinc-500 bg-zinc-800 border-zinc-700">{log.userRole}</span>
-                          <p className="text-[10px] text-zinc-600 mt-0.5">{formatDateTime(log.createdAt)}</p>
+                          <p className="text-[11px] font-semibold text-gray-700">{log.userName}</p>
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded border text-gray-500 bg-gray-100 border-gray-300">{log.userRole}</span>
+                          <p className="text-[10px] text-gray-400 mt-0.5">{formatDateTime(log.createdAt)}</p>
                         </div>
                         {isAdmin && (
                           <button
@@ -149,13 +149,13 @@ export function AuditView({ user }: Props) {
 
                     {/* Changes */}
                     {log.changes && Object.keys(log.changes).length > 0 && (
-                      <div className="mt-3 bg-zinc-950/60 border border-zinc-900 rounded-lg p-3 space-y-1">
-                        <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Alterações</p>
+                      <div className="mt-3 bg-blue-50/60 border border-gray-200 rounded-lg p-3 space-y-1">
+                        <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Alterações</p>
                         {Object.entries(log.changes).map(([field, { from, to }]) => (
                           <div key={field} className="flex items-center gap-2 text-[10px]">
-                            <span className="text-zinc-500 uppercase font-bold">{field}:</span>
+                            <span className="text-gray-500 uppercase font-bold">{field}:</span>
                             <span className="bg-red-500/10 text-red-400 px-1.5 py-0.5 rounded line-through">{String(from)}</span>
-                            <span className="text-zinc-600">→</span>
+                            <span className="text-gray-400">→</span>
                             <span className="bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded">{String(to)}</span>
                           </div>
                         ))}
@@ -168,9 +168,9 @@ export function AuditView({ user }: Props) {
           </div>
         </div>
       ) : (
-        <div className="bg-zinc-900/10 border border-zinc-900 rounded-xl p-10 text-center">
-          <Shield className="h-10 w-10 text-zinc-700 mx-auto mb-3" />
-          <p className="text-sm text-zinc-500">Nenhum evento encontrado com os filtros selecionados.</p>
+        <div className="bg-gray-100/10 border border-gray-200 rounded-xl p-10 text-center">
+          <Shield className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+          <p className="text-sm text-gray-500">Nenhum evento encontrado com os filtros selecionados.</p>
         </div>
       )}
     </div>

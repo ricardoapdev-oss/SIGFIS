@@ -1,0 +1,450 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  ADMIN
+  GESTOR
+  FISCAL
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ProcessStatus {
+  PLANNING
+  LEGAL_REVIEW
+  BIDDING
+  CONTRACT_PREP
+  EXECUTION
+  CONCLUDED
+  CANCELED
+}
+
+enum BiddingModality {
+  LICITACAO_13303
+  DISPENSA_13303
+  INEXIGIBILIDADE
+  PREGAO_ELETRONICO
+  OUTROS
+}
+
+enum ContractStatus {
+  DRAFT
+  ACTIVE
+  SUSPENDED
+  CONCLUDED
+  RESCINDED
+}
+
+enum FiscalRole {
+  TITULAR
+  SUBSTITUTO
+  TECNICO
+  ADMINISTRATIVO
+}
+
+enum OccurrenceSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum OccurrenceStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  REJECTED
+}
+
+enum MeasurementStatus {
+  PENDING_FISCAL
+  PENDING_GESTOR
+  APPROVED
+  REJECTED
+}
+
+enum AlterationType {
+  ADDENDUM_VALUE_INCREASE
+  ADDENDUM_VALUE_DECREASE
+  ADDENDUM_TIME_EXTENSION
+  PRICE_REAJUSTE
+  PRICE_REPACTUACAO
+  PRICE_REEQUILIBRIO
+}
+
+enum AlterationStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+}
+
+enum DocumentCategory {
+  CONTRACT_MINUTA
+  CONTRACT_SIGNED
+  FISCAL_PORTARIA
+  MEASUREMENT_REPORT
+  INVOICE_NF
+  OCCURRENCE_EVIDENCE
+  ADDENDUM_SIGNED
+  OTHER
+}
+
+enum AlertType {
+  EXPIRATION_90_DAYS
+  EXPIRATION_60_DAYS
+  EXPIRATION_30_DAYS
+  OCCURRENCE_CRITICAL
+  MEASUREMENT_PENDING
+  CONTRACT_LIMIT_WARNING
+}
+
+enum PhaseStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+  BLOCKED
+}
+
+enum WorkflowItemType {
+  DOCUMENT
+  ACTION
+}
+
+enum WorkflowItemStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  WAIVED
+}
+
+enum WorkflowTargetRole {
+  GESTOR
+  FISCAL
+}
+
+model User {
+  id                 String             @id @default(uuid()) @db.Uuid
+  name               String             @db.VarChar(255)
+  email              String             @unique @db.VarChar(255)
+  passwordHash       String             @db.VarChar(255)
+  role               UserRole
+  status             UserStatus         @default(ACTIVE)
+  registrationNumber String?            @unique @db.VarChar(50)
+  createdAt          DateTime           @default(now()) @db.Timestamptz
+  updatedAt          DateTime           @updatedAt @db.Timestamptz
+
+  procurementProcesses ProcurementProcess[] @relation("ProcurementRequester")
+  responsibleProcesses ProcurementProcess[] @relation("ProcessResponsibleFiscal")
+  managedContracts     Contract[]           @relation("ContractManager")
+  fiscalAssignments    FiscalAssignment[]
+  occurrences          Occurrence[]         @relation("OccurrenceFiscal")
+  resolvedOccurrences  Occurrence[]         @relation("OccurrenceResolver")
+  measurements         InspectionMeasurement[] @relation("MeasurementFiscal")
+  approvedMeasurements InspectionMeasurement[] @relation("MeasurementApprover")
+  requestedAlterations ContractAlteration[] @relation("AlterationRequester")
+  reviewedAlterations  ContractAlteration[] @relation("AlterationReviewer")
+  documents            Document[]
+  sentCommunications   Communication[]      @relation("CommunicationSender")
+  receivedCommunications Communication[]    @relation("CommunicationRecipient")
+  processPhases        ProcessPhase[]       @relation("PhaseResponsible")
+
+  @@map("users")
+}
+
+model Contractor {
+  id                   String     @id @default(uuid()) @db.Uuid
+  corporateName        String     @db.VarChar(255)
+  tradeName            String?    @db.VarChar(255)
+  cnpjCpf              String     @unique @db.VarChar(20)
+  email                String     @db.VarChar(255)
+  phone                String?    @db.VarChar(20)
+  postalCode           String?    @db.VarChar(10)
+  addressStreet        String?    @db.VarChar(255)
+  addressNumber        String?    @db.VarChar(20)
+  addressNeighborhood  String?    @db.VarChar(100)
+  addressCity          String?    @db.VarChar(100)
+  addressState         String?    @db.VarChar(2)
+  stateInscription     String?    @db.VarChar(50)
+  municipalInscription String?    @db.VarChar(50)
+  createdAt            DateTime   @default(now()) @db.Timestamptz
+  updatedAt            DateTime   @updatedAt @db.Timestamptz
+
+  contracts            Contract[]
+
+  @@map("contractors")
+}
+
+model ProcurementProcess {
+  id                  String          @id @default(uuid()) @db.Uuid
+  processNumber       String          @unique @db.VarChar(100)
+  subject             String          @db.VarChar(500)
+  description         String?         @db.Text
+  status              ProcessStatus   @default(PLANNING)
+  modality            BiddingModality
+  estimatedValue      Decimal         @db.Decimal(15, 2)
+  requesterDepartment String          @db.VarChar(100)
+  requesterId         String          @db.Uuid
+  responsibleFiscalId String?         @db.Uuid
+  relatedProcessNumbers String[]      @default([])
+  legalBasis          String?         @db.VarChar(255)
+  contractReference   String?         @db.VarChar(150)
+  currentAddendum     String?         @db.VarChar(150)
+  fiscalOrdinance     String?         @db.VarChar(150)
+  observation         String?         @db.Text
+  createdAt           DateTime        @default(now()) @db.Timestamptz
+  updatedAt           DateTime        @updatedAt @db.Timestamptz
+
+  requester           User            @relation("ProcurementRequester", fields: [requesterId], references: [id])
+  responsibleFiscal   User?           @relation("ProcessResponsibleFiscal", fields: [responsibleFiscalId], references: [id])
+  contracts           Contract[]
+  documents           Document[]
+  phases              ProcessPhase[]
+  workflowItems       ProcessWorkflowItem[]
+
+  @@map("procurement_processes")
+}
+
+model Contract {
+  id                String             @id @default(uuid()) @db.Uuid
+  contractNumber    String             @db.VarChar(100)
+  processId         String?            @db.Uuid
+  contractorId      String             @db.Uuid
+  objectDescription String             @db.Text
+  initialValue      Decimal            @db.Decimal(15, 2)
+  currentValue      Decimal            @db.Decimal(15, 2)
+  worksheetOrder    Int?
+  amendmentSummary  String?            @db.VarChar(150)
+  monthlyValue      Decimal?           @db.Decimal(15, 2)
+  outstandingBalance Decimal?          @db.Decimal(15, 2)
+  observation       String?            @db.Text
+  signingDate       DateTime           @db.Date
+  startDate         DateTime           @db.Date
+  endDate           DateTime           @db.Date
+  status            ContractStatus     @default(DRAFT)
+  managerId         String?            @db.Uuid
+  createdAt         DateTime           @default(now()) @db.Timestamptz
+  updatedAt         DateTime           @updatedAt @db.Timestamptz
+
+  process           ProcurementProcess? @relation(fields: [processId], references: [id])
+  contractor        Contractor         @relation(fields: [contractorId], references: [id])
+  manager           User?              @relation("ContractManager", fields: [managerId], references: [id])
+  fiscalAssignments FiscalAssignment[]
+  occurrences       Occurrence[]
+  measurements      InspectionMeasurement[]
+  alterations       ContractAlteration[]
+  documents         Document[]
+  communications    Communication[]
+  alerts            SystemAlert[]
+
+  @@index([managerId], map: "idx_contracts_manager")
+  @@index([contractorId], map: "idx_contracts_contractor")
+  @@index([contractNumber], map: "idx_contracts_number")
+  @@map("contracts")
+}
+
+model ProcessPhase {
+  id            String      @id @default(uuid()) @db.Uuid
+  processId     String      @db.Uuid
+  phaseNumber   Int
+  name          String      @db.VarChar(150)
+  status        PhaseStatus @default(PENDING)
+  plannedStart  DateTime?   @db.Date
+  plannedEnd    DateTime?   @db.Date
+  actualStart   DateTime?   @db.Date
+  actualEnd     DateTime?   @db.Date
+  responsibleId String?     @db.Uuid
+  observations  String?     @db.Text
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now()) @db.Timestamptz
+  updatedAt     DateTime    @updatedAt @db.Timestamptz
+
+  process       ProcurementProcess   @relation(fields: [processId], references: [id], onDelete: Cascade)
+  responsible   User?                @relation("PhaseResponsible", fields: [responsibleId], references: [id])
+  workflowItems ProcessWorkflowItem[]
+
+  @@unique([processId, phaseNumber], name: "unique_process_phase_number")
+  @@index([responsibleId], map: "idx_process_phases_responsible")
+  @@map("process_phases")
+}
+
+model ProcessWorkflowItem {
+  id          String             @id @default(uuid()) @db.Uuid
+  processId   String             @db.Uuid
+  phaseId     String?            @db.Uuid
+  title       String             @db.VarChar(180)
+  description String?            @db.Text
+  type        WorkflowItemType
+  targetRole  WorkflowTargetRole
+  status      WorkflowItemStatus @default(PENDING)
+  isRequired  Boolean            @default(true)
+  dueDate     DateTime?          @db.Date
+  createdAt   DateTime           @default(now()) @db.Timestamptz
+  updatedAt   DateTime           @updatedAt @db.Timestamptz
+
+  process     ProcurementProcess @relation(fields: [processId], references: [id], onDelete: Cascade)
+  phase       ProcessPhase?      @relation(fields: [phaseId], references: [id], onDelete: SetNull)
+
+  @@index([processId, status], map: "idx_process_workflow_items_process_status")
+  @@map("process_workflow_items")
+}
+
+model FiscalAssignment {
+  id             String     @id @default(uuid()) @db.Uuid
+  contractId     String     @db.Uuid
+  fiscalId       String     @db.Uuid
+  role           FiscalRole @default(TITULAR)
+  designationAct String     @db.VarChar(150)
+  designationDate DateTime   @db.Date
+  startDate      DateTime   @db.Date
+  endDate        DateTime?  @db.Date
+  isActive       Boolean    @default(true)
+  createdAt      DateTime   @default(now()) @db.Timestamptz
+  updatedAt      DateTime   @updatedAt @db.Timestamptz
+
+  contract       Contract   @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  fiscal         User       @relation(fields: [fiscalId], references: [id])
+
+  @@unique([contractId, fiscalId, role], name: "unique_fiscal_contract_role")
+  @@index([fiscalId], map: "idx_fiscal_assignments_fiscal")
+  @@map("fiscal_assignments")
+}
+
+model Occurrence {
+  id                    String             @id @default(uuid()) @db.Uuid
+  contractId            String             @db.Uuid
+  fiscalId              String             @db.Uuid
+  title                 String             @db.VarChar(255)
+  description           String             @db.Text
+  severity              OccurrenceSeverity @default(MEDIUM)
+  status                OccurrenceStatus   @default(OPEN)
+  resolutionDescription String?            @db.Text
+  resolvedById          String?            @db.Uuid
+  resolvedAt            DateTime?          @db.Timestamptz
+  createdAt             DateTime           @default(now()) @db.Timestamptz
+  updatedAt             DateTime           @updatedAt @db.Timestamptz
+
+  contract              Contract           @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  fiscal                User               @relation("OccurrenceFiscal", fields: [fiscalId], references: [id])
+  resolver              User?              @relation("OccurrenceResolver", fields: [resolvedById], references: [id])
+  documents             Document[]
+
+  @@index([contractId, severity], map: "idx_occurrences_contract_severity")
+  @@map("occurrences")
+}
+
+model InspectionMeasurement {
+  id                 String            @id @default(uuid()) @db.Uuid
+  contractId         String            @db.Uuid
+  fiscalId           String            @db.Uuid
+  periodStart        DateTime          @db.Date
+  periodEnd          DateTime          @db.Date
+  measurementValue   Decimal           @db.Decimal(15, 2)
+  reportDescription  String            @db.Text
+  status             MeasurementStatus @default(PENDING_FISCAL)
+  approvedById       String?           @db.Uuid
+  approvalDate       DateTime?         @db.Timestamptz
+  rejectionReason    String?           @db.Text
+  createdAt          DateTime          @default(now()) @db.Timestamptz
+  updatedAt          DateTime          @updatedAt @db.Timestamptz
+
+  contract           Contract          @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  fiscal             User              @relation("MeasurementFiscal", fields: [fiscalId], references: [id])
+  approver           User?             @relation("MeasurementApprover", fields: [approvedById], references: [id])
+  documents          Document[]
+
+  @@index([contractId], map: "idx_measurements_contract")
+  @@map("inspections_measurements")
+}
+
+model ContractAlteration {
+  id                  String           @id @default(uuid()) @db.Uuid
+  contractId          String           @db.Uuid
+  type                AlterationType
+  alterationNumber    String?          @db.VarChar(50)
+  valueChange         Decimal          @default(0.00) @db.Decimal(15, 2)
+  newEndDate          DateTime?        @db.Date
+  justification       String           @db.Text
+  status              AlterationStatus @default(DRAFT)
+  requestedById       String           @db.Uuid
+  reviewedById        String?          @db.Uuid
+  reviewDate          DateTime?        @db.Timestamptz
+  reviewNotes         String?          @db.Text
+  createdAt           DateTime         @default(now()) @db.Timestamptz
+  updatedAt           DateTime         @updatedAt @db.Timestamptz
+
+  contract            Contract         @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  requester           User             @relation("AlterationRequester", fields: [requestedById], references: [id])
+  reviewer            User?            @relation("AlterationReviewer", fields: [reviewedById], references: [id])
+
+  @@index([contractId], map: "idx_alterations_contract")
+  @@map("contract_alterations")
+}
+
+model Document {
+  id            String           @id @default(uuid()) @db.Uuid
+  contractId    String?          @db.Uuid
+  processId     String?          @db.Uuid
+  occurrenceId  String?          @db.Uuid
+  measurementId String?          @db.Uuid
+  category      DocumentCategory
+  title         String           @db.VarChar(255)
+  fileKey       String           @db.VarChar(255)
+  fileSize      Int
+  mimeType      String           @db.VarChar(100)
+  uploadedById  String           @db.Uuid
+  createdAt     DateTime         @default(now()) @db.Timestamptz
+
+  contract      Contract?        @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  process       ProcurementProcess? @relation(fields: [processId], references: [id], onDelete: Cascade)
+  occurrence    Occurrence?      @relation(fields: [occurrenceId], references: [id], onDelete: Cascade)
+  measurement   InspectionMeasurement? @relation(fields: [measurementId], references: [id], onDelete: Cascade)
+  uploadedBy    User             @relation(fields: [uploadedById], references: [id])
+
+  @@map("documents")
+}
+
+model Communication {
+  id           String    @id @default(uuid()) @db.Uuid
+  contractId   String    @db.Uuid
+  senderId     String    @db.Uuid
+  recipientId  String?   @db.Uuid
+  subject      String    @db.VarChar(255)
+  message      String    @db.Text
+  parentId     String?   @db.Uuid
+  readAt       DateTime? @db.Timestamptz
+  createdAt    DateTime  @default(now()) @db.Timestamptz
+
+  contract     Contract  @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  sender       User      @relation("CommunicationSender", fields: [senderId], references: [id])
+  recipient    User?     @relation("CommunicationRecipient", fields: [recipientId], references: [id])
+  parent       Communication? @relation("CommunicationReplies", fields: [parentId], references: [id])
+  replies      Communication[] @relation("CommunicationReplies")
+
+  @@map("communications")
+}
+
+model SystemAlert {
+  id         String    @id @default(uuid()) @db.Uuid
+  contractId String?   @db.Uuid
+  type       AlertType
+  message    String    @db.VarChar(500)
+  targetRole UserRole
+  isRead     Boolean   @default(false)
+  createdAt  DateTime  @default(now()) @db.Timestamptz
+
+  contract   Contract? @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([targetRole], map: "idx_system_alerts_unread")
+  @@map("system_alerts")
+}

@@ -29,9 +29,9 @@ const statusColor: Record<string, string> = {
 };
 
 const thS: CSSProperties = {
-  padding: '3px 4px',
-  fontSize: '5.5pt',
-  fontWeight: 700,
+  padding: '4px 5px',
+  fontSize: '7pt',
+  fontWeight: 800,
   textTransform: 'uppercase',
   letterSpacing: '0.03em',
   textAlign: 'center',
@@ -42,13 +42,13 @@ const thS: CSSProperties = {
   overflow: 'hidden',
 };
 const tdS: CSSProperties = {
-  padding: '2.5px 4px',
+  padding: '4px 5px',
   verticalAlign: 'top',
-  borderBottom: '1px solid #e5e7eb',
-  borderRight: '1px solid #f3f4f6',
-  lineHeight: '1.35',
-  fontSize: '5.5pt',
-  color: '#111827',
+  borderBottom: '1px solid #d1d5db',
+  borderRight: '1px solid #e5e7eb',
+  lineHeight: '1.4',
+  fontSize: '7pt',
+  color: '#0f172a',
   overflow: 'hidden',
   wordBreak: 'break-word',
 };
@@ -69,8 +69,15 @@ export function ContractReport({ user, onClose }: Props) {
   })();
 
   const sorted = (contracts || []).sort((a, b) => {
-    const order = ['ACTIVE','SUSPENDED','EXPIRED','RESCINDED','CONCLUDED'];
-    return order.indexOf(a.status) - order.indexOf(b.status) || a.contractNumber.localeCompare(b.contractNumber);
+    const parse = (str: string) => {
+      if (!str) return { n: 0, y: 0 };
+      const p = str.split('/');
+      return p.length === 2 ? { n: parseInt(p[0]) || 0, y: parseInt(p[1]) || 0 } : { n: 0, y: 0 };
+    };
+    const pA = parse(a.contractNumber);
+    const pB = parse(b.contractNumber);
+    if (pA.y !== pB.y) return pB.y - pA.y;
+    return pB.n - pA.n;
   });
   const activeCount   = sorted.filter(c => c.status === 'ACTIVE').length;
   const totalValue    = sorted.reduce((s, c) => s + Number(c.currentValue), 0);
@@ -108,11 +115,13 @@ export function ContractReport({ user, onClose }: Props) {
       }
     `;
     document.head.appendChild(el);
-    window.print();
-    window.addEventListener('afterprint', () => {
-      document.getElementById('sigfis-report-print-style')?.remove();
-      document.getElementById('sigfis-print-portal')?.remove();
-    }, { once: true });
+    setTimeout(() => {
+      window.print();
+      window.addEventListener('afterprint', () => {
+        document.getElementById('sigfis-report-print-style')?.remove();
+        document.getElementById('sigfis-print-portal')?.remove();
+      }, { once: true });
+    }, 100);
   };
 
   return (
@@ -274,13 +283,13 @@ function ReportContent({ contracts, user, emissionDate, emissionTime, periodLabe
       {/* ══ TABELA PRINCIPAL ══════════════════════════════════════════════════ */}
       <div style={{ padding: '3mm 10mm 5mm' }}>
         <div style={{
-          fontSize: '7pt', fontWeight: 800, color: '#1e3a8a', marginBottom: '2.5mm',
+          fontSize: '8pt', fontWeight: 800, color: '#1e3a8a', marginBottom: '2.5mm',
           paddingBottom: '1.5mm', borderBottom: '2px solid #1e3a8a',
           textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', justifyContent: 'space-between',
         }}>
           <span>Relação de Contratos Administrativos</span>
-          <span style={{ fontSize: '6pt', color: '#6b7280', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>
-            Ordenado por situação e número do contrato · Todos os valores em R$
+          <span style={{ fontSize: '7pt', color: '#4b5563', fontWeight: 500, textTransform: 'none', letterSpacing: 0 }}>
+            Ordenado por número do contrato (Mais recentes primeiro) · Todos os valores em R$
           </span>
         </div>
 

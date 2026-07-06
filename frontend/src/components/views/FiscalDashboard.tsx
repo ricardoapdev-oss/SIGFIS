@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -46,7 +46,7 @@ function CountCard({ label, value, icon, accent, onClick }: {
         <div className={`p-2.5 rounded-lg border ${cfg.icon}`}>{icon}</div>
         {value > 0 && <span className={`h-2 w-2 rounded-full ${cfg.dot} animate-pulse mt-0.5`} />}
       </div>
-      <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">{label}</p>
+      <p className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">{label}</p>
       <p className={`text-3xl font-bold mt-1 tabular-nums ${cfg.num}`}>{value}</p>
     </button>
   );
@@ -71,24 +71,24 @@ function ContractCard({ contract, onClick }: { contract: any; onClick: () => voi
 
   return (
     <button onClick={onClick}
-      className="w-full text-left bg-zinc-900/20 border border-zinc-900/80 hover:border-zinc-800 p-4 rounded-xl transition-all group cursor-pointer">
+      className="w-full text-left bg-gray-100/20 border border-gray-200 hover:border-gray-300 p-4 rounded-xl transition-all group cursor-pointer">
       <div className="flex justify-between items-start gap-3 mb-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-bold text-zinc-500">{contract.contractNumber}</span>
-            <span className="text-[9px] font-bold text-zinc-400 bg-zinc-800 border border-zinc-700 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-bold text-gray-500">{contract.contractNumber}</span>
+            <span className="text-[9px] font-bold text-gray-500 bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded">
               {statusLabels[contract.status] ?? contract.status}
             </span>
           </div>
-          <p className="text-xs font-semibold text-zinc-200 group-hover:text-white transition-colors line-clamp-1">
+          <p className="text-xs font-semibold text-gray-800 group-hover:text-gray-900 transition-colors line-clamp-1">
             {contract.objectDescription}
           </p>
-          <p className="text-[10px] text-zinc-500 mt-0.5 truncate">
+          <p className="text-[10px] text-gray-500 mt-0.5 truncate">
             {(contract.contractor as any)?.tradeName || (contract.contractor as any)?.corporateName || '—'}
           </p>
         </div>
         <div className="text-right shrink-0">
-          <p className="text-xs font-bold text-zinc-300">{formatCurrency(contract.currentValue)}</p>
+          <p className="text-xs font-bold text-gray-700">{formatCurrency(contract.currentValue)}</p>
           <span className={`text-[9px] font-bold px-2 py-0.5 rounded border block mt-1 ${urgencyCfg.badge}`}>
             {urgencyCfg.label}
           </span>
@@ -96,13 +96,13 @@ function ContractCard({ contract, onClick }: { contract: any; onClick: () => voi
       </div>
 
       {/* Barra de urgência */}
-      <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
+      <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
         <div className={`h-full ${urgencyCfg.bar} rounded-full transition-all`} style={{ width: `${urgencyCfg.pct}%` }} />
       </div>
 
       <div className="flex items-center justify-between mt-2">
-        <span className="text-[9px] text-zinc-600">Vence {formatDate(contract.endDate)}</span>
-        <ChevronRight className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+        <span className="text-[9px] text-gray-400">Vence {formatDate(contract.endDate)}</span>
+        <ChevronRight className="h-3.5 w-3.5 text-gray-400 group-hover:text-gray-500 transition-colors" />
       </div>
     </button>
   );
@@ -118,7 +118,7 @@ function AlertBadge({ alert }: { alert: ContractAlert }) {
     PROCESS_PHASE_OVERDUE:    'bg-amber-500/8 border-amber-500/25 text-amber-400',
     COMMUNICATION_MANDATORY:  'bg-blue-500/8 border-blue-500/25 text-blue-400',
   };
-  const cls = severityCfg[alert.type] ?? 'bg-zinc-900/40 border-zinc-800 text-zinc-400';
+  const cls = severityCfg[alert.type] ?? 'bg-gray-100/40 border-gray-300 text-gray-500';
 
   return (
     <div className={`${cls} border rounded-xl p-3`}>
@@ -165,25 +165,25 @@ function ProcessItem({ process, onClick }: { process: any; onClick: () => void }
     PLANNING:    'bg-blue-500/10 border-blue-500/20 text-blue-400',
     IN_PROGRESS: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
     CONCLUDED:   'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
-    CANCELED:    'bg-zinc-800 border-zinc-700 text-zinc-500',
+    CANCELED:    'bg-gray-100 border-gray-300 text-gray-500',
   };
   const statusLabel: Record<string, string> = {
     PLANNING: 'Planejamento', IN_PROGRESS: 'Em Andamento', CONCLUDED: 'Concluído', CANCELED: 'Cancelado',
   };
   return (
     <button onClick={onClick}
-      className="w-full text-left bg-zinc-900/20 border border-zinc-900/80 hover:border-zinc-800 p-3 rounded-xl transition-colors group cursor-pointer flex justify-between items-center">
+      className="w-full text-left bg-gray-100/20 border border-gray-200 hover:border-gray-300 p-3 rounded-xl transition-colors group cursor-pointer flex justify-between items-center">
       <div className="min-w-0">
-        <span className="text-[10px] text-zinc-500 block">{process.processNumber}</span>
-        <p className="text-xs font-semibold text-zinc-300 group-hover:text-white transition-colors line-clamp-1">
+        <span className="text-[10px] text-gray-500 block">{process.processNumber}</span>
+        <p className="text-xs font-semibold text-gray-700 group-hover:text-gray-900 transition-colors line-clamp-1">
           {process.subject}
         </p>
       </div>
       <div className="flex items-center gap-2 shrink-0 ml-3">
-        <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${statusCfg[process.status] ?? 'bg-zinc-800 border-zinc-700 text-zinc-400'}`}>
+        <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${statusCfg[process.status] ?? 'bg-gray-100 border-gray-300 text-gray-500'}`}>
           {statusLabel[process.status] ?? process.status}
         </span>
-        <ChevronRight className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+        <ChevronRight className="h-3.5 w-3.5 text-gray-400 group-hover:text-gray-500 transition-colors" />
       </div>
     </button>
   );
@@ -196,13 +196,13 @@ function CommCard({ comm, onClick }: { comm: any; onClick: () => void }) {
       className={`w-full text-left p-3 rounded-xl border transition-colors cursor-pointer ${
         comm.isMandatory
           ? 'bg-red-500/5 border-red-500/20 hover:border-red-500/40'
-          : 'bg-zinc-900/20 border-zinc-900/80 hover:border-zinc-800'
+          : 'bg-gray-100/20 border-gray-200 hover:border-gray-300'
       }`}>
       {comm.isMandatory && (
         <span className="text-[9px] font-bold text-red-400 uppercase block mb-1">Obrigatório</span>
       )}
-      <p className="text-[11px] font-semibold text-zinc-300 line-clamp-1">{comm.subject}</p>
-      <p className="text-[10px] text-zinc-500 mt-0.5">{(comm.sender as any)?.name}</p>
+      <p className="text-[11px] font-semibold text-gray-700 line-clamp-1">{comm.subject}</p>
+      <p className="text-[10px] text-gray-500 mt-0.5">{(comm.sender as any)?.name}</p>
     </button>
   );
 }
@@ -211,10 +211,10 @@ function CommCard({ comm, onClick }: { comm: any; onClick: () => void }) {
 function SectionHeader({ title, icon, count }: { title: string; icon: React.ReactNode; count?: number }) {
   return (
     <div className="flex items-center gap-2 mb-3">
-      <span className="text-zinc-500">{icon}</span>
-      <h3 className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">{title}</h3>
+      <span className="text-gray-500">{icon}</span>
+      <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">{title}</h3>
       {count !== undefined && count > 0 && (
-        <span className="text-[9px] font-bold bg-zinc-800 text-zinc-400 border border-zinc-700 px-1.5 py-0.5 rounded-full tabular-nums">
+        <span className="text-[9px] font-bold bg-gray-100 text-gray-500 border border-gray-300 px-1.5 py-0.5 rounded-full tabular-nums">
           {count}
         </span>
       )}
@@ -232,8 +232,8 @@ function UrgencyBar({ contracts }: { contracts: any[] }) {
   if (contracts.length === 0) return null;
 
   return (
-    <div className="bg-zinc-900/40 border border-zinc-900 rounded-xl p-4 mb-5">
-      <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Situação da Carteira</p>
+    <div className="bg-gray-100/40 border border-gray-200 rounded-xl p-4 mb-5">
+      <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">Situação da Carteira</p>
       <div className="flex gap-2 h-2 rounded-full overflow-hidden">
         {expired > 0 && <div className="bg-red-600 rounded-full" style={{ flex: expired }} />}
         {critical > 0 && <div className="bg-red-500" style={{ flex: critical }} />}
@@ -256,16 +256,16 @@ export function FiscalDashboard({ user, onNavigate }: Props) {
     queryKey: ['dashboard-fiscal', user.id],
     queryFn: () => api.dashboard.fiscal(),
     enabled: !!user,
-    staleTime: 30_000,
+    staleTime: 300_000,
   });
 
   if (isLoading) {
     return (
       <div className="space-y-5 max-w-7xl mx-auto">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-28 bg-zinc-900/40 rounded-xl animate-pulse" />)}
+          {[...Array(4)].map((_, i) => <div key={i} className="h-28 bg-gray-100/40 rounded-xl animate-pulse" />)}
         </div>
-        {[...Array(3)].map((_, i) => <div key={i} className="h-40 bg-zinc-900/40 rounded-xl animate-pulse" />)}
+        {[...Array(3)].map((_, i) => <div key={i} className="h-40 bg-gray-100/40 rounded-xl animate-pulse" />)}
       </div>
     );
   }
@@ -291,8 +291,8 @@ export function FiscalDashboard({ user, onNavigate }: Props) {
       {/* ── Header ── */}
       <div className="flex justify-between items-start">
         <div>
-          <h2 className="text-base font-semibold text-white">{greeting}, {firstName}</h2>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          <h2 className="text-base font-semibold text-gray-900">{greeting}, {firstName}</h2>
+          <p className="text-xs text-gray-500 mt-0.5">
             Painel de Fiscalização · {user.registrationNumber}
             {criticalAlerts.length > 0 && (
               <span className="ml-2 text-red-400 font-semibold animate-pulse">
@@ -374,10 +374,10 @@ export function FiscalDashboard({ user, onNavigate }: Props) {
                 }
               </div>
             ) : (
-              <div className="bg-zinc-900/10 border border-zinc-900 rounded-xl p-10 text-center">
-                <FileText className="h-8 w-8 text-zinc-700 mx-auto mb-2" />
-                <p className="text-xs text-zinc-500 font-semibold">Nenhum contrato designado</p>
-                <p className="text-[10px] text-zinc-600 mt-1">Aguarde designação pelo gestor</p>
+              <div className="bg-gray-100/10 border border-gray-200 rounded-xl p-10 text-center">
+                <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-xs text-gray-500 font-semibold">Nenhum contrato designado</p>
+                <p className="text-[10px] text-gray-400 mt-1">Aguarde designação pelo gestor</p>
               </div>
             )}
           </div>
@@ -400,7 +400,7 @@ export function FiscalDashboard({ user, onNavigate }: Props) {
 
           {/* Status rápido de pendências */}
           {totalPending > 0 && (
-            <div className="bg-zinc-900/20 border border-zinc-900 rounded-xl p-4">
+            <div className="bg-gray-100/20 border border-gray-200 rounded-xl p-4">
               <SectionHeader title="Resumo de Pendências" icon={<Activity className="h-3.5 w-3.5" />} />
               <div className="grid grid-cols-3 gap-3">
                 <button onClick={() => onNavigate('contracts', undefined, 'pending_measurements')}
@@ -449,7 +449,7 @@ export function FiscalDashboard({ user, onNavigate }: Props) {
               <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-5 text-center">
                 <CheckCircle className="h-6 w-6 text-emerald-500 mx-auto mb-2" />
                 <p className="text-[11px] text-emerald-400 font-semibold">Sem alertas pendentes</p>
-                <p className="text-[10px] text-zinc-500 mt-0.5">Carteira em dia</p>
+                <p className="text-[10px] text-gray-500 mt-0.5">Carteira em dia</p>
               </div>
             )}
           </div>
@@ -476,10 +476,10 @@ export function FiscalDashboard({ user, onNavigate }: Props) {
 
           {/* Calendário simples */}
           {expirations.length === 0 && (
-            <div className="bg-zinc-900/20 border border-zinc-900 rounded-xl p-5 text-center">
-              <Calendar className="h-8 w-8 text-zinc-700 mx-auto mb-2" />
-              <p className="text-xs text-zinc-500">Nenhum vencimento próximo</p>
-              <p className="text-[10px] text-zinc-600 mt-0.5">nos próximos 180 dias</p>
+            <div className="bg-gray-100/20 border border-gray-200 rounded-xl p-5 text-center">
+              <Calendar className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+              <p className="text-xs text-gray-500">Nenhum vencimento próximo</p>
+              <p className="text-[10px] text-gray-400 mt-0.5">nos próximos 180 dias</p>
             </div>
           )}
 
@@ -500,7 +500,7 @@ export function FiscalDashboard({ user, onNavigate }: Props) {
           )}
 
           {/* Painel de saúde pessoal */}
-          <div className="bg-zinc-900/20 border border-zinc-900 rounded-xl p-4">
+          <div className="bg-gray-100/20 border border-gray-200 rounded-xl p-4">
             <SectionHeader title="Minha Situação" icon={<Shield className="h-3.5 w-3.5" />} />
             <div className="space-y-2.5">
               {[
@@ -524,10 +524,10 @@ export function FiscalDashboard({ user, onNavigate }: Props) {
                   icon: <Activity className="h-3.5 w-3.5 text-blue-400" />,
                 },
               ].map(({ label, value, color, icon, isCurrency }, i) => (
-                <div key={i} className="flex items-center justify-between bg-zinc-950/40 border border-zinc-900 rounded-lg px-3 py-2">
+                <div key={i} className="flex items-center justify-between bg-blue-50/40 border border-gray-200 rounded-lg px-3 py-2">
                   <div className="flex items-center gap-2">
                     {icon}
-                    <span className="text-[10px] text-zinc-400">{label}</span>
+                    <span className="text-[10px] text-gray-500">{label}</span>
                   </div>
                   <span className={`text-[11px] font-bold ${color} tabular-nums`}>
                     {isCurrency ? formatCurrency(value as number) : value}

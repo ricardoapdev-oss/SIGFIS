@@ -14,7 +14,7 @@ export class OccurrencesService {
       throw new NotFoundException('Contrato não encontrado');
     }
 
-    // Verificar se o usuário tem acesso ao contrato
+    // FISCAL: verifica se está designado ao contrato
     if (role === UserRole.FISCAL) {
       const isAssigned = await this.prisma.fiscalAssignment.findFirst({
         where: { contractId: data.contractId, fiscalId: userId, isActive: true },
@@ -22,9 +22,8 @@ export class OccurrencesService {
       if (!isAssigned) {
         throw new ForbiddenException('Acesso negado a este contrato');
       }
-    } else if (role === UserRole.ADMIN) {
-      throw new ForbiddenException('Perfil administrativo não pode registrar ocorrências.');
     }
+    // GESTOR e ADMIN podem registrar em qualquer contrato
 
     const occurrence = await this.prisma.occurrence.create({
       data: {
@@ -61,7 +60,7 @@ export class OccurrencesService {
       throw new NotFoundException('Ocorrência não encontrada');
     }
 
-    // Verificar se o usuário tem permissão para resolver
+    // FISCAL: verifica se está designado ao contrato
     if (role === UserRole.FISCAL) {
       const isAssigned = await this.prisma.fiscalAssignment.findFirst({
         where: { contractId: occurrence.contractId, fiscalId: userId, isActive: true },
@@ -69,9 +68,8 @@ export class OccurrencesService {
       if (!isAssigned) {
         throw new ForbiddenException('Acesso negado a este contrato');
       }
-    } else if (role === UserRole.ADMIN) {
-      throw new ForbiddenException('Perfil administrativo não pode resolver ocorrências.');
     }
+    // GESTOR e ADMIN podem resolver qualquer ocorrência
 
     return this.prisma.occurrence.update({
       where: { id },

@@ -20,15 +20,20 @@ export class ContractsController {
     return this.contractsService.findAll(req.user.id, req.user.role);
   }
 
+  @Get('report')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR, UserRole.ALTA_GESTAO)
+  getReport(@Req() req) {
+    return this.contractsService.findReport(req.user.role);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string, @Req() req) {
     return this.contractsService.findOne(id, req.user.id, req.user.role);
   }
 
   @Post()
-  @Roles(UserRole.ADMIN, UserRole.GESTOR)
-  create(@Body() body: any) {
-    return this.contractsService.create(body);
+  create(@Req() req, @Body() body: any) {
+    return this.contractsService.create(body, req.user.id);
   }
 
   @Patch(':id')
@@ -40,7 +45,7 @@ export class ContractsController {
   @Post(':id/assign-fiscal')
   @Roles(UserRole.ADMIN, UserRole.GESTOR)
   assignFiscal(@Param('id') id: string, @Body() body: any) {
-    return this.contractsService.assignFiscal(id, body);
+    return this.contractsService.assignFiscalSafe(id, body);
   }
 
   @Patch(':id/assignments/:assignmentId/deactivate')

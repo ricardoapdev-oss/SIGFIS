@@ -27,8 +27,8 @@ export class MeasurementsService {
       if (!isAssigned) {
         throw new ForbiddenException('Você não é fiscal designado para este contrato e não pode registrar medições.');
       }
-    } else if (role !== UserRole.GESTOR) {
-      throw new ForbiddenException('Apenas Fiscais ou Gestores podem criar medições.');
+    } else if (role !== UserRole.GESTOR && role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Apenas Fiscais, Gestores ou Administradores podem criar medições.');
     }
 
     const measurement = await this.prisma.inspectionMeasurement.create({

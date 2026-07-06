@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useQuery } from '@tanstack/react-query';
 import { ShieldAlert, ShieldCheck, AlertTriangle, ChevronRight, RefreshCw, TrendingUp } from 'lucide-react';
@@ -20,7 +20,7 @@ function Semaphore({ level }: { level: RiskLevel }) {
   return (
     <div className="flex flex-col items-center gap-1.5 shrink-0">
       {(['RED', 'YELLOW', 'GREEN'] as RiskLevel[]).map(l => (
-        <div key={l} className={`h-3.5 w-3.5 rounded-full border ${l === level ? riskConfig[l].dot + ' border-transparent' : 'bg-zinc-800 border-zinc-700'}`} />
+        <div key={l} className={`h-3.5 w-3.5 rounded-full border ${l === level ? riskConfig[l].dot + ' border-transparent' : 'bg-gray-100 border-gray-300'}`} />
       ))}
     </div>
   );
@@ -41,18 +41,18 @@ function RiskCard({ item, onNavigate }: { item: RiskItem; onNavigate: Props['onN
           <div className="flex justify-between items-start mb-2">
             <div>
               <span className={`text-[9px] font-bold uppercase tracking-widest ${cfg.color}`}>{cfg.label}</span>
-              <p className="text-xs font-bold text-zinc-200 mt-0.5">{item.contractNumber}</p>
+              <p className="text-xs font-bold text-gray-800 mt-0.5">{item.contractNumber}</p>
             </div>
             <div className="flex items-center gap-2 shrink-0 ml-4">
               <div className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${cfg.color} ${cfg.bg} ${cfg.border}`}>
                 Score {item.riskScore}/100
               </div>
-              <ChevronRight className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+              <ChevronRight className="h-3.5 w-3.5 text-gray-400 group-hover:text-gray-500 transition-colors" />
             </div>
           </div>
 
           {/* Score bar */}
-          <div className="h-1 bg-zinc-800 rounded-full overflow-hidden mb-3">
+          <div className="h-1 bg-gray-100 rounded-full overflow-hidden mb-3">
             <div className="h-full rounded-full transition-all" style={{
               width: `${item.riskScore}%`,
               background: item.riskLevel === 'RED' ? '#ef4444' : item.riskLevel === 'YELLOW' ? '#f59e0b' : '#10b981',
@@ -67,7 +67,7 @@ function RiskCard({ item, onNavigate }: { item: RiskItem; onNavigate: Props['onN
           </div>
 
           {/* Footer */}
-          <div className="flex gap-4 mt-3 text-[10px] text-zinc-500">
+          <div className="flex gap-4 mt-3 text-[10px] text-gray-500">
             {item.daysUntilExpiry !== undefined && (
               <span>Vence em <strong className={cfg.color}>{item.daysUntilExpiry} dias</strong></span>
             )}
@@ -84,7 +84,7 @@ export function RiskPanel({ user, onNavigate }: Props) {
     queryKey: ['risk-panel', user.id],
     queryFn: () => api.risk.panel(),
     enabled: !!user,
-    staleTime: 60_000,
+    staleTime: 300_000,
   });
 
   const items: RiskItem[] = (data as any)?.items ?? [];
@@ -99,11 +99,11 @@ export function RiskPanel({ user, onNavigate }: Props) {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h2 className="text-base font-semibold text-white">Painel de Risco</h2>
-          <p className="text-xs text-zinc-500 mt-0.5">Semáforo de risco contratual baseado em prazo, ocorrências e pendências</p>
+          <h2 className="text-base font-semibold text-gray-900">Painel de Risco</h2>
+          <p className="text-xs text-gray-500 mt-0.5">Semáforo de risco contratual baseado em prazo, ocorrências e pendências</p>
         </div>
         <button onClick={() => refetch()} disabled={isFetching}
-          className="flex items-center gap-1.5 text-[10px] text-zinc-500 hover:text-zinc-300 border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+          className="flex items-center gap-1.5 text-[10px] text-gray-500 hover:text-gray-700 border border-gray-300 bg-gray-100/40 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
           <RefreshCw className={`h-3 w-3 ${isFetching ? 'animate-spin' : ''}`} />
           Recalcular
         </button>
@@ -121,9 +121,9 @@ export function RiskPanel({ user, onNavigate }: Props) {
             <div key={level} className={`p-5 rounded-xl border ${cfg.bg} ${cfg.border} flex items-center gap-4`}>
               <div className={`p-3 rounded-xl border ${cfg.bg} ${cfg.border} ${cfg.color}`}>{cfg.icon}</div>
               <div>
-                <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{label}</p>
+                <p className="text-[10px] text-gray-500 uppercase tracking-widest">{label}</p>
                 <p className={`text-3xl font-bold ${cfg.color}`}>{count}</p>
-                <p className="text-[9px] text-zinc-500">{count === 1 ? 'contrato' : 'contratos'}</p>
+                <p className="text-[9px] text-gray-500">{count === 1 ? 'contrato' : 'contratos'}</p>
               </div>
             </div>
           );
@@ -131,19 +131,19 @@ export function RiskPanel({ user, onNavigate }: Props) {
       </div>
 
       {/* Legenda da metodologia */}
-      <div className="bg-zinc-900/20 border border-zinc-900 rounded-xl p-4">
-        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+      <div className="bg-gray-100/20 border border-gray-200 rounded-xl p-4">
+        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
           <TrendingUp className="h-3.5 w-3.5" /> Metodologia de Cálculo
         </p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-[10px] text-zinc-400">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-[10px] text-gray-500">
           <div><strong className="text-red-400">+40 pts</strong> — Contrato vencido</div>
           <div><strong className="text-amber-400">+35 pts</strong> — Vence em ≤ 30 dias</div>
           <div><strong className="text-amber-400">+30 pts</strong> — Ocorrência crítica aberta</div>
           <div><strong className="text-blue-400">+20 pts</strong> — Vence em ≤ 90 dias</div>
           <div><strong className="text-blue-400">+10 pts</strong> — Vence em ≤ 180 dias</div>
-          <div><strong className="text-zinc-300">+15 pts</strong> — Ocorrência alta aberta</div>
-          <div><strong className="text-zinc-300">+10 pts</strong> — Medição pendente</div>
-          <div><strong className="text-zinc-300">+8 pts</strong> — Alerta ativo</div>
+          <div><strong className="text-gray-700">+15 pts</strong> — Ocorrência alta aberta</div>
+          <div><strong className="text-gray-700">+10 pts</strong> — Medição pendente</div>
+          <div><strong className="text-gray-700">+8 pts</strong> — Alerta ativo</div>
         </div>
         <div className="flex gap-4 mt-3 text-[10px]">
           <span><span className="text-red-400 font-bold">VERMELHO</span> ≥ 40 pts</span>
@@ -153,7 +153,7 @@ export function RiskPanel({ user, onNavigate }: Props) {
       </div>
 
       {isLoading ? (
-        <div className="space-y-3">{[...Array(4)].map((_, i) => <div key={i} className="h-24 bg-zinc-900/40 rounded-xl animate-pulse" />)}</div>
+        <div className="space-y-3">{[...Array(4)].map((_, i) => <div key={i} className="h-24 bg-gray-100/40 rounded-xl animate-pulse" />)}</div>
       ) : (
         <div className="space-y-6">
           {/* RED */}
@@ -189,7 +189,7 @@ export function RiskPanel({ user, onNavigate }: Props) {
           {items.length === 0 && (
             <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-10 text-center">
               <ShieldCheck className="h-12 w-12 text-emerald-500 mx-auto mb-4" />
-              <p className="text-sm font-semibold text-white">Nenhum contrato cadastrado</p>
+              <p className="text-sm font-semibold text-gray-900">Nenhum contrato cadastrado</p>
             </div>
           )}
         </div>

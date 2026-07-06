@@ -33,18 +33,21 @@ if not exist "%~dp0backend\.env" (
 echo Configuracao encontrada. Iniciando instalacao...
 echo.
 
-:: Definir Node.js
+:: Definir Node.js: preferir node.exe portavel, senao usar o do sistema
 if exist "%~dp0node.exe" (
     set NODE="%~dp0node.exe"
 ) else (
     set NODE=node
 )
 
-:: Mudar para diretorio do backend
+:: Definir caminho do Prisma CLI (evita usar prisma.cmd que pode ter problemas no Windows)
+set PRISMA_CLI=node_modules\prisma\build\index.js
+
+:: Mudar para diretorio do backend (dotenv e prisma precisam do .env neste diretorio)
 cd /d "%~dp0backend"
 
 echo [1/2] Criando tabelas no banco de dados...
-%NODE% node_modules\.bin\prisma db push --accept-data-loss
+%NODE% %PRISMA_CLI% db push --accept-data-loss
 if errorlevel 1 (
     echo.
     echo [ERRO] Falha ao criar tabelas!

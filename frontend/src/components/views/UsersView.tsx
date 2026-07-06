@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -76,8 +76,8 @@ export function UsersView({ user }: UsersViewProps) {
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-base font-semibold text-white">Gestão de Usuários</h2>
-          <p className="text-xs text-zinc-500 mt-0.5">Servidores cadastrados no sistema com seus perfis de acesso</p>
+          <h2 className="text-base font-semibold text-gray-900">Gestão de Usuários</h2>
+          <p className="text-xs text-gray-500 mt-0.5">Servidores cadastrados no sistema com seus perfis de acesso</p>
         </div>
         {(user.role === 'GESTOR' || user.role === 'ALTA_GESTAO' || user.role === 'ADMIN') && (
           <button
@@ -93,14 +93,14 @@ export function UsersView({ user }: UsersViewProps) {
       {isLoading ? (
         <div className="space-y-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-14 bg-zinc-900/40 rounded-xl animate-pulse" />
+            <div key={i} className="h-14 bg-gray-100/40 rounded-xl animate-pulse" />
           ))}
         </div>
       ) : (
-        <div className="bg-zinc-900/20 border border-zinc-900 rounded-xl overflow-hidden">
+        <div className="bg-gray-100/20 border border-gray-200 rounded-xl overflow-hidden">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="bg-zinc-900/40 border-b border-zinc-900 text-zinc-400 font-semibold">
+              <tr className="bg-gray-100/40 border-b border-gray-200 text-gray-500 font-semibold">
                 <th className="p-4">Servidor</th>
                 <th className="p-4">E-mail</th>
                 <th className="p-4">Matrícula</th>
@@ -109,19 +109,19 @@ export function UsersView({ user }: UsersViewProps) {
                 {(user.role === 'GESTOR' || user.role === 'ADMIN' || user.role === 'ALTA_GESTAO') && <th className="p-4 text-center">Ações</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-900">
+            <tbody className="divide-y divide-gray-200">
               {userList.map((u: any) => (
-                <tr key={u.id} className="hover:bg-zinc-900/30 transition-colors">
+                <tr key={u.id} className="hover:bg-gray-100/30 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-7 w-7 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-[10px] text-zinc-300 shrink-0">
+                      <div className="h-7 w-7 rounded-full bg-gray-100 flex items-center justify-center font-bold text-[10px] text-gray-700 shrink-0">
                         {u.name.charAt(0)}
                       </div>
-                      <span className="font-semibold text-zinc-200">{u.name}</span>
+                      <span className="font-semibold text-gray-800">{u.name}</span>
                     </div>
                   </td>
-                  <td className="p-4 text-zinc-400">{u.email}</td>
-                  <td className="p-4 text-zinc-400 font-mono">{u.registrationNumber || '—'}</td>
+                  <td className="p-4 text-gray-500">{u.email}</td>
+                  <td className="p-4 text-gray-500 font-mono">{u.registrationNumber || '—'}</td>
                   <td className="p-4">
                     <span className={`px-2.5 py-0.5 rounded text-[10px] font-semibold border ${roleColor[u.role] || ''}`}>
                       {userRoleLabel[u.role] || u.role}
@@ -148,8 +148,8 @@ export function UsersView({ user }: UsersViewProps) {
                             title={u.status === 'ACTIVE' ? 'Desativar usuário' : 'Reativar usuário'}
                             className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                               u.status === 'ACTIVE'
-                                ? 'hover:bg-red-500/10 text-zinc-400 hover:text-red-400'
-                                : 'hover:bg-emerald-500/10 text-zinc-400 hover:text-emerald-400'
+                                ? 'hover:bg-red-500/10 text-gray-500 hover:text-red-400'
+                                : 'hover:bg-emerald-500/10 text-gray-500 hover:text-emerald-400'
                             }`}
                           >
                             {u.status === 'ACTIVE' ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
@@ -163,7 +163,7 @@ export function UsersView({ user }: UsersViewProps) {
                               }
                             }}
                             title="Excluir usuário"
-                            className="p-1.5 rounded-lg transition-colors cursor-pointer hover:bg-red-500/10 text-zinc-400 hover:text-red-400"
+                            className="p-1.5 rounded-lg transition-colors cursor-pointer hover:bg-red-500/10 text-gray-500 hover:text-red-400"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -180,16 +180,16 @@ export function UsersView({ user }: UsersViewProps) {
 
       {/* Modal: Novo Usuário */}
       {isNewOpen && (
-        <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
+        <div className="fixed inset-0 bg-blue-50/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-gray-300 w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
             <button
               onClick={() => setIsNewOpen(false)}
-              className="absolute right-4 top-4 p-1 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+              className="absolute right-4 top-4 p-1 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer"
             >
               <X className="h-4 w-4" />
             </button>
-            <h3 className="text-sm font-bold text-white mb-2">Cadastrar Servidor</h3>
-            <p className="text-xs text-zinc-500 mb-5 border-b border-zinc-800 pb-3">Adicionar novo usuário ao SIGECONTRATOS.</p>
+            <h3 className="text-sm font-bold text-gray-900 mb-2">Cadastrar Servidor</h3>
+            <p className="text-xs text-gray-500 mb-5 border-b border-gray-300 pb-3">Adicionar novo usuário ao SIGECONTRATOS.</p>
 
             <form
               onSubmit={(e) => {
@@ -205,41 +205,41 @@ export function UsersView({ user }: UsersViewProps) {
               className="space-y-4"
             >
               <div>
-                <label className="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">Nome Completo</label>
+                <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">Nome Completo</label>
                 <input type="text" value={fName} onChange={(e) => setFName(e.target.value)} required
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
+                  className="w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
                   placeholder="Nome do servidor" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">E-mail Corporativo</label>
+                  <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">E-mail Corporativo</label>
                   <input type="email" value={fEmail} onChange={(e) => setFEmail(e.target.value)} required
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
+                    className="w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
                     placeholder="servidor@iquego.com.br" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">Matrícula</label>
+                  <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">Matrícula</label>
                   <input type="text" value={fRegistration} onChange={(e) => setFRegistration(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
+                    className="w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
                     placeholder="IQG-0000" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">Perfil de Acesso</label>
+                  <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">Perfil de Acesso</label>
                   <select value={fRole} onChange={(e) => setFRole(e.target.value as 'GESTOR' | 'FISCAL' | 'ALTA_GESTAO')} required
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-emerald-500/50">
+                    className="w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500/50">
                     <option value="FISCAL">Fiscal de Contrato</option>
                     <option value="GESTOR">Gestor de Contratos</option>
                     {(user.role === 'ADMIN' || user.role === 'ALTA_GESTAO') && <option value="ALTA_GESTAO">Alta Gestão</option>}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5">Senha Inicial</label>
+                  <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">Senha Inicial</label>
                   <input type="password" value={fPassword} onChange={(e) => setFPassword(e.target.value)} required minLength={6}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
+                    className="w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
                     placeholder="Mínimo 6 caracteres" />
                 </div>
               </div>

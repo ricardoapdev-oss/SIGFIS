@@ -47,8 +47,7 @@ enum ContractStatus {
 enum FiscalRole {
   TITULAR
   SUBSTITUTO
-  TECNICO
-  ADMINISTRATIVO
+  SUPLENTE
 }
 
 enum OccurrenceSeverity {
@@ -132,6 +131,7 @@ model User {
   sentCommunications   Communication[]      @relation("CommunicationSender")
   receivedCommunications Communication[]    @relation("CommunicationRecipient")
   responsiblePhases    ProcurementPhase[]   @relation("PhaseResponsible")
+  registeredPayments   ContractPayment[]    @relation("PaymentRegisteredBy")
 
   @@map("users")
 }
@@ -160,17 +160,32 @@ model Contractor {
 }
 
 model ProcurementProcess {
-  id                  String          @id @default(uuid()) @db.Uuid
-  processNumber       String          @unique @db.VarChar(100)
-  subject             String          @db.VarChar(500)
-  description         String?         @db.Text
-  status              ProcessStatus   @default(PLANNING)
-  modality            BiddingModality
-  estimatedValue      Decimal         @db.Decimal(15, 2)
-  requesterDepartment String          @db.VarChar(100)
-  requesterId         String          @db.Uuid
-  createdAt           DateTime        @default(now()) @db.Timestamptz
-  updatedAt           DateTime        @updatedAt @db.Timestamptz
+  id                         String          @id @default(uuid()) @db.Uuid
+  processNumber              String          @unique @db.VarChar(100)
+  subject                    String          @db.VarChar(500)
+  description                String?         @db.Text
+  status                     ProcessStatus   @default(PLANNING)
+  modality                   BiddingModality
+  estimatedValue             Decimal         @db.Decimal(15, 2)
+  requesterDepartment        String          @db.VarChar(100)
+  requesterId                String          @db.Uuid
+  tipoContratacao            String?         @db.VarChar(50)
+  fundamentoLegalPreliminar  String?         @db.VarChar(500)
+  dataSolicitacao            DateTime?       @db.Date
+  responsavelDemanda         String?         @db.VarChar(255)
+  prioridade                 String?         @db.VarChar(20)
+  possuiPrazoCritico         Boolean         @default(false)
+  dataLimiteProcesso         DateTime?       @db.Date
+  justificativaUrgencia      String?         @db.Text
+  exigeTR                    Boolean         @default(true)
+  exigeParecerJuridico       Boolean         @default(true)
+  exigeRatificacaoAutoridade Boolean         @default(true)
+  exigeContratoFormal        Boolean         @default(true)
+  exigePublicacaoDivulgacao  Boolean         @default(true)
+  fiscalDefinido             Boolean         @default(false)
+  observacoesGerenciais      String?         @db.Text
+  createdAt                  DateTime        @default(now()) @db.Timestamptz
+  updatedAt                  DateTime        @updatedAt @db.Timestamptz
 
   requester           User            @relation("ProcurementRequester", fields: [requesterId], references: [id])
   contracts           Contract[]
@@ -208,6 +223,7 @@ model Contract {
   documents         Document[]
   communications    Communication[]
   alerts            SystemAlert[]
+  payments          ContractPayment[]
 
   @@index([managerId], map: "idx_contracts_manager")
   @@index([contractorId], map: "idx_contracts_contractor")
@@ -338,6 +354,8 @@ model Communication {
   message      String    @db.Text
   parentId     String?   @db.Uuid
   readAt       DateTime? @db.Timestamptz
+  isCompleted  Boolean   @default(false)
+  completedAt  DateTime? @db.Timestamptz
   createdAt    DateTime  @default(now()) @db.Timestamptz
 
   contract     Contract  @relation(fields: [contractId], references: [id], onDelete: Cascade)
@@ -372,24 +390,50 @@ enum PhaseStatus {
 }
 
 model ProcurementPhase {
-  id            String      @id @default(uuid()) @db.Uuid
-  processId     String      @db.Uuid
-  phaseNumber   Int
-  name          String      @db.VarChar(255)
-  status        PhaseStatus @default(PENDING)
-  plannedStart  DateTime?   @db.Date
-  plannedEnd    DateTime?   @db.Date
-  actualStart   DateTime?   @db.Date
-  actualEnd     DateTime?   @db.Date
-  responsibleId String?     @db.Uuid
-  isActive      Boolean     @default(true)
-  createdAt     DateTime    @default(now()) @db.Timestamptz
-  updatedAt     DateTime    @updatedAt @db.Timestamptz
+  id                         String      @id @default(uuid()) @db.Uuid
+  processId                  String      @db.Uuid
+  phaseNumber                Int
+  name                       String      @db.VarChar(255)
+  status                     PhaseStatus @default(PENDING)
+  plannedStart               DateTime?   @db.Date
+  plannedEnd                 DateTime?   @db.Date
+  actualStart                DateTime?   @db.Date
+  actualEnd                  DateTime?   @db.Date
+  responsibleId              String?     @db.Uuid
+  isActive                   Boolean     @default(true)
+  descricao                  String?     @db.Text
+  responsavelSetor           String?     @db.VarChar(100)
+  documentoObrigatorio       String?     @db.VarChar(255)
+  prazoDias                  Int?
+  pendenciaCritica           String?     @db.Text
+  checklistItems             Json?
+  bloqueiaAvancoSemConclusao Boolean     @default(false)
+  alertaAtivo                Boolean     @default(true)
+  observacoes                String?     @db.Text
+  createdAt                  DateTime    @default(now()) @db.Timestamptz
+  updatedAt                  DateTime    @updatedAt @db.Timestamptz
 
   process       ProcurementProcess @relation(fields: [processId], references: [id], onDelete: Cascade)
   responsible   User?              @relation("PhaseResponsible", fields: [responsibleId], references: [id])
 
   @@map("procurement_phases")
+}
+
+model ContractPayment {
+  id              String   @id @default(uuid()) @db.Uuid
+  contractId      String   @db.Uuid
+  registeredById  String   @db.Uuid
+  paymentDate     DateTime @db.Date
+  value           Decimal  @db.Decimal(15, 2)
+  invoiceNumber   String?  @db.VarChar(100)
+  description     String   @db.Text
+  createdAt       DateTime @default(now()) @db.Timestamptz
+
+  contract        Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  registeredBy    User     @relation("PaymentRegisteredBy", fields: [registeredById], references: [id])
+
+  @@index([contractId], map: "idx_payments_contract")
+  @@map("contract_payments")
 }
 
 model AuditLog {

@@ -17,5 +17,6 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "exclude": ["**/*-Laptop de Ricardo.ts", "node_modules"]
 }
