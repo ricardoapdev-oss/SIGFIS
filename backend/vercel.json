@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "_comment": "Usado apenas se o backend for implantado como projeto Vercel independente (fora do modo 'Services'). No deploy atual (vercel.json na raiz do repositório, chave 'services'), o roteamento é definido pelos rewrites de nível superior — este arquivo fica inerte, mas foi mantido para não quebrar um deploy standalone do backend.",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api" }
+  ]
+}

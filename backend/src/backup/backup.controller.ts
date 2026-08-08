@@ -19,10 +19,10 @@ export class BackupController {
       const stream = await this.backupService.createBackupStream();
       
       const dateStr = new Date().toISOString().replace(/[:.]/g, '-').split('T')[0];
-      const filename = `sigecontratos_backup_${dateStr}.dump`;
+      const filename = `sigecontratos_backup_${dateStr}.json`;
 
       res.set({
-        'Content-Type': 'application/octet-stream',
+        'Content-Type': 'application/json',
         'Content-Disposition': `attachment; filename="${filename}"`,
       });
 

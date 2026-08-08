@@ -1,105 +1,92 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { spawn, exec } from 'child_process';
-import { promisify } from 'util';
 import { Readable } from 'stream';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
+import { PrismaService } from '../prisma/prisma.service';
 
-const execAsync = promisify(exec);
+// Ordem de dependência das tabelas (pai antes de filho, respeitando as FKs
+// do schema.prisma). A restauração apaga na ordem inversa e insere nesta ordem.
+const TABLES_IN_DEPENDENCY_ORDER = [
+  'user',
+  'contractor',
+  'procurementProcess',
+  'contract',
+  'fiscalAssignment',
+  'occurrence',
+  'inspectionMeasurement',
+  'contractAlteration',
+  'document',
+  'communication',
+  'systemAlert',
+  'procurementPhase',
+  'contractPayment',
+  'auditLog',
+] as const;
 
-interface DbParams { user: string; password: string; host: string; port: string; dbname: string; }
+const BACKUP_FORMAT = 'sigfis-json-backup';
+const BACKUP_VERSION = 1;
 
+/**
+ * Backup/restore do banco via Prisma (dump/carga em JSON), em vez de pg_dump/
+ * pg_restore ou containers Docker locais. A implementação anterior dependia de
+ * binários do PostgreSQL instalados na máquina (ou de um container Docker com
+ * o nome fixo "sigecontratos_postgres") — isso não existe em ambiente serverless
+ * (Vercel): sem filesystem persistente, sem possibilidade de instalar/rodar
+ * binários externos. Esta versão preserva a mesma funcionalidade (baixar um
+ * arquivo de backup e restaurar a partir dele) usando apenas o Prisma Client,
+ * que já é a única forma de acesso ao banco disponível no runtime serverless.
+ *
+ * Observação: para bancos muito grandes, prefira o backup automático do
+ * próprio Supabase (Point-in-Time Recovery / snapshots diários) como fonte
+ * primária de disaster recovery — este endpoint é um utilitário complementar.
+ */
 @Injectable()
 export class BackupService {
-
-  private parseDbUrl(url: string): DbParams {
-    const match = url.match(/postgresql:\/\/([^:]+):([^@]+)@([^:/]+):?(\d*)\/?(.+)/);
-    if (!match) throw new InternalServerErrorException('DATABASE_URL inválida.');
-    return { user: match[1], password: match[2], host: match[3], port: match[4] || '5432', dbname: match[5] };
-  }
-
-  private async findBinary(name: string): Promise<string | null> {
-    const candidates = [
-      name,
-      `C:\\Program Files\\PostgreSQL\\17\\bin\\${name}.exe`,
-      `C:\\Program Files\\PostgreSQL\\16\\bin\\${name}.exe`,
-      `C:\\Program Files\\PostgreSQL\\15\\bin\\${name}.exe`,
-      `C:\\Program Files\\PostgreSQL\\14\\bin\\${name}.exe`,
-    ];
-    for (const candidate of candidates) {
-      try { await execAsync(`"${candidate}" --version`); return candidate; } catch { continue; }
-    }
-    return null;
-  }
+  constructor(private prisma: PrismaService) {}
 
   async createBackupStream(): Promise<Readable> {
-    const pgDump = await this.findBinary('pg_dump');
-
-    if (pgDump) {
-      const { user, password, host, port, dbname } = this.parseDbUrl(process.env.DATABASE_URL);
-      return new Promise((resolve, reject) => {
-        const proc = spawn(`"${pgDump}"`, ['-h', host, '-p', port, '-U', user, '-Fc', dbname], {
-          shell: true,
-          env: { ...process.env, PGPASSWORD: password },
-        });
-        proc.on('error', err => reject(new InternalServerErrorException(`Erro ao iniciar backup: ${err.message}`)));
-        proc.stderr.on('data', d => console.warn(`pg_dump: ${d}`));
-        resolve(proc.stdout);
-      });
+    const tables: Record<string, unknown[]> = {};
+    for (const table of TABLES_IN_DEPENDENCY_ORDER) {
+      tables[table] = await (this.prisma as any)[table].findMany();
     }
 
-    // Fallback: Docker
-    return new Promise((resolve, reject) => {
-      const proc = spawn('docker', ['exec', 'sigecontratos_postgres', 'pg_dump', '-U', 'sigecontratos_user', '-Fc', 'sigecontratos_db']);
-      proc.on('error', err => reject(new InternalServerErrorException(
-        `pg_dump e Docker não encontrados. Instale o PostgreSQL ou Docker. Detalhe: ${err.message}`
-      )));
-      proc.stderr.on('data', d => console.warn(`pg_dump (docker): ${d}`));
-      resolve(proc.stdout);
-    });
+    const payload = {
+      format: BACKUP_FORMAT,
+      version: BACKUP_VERSION,
+      generatedAt: new Date().toISOString(),
+      tables,
+    };
+
+    return Readable.from([JSON.stringify(payload, null, 2)]);
   }
 
   async restoreBackup(fileBuffer: Buffer): Promise<void> {
-    const pgRestore = await this.findBinary('pg_restore');
-    const tmpFile = path.join(os.tmpdir(), `sigfis_restore_${Date.now()}.dump`);
-    fs.writeFileSync(tmpFile, fileBuffer);
-
+    let payload: any;
     try {
-      if (pgRestore) {
-        const { user, password, host, port, dbname } = this.parseDbUrl(process.env.DATABASE_URL);
-        await new Promise<void>((resolve, reject) => {
-          const proc = spawn(
-            `"${pgRestore}"`,
-            ['-h', host, '-p', port, '-U', user, '-d', dbname, '--clean', '--if-exists', '--no-owner', '--no-privileges', tmpFile],
-            { shell: true, env: { ...process.env, PGPASSWORD: password } }
-          );
-          let errOut = '';
-          proc.stderr.on('data', d => { errOut += d.toString(); console.warn(`pg_restore: ${d}`); });
-          proc.on('error', err => reject(new InternalServerErrorException(`Erro ao iniciar restauração: ${err.message}`)));
-          proc.on('close', code => {
-            if (code === 0 || code === 1) resolve(); // code 1 = non-fatal warnings
-            else reject(new InternalServerErrorException(`Falha na restauração (código ${code}): ${errOut.slice(-500)}`));
-          });
-        });
-      } else {
-        // Fallback: Docker
-        await new Promise<void>((resolve, reject) => {
-          const proc = spawn('docker', ['exec', '-i', 'sigecontratos_postgres', 'pg_restore',
-            '-U', 'sigecontratos_user', '-d', 'sigecontratos_db', '--clean', '--if-exists', '--no-owner']);
-          let errOut = '';
-          proc.stderr.on('data', d => { errOut += d.toString(); console.warn(`pg_restore (docker): ${d}`); });
-          proc.on('error', err => reject(new InternalServerErrorException(`pg_restore e Docker não encontrados. Detalhe: ${err.message}`)));
-          proc.on('close', code => {
-            if (code === 0 || code === 1) resolve();
-            else reject(new InternalServerErrorException(`Falha na restauração via Docker (código ${code}): ${errOut.slice(-500)}`));
-          });
-          proc.stdin.write(fileBuffer);
-          proc.stdin.end();
-        });
-      }
-    } finally {
-      try { fs.unlinkSync(tmpFile); } catch { /* ignore cleanup errors */ }
+      payload = JSON.parse(fileBuffer.toString('utf-8'));
+    } catch {
+      throw new InternalServerErrorException('Arquivo de backup inválido: JSON malformado.');
     }
+
+    if (payload?.format !== BACKUP_FORMAT || !payload.tables) {
+      throw new InternalServerErrorException(
+        'Arquivo de backup inválido ou de formato incompatível. Use um arquivo gerado por este sistema.',
+      );
+    }
+
+    const tables = payload.tables as Record<string, unknown[]>;
+
+    await this.prisma.$transaction(
+      async (tx) => {
+        for (const table of [...TABLES_IN_DEPENDENCY_ORDER].reverse()) {
+          await (tx as any)[table].deleteMany({});
+        }
+        for (const table of TABLES_IN_DEPENDENCY_ORDER) {
+          const rows = tables[table];
+          if (Array.isArray(rows) && rows.length > 0) {
+            await (tx as any)[table].createMany({ data: rows });
+          }
+        }
+      },
+      { timeout: 60_000 },
+    );
   }
 }

@@ -36,6 +36,9 @@ services:
       - "3001:3001"
     environment:
       DATABASE_URL: postgresql://sigecontratos_user:sigecontratos_password@postgres:5432/sigecontratos_db
+      # Mesma conexão local — o Prisma exige a variável DIRECT_URL definida
+      # (usada só por `prisma db push`/`migrate`, ver schema.prisma).
+      DIRECT_URL: postgresql://sigecontratos_user:sigecontratos_password@postgres:5432/sigecontratos_db
       JWT_SECRET: ${JWT_SECRET:-sigecontratos_jwt_troque_em_producao_2026}
       PORT: 3001
     depends_on:

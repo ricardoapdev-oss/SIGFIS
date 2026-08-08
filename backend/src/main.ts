@@ -3,18 +3,12 @@ import * as path from 'path';
 // Carrega .env do diretório de trabalho (onde o processo é iniciado)
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { createNestApp } from './create-app';
 
+// Bootstrap para execução local (nest start) e Docker (node dist/main).
+// Não é usado na Vercel — lá o entrypoint é api/index.ts.
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
-  app.enableCors({
-    origin: true,
-    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  });
+  const app = await createNestApp();
 
   const port = process.env.PORT ?? 3001;
   await app.listen(port);
