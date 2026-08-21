@@ -194,10 +194,13 @@ funcional existentes.
     as rotas respondam em `/api/*` quando expostas pelo `vercel.json` da
     raiz.
 
-12. **`backend/vercel.json`** — comentário atualizado explicando que fica
-    inerte enquanto o deploy usa o `vercel.json` da raiz ("Services");
-    preservado para o caso de o backend ser implantado como projeto Vercel
-    standalone no futuro.
+12. **`backend/vercel.json`** — mantido para o caso de o backend ser
+    implantado como projeto Vercel standalone no futuro; fica inerte
+    enquanto o deploy usa o `vercel.json` da raiz ("Services"). Um campo
+    `_comment` explicativo foi removido de ambos os `vercel.json`
+    (raiz e `backend/`) porque o schema da Vercel rejeita propriedades
+    desconhecidas (`should NOT have additional property '_comment'`) — a
+    explicação agora vive só aqui neste documento.
 
 13. **`backend/package.json`** — scripts `build` e `postinstall` passaram a
     invocar o CLI via `node node_modules/<pacote>/bin.js ...` em vez do
