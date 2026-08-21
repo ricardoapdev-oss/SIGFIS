@@ -300,6 +300,72 @@ _A preencher após o deploy:_
 
 - Projeto (frontend + backend, mesmo domínio): `https://____________.vercel.app`
 
+## 11.5. Incidente: `TS2305` em `@nestjs/common` no build da Vercel
+
+Depois do deploy inicial funcionar, o build passou a falhar de forma
+intermitente com dezenas de erros como
+`Module '"@nestjs/common"' has no exported member 'Controller'`.
+
+**Investigação:** validado exaustivamente que não era causa do repositório —
+integridade do pacote (SHA512 do tarball baixado do registry batendo com o
+`package-lock.json`), `package-lock.json` correto, resolução do TypeScript
+correta, ausência de `.npmrc`/aliases, `npm ci`/`npm ci --ignore-scripts`/
+`npm install` e npm 10.x/11.x todos produzindo instalação completa em Linux
+Node 24 — sempre com sucesso, sem nunca reproduzir a falha localmente. O erro
+real, obtido via um diagnóstico temporário publicado num deploy, era
+`Cannot find module './core'` dentro de `@nestjs/common/decorators/index.js`
+— ou seja, o `npm ci` da Vercel instalava o pacote **parcialmente**
+(arquivos externos intactos, subpasta interna `decorators/core/` ausente),
+uma classe de falha de extração de tarball já documentada no próprio
+`npm/cli` (não específica deste projeto).
+
+**Achado adicional durante a investigação:** o projeto Vercel usava
+`Framework Preset: NestJS` com Build/Install Command "automático" — uma
+variável nunca coberta pelos testes locais (que sempre rodaram `npm ci`/
+`npm run build` manualmente). Como não há como confirmar de fora se esse
+preset altera o pipeline de instalação, ele foi neutralizado por segurança.
+
+**Correção aplicada (arquivos):**
+- `backend/vercel.json` — adicionado `"framework": null` (desativa qualquer
+  pipeline automático específico de framework) e `installCommand`/
+  `buildCommand` explícitos (`npm ci` / `npm run build`), eliminando
+  qualquer inferência "automática" por parte da Vercel.
+- `backend/scripts/verify-nest-common.js` (substituiu o diagnóstico
+  temporário `build-diagnostics.js`, removido) — roda antes do `tsc` no
+  script `build`. Verifica a presença dos arquivos e exports essenciais de
+  `@nestjs/common`; se algo estiver faltando, tenta **uma** reinstalação
+  limpa (`npm ci`) e verifica de novo; se ainda assim faltar, falha com a
+  mensagem explícita `INSTALAÇÃO INCOMPLETA DE @nestjs/common` em vez de
+  deixar o `tsc` gerar dezenas de `TS2305` confusos. Não edita, cria ou
+  substitui nenhum arquivo dentro de `node_modules` — a única ação
+  corretiva é reinstalar via `npm ci`.
+
+**Confirmado durante a investigação (não alterado):** o Root Directory do
+projeto Vercel é `backend` (projeto standalone) — a arquitetura "Services"
+descrita na seção 2 deste documento **não está em vigor** neste deployment;
+o `vercel.json` da raiz do repositório fica inerte, e quem manda é
+`backend/vercel.json`. Mantido registrado aqui para não gerar confusão
+futura; se a intenção for reativar "Services", o Root Directory do projeto
+precisa apontar para a raiz do repositório, não para `backend`.
+
+## 11.6. Testes que comprovam a correção (Linux/Node 24.19.0/npm 11.17.0)
+
+Reprodução isolada, sem `node_modules`/`dist` pré-existentes:
+
+```
+npm ci                              → sucesso (mesmo aviso allow-scripts da Vercel, reproduzido)
+npm run build                       → exit 0, "[verify-nest-common] @nestjs/common instalado corretamente."
+dist/main.js                        → gerado
+node dist/main.js                   → app inicia, todos os módulos e rotas mapeados, Prisma conectado
+GET /                                → 200 "Hello World!"
+POST /auth/login (credencial inválida) → 401 "E-mail ou senha incorretos" (prova Prisma + AuthService)
+GET /contracts (sem token)          → 401 Unauthorized (prova JwtAuthGuard ativo)
+GET /users (sem token)              → 401 Unauthorized
+tsc --noEmit em api/+src/ juntos    → exit 0
+```
+Testado contra o Supabase **DEV** (somente leitura — nenhuma escrita, nenhum
+`db push`, nenhum seed).
+
 ## 11. Checklist final
 
 - [x] Auditoria da arquitetura atual
@@ -311,7 +377,8 @@ _A preencher após o deploy:_
 - [x] `.env.example` (backend e frontend) documentados
 - [x] Build local de backend e frontend validado
 - [x] Schema aplicado ao Supabase PROD (`prisma db push`) — 14 tabelas, sem dados
-- [x] `vercel.json` (raiz) criado e validado para o modelo "Services"
+- [x] `vercel.json` (raiz) criado — inerte neste projeto (Root Directory = `backend`, ver seção 11.5); `backend/vercel.json` é o que está em vigor
+- [x] Incidente de instalação parcial de `@nestjs/common` investigado e mitigado (seção 11.5)
 - [ ] Variáveis de ambiente de produção cadastradas no serviço `backend`
 - [ ] Deploy do projeto concluído (frontend + backend) e URL obtida
 - [ ] Login validado para ADMIN, GESTOR, FISCAL e ALTA_GESTAO em produção

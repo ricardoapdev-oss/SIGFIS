@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "postinstall": "node node_modules/prisma/build/index.js generate",
-    "build": "node scripts/build-diagnostics.js && node node_modules/typescript/bin/tsc -p tsconfig.build.json",
+    "build": "node scripts/verify-nest-common.js && node node_modules/typescript/bin/tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
