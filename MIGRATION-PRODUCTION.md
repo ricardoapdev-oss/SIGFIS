@@ -366,6 +366,60 @@ tsc --noEmit em api/+src/ juntos    → exit 0
 Testado contra o Supabase **DEV** (somente leitura — nenhuma escrita, nenhum
 `db push`, nenhum seed).
 
+## 11.7. `FUNCTION_INVOCATION_FAILED` — abandono do entrypoint customizado
+
+Depois do build passar (11.5), o domínio de produção respondia
+`500 FUNCTION_INVOCATION_FAILED` em toda requisição. Build OK, runtime
+quebrado — outro sintoma, outra causa.
+
+**Investigação:** a arquitetura em uso (`backend/api/index.ts` como handler
+Express manual + `backend/vercel.json` com `framework: null`, rewrite
+`/(.*) → /api` e `outputDirectory: "."`) era uma solução **não-oficial**,
+criada durante a migração inicial por analogia com o padrão genérico de
+Vercel Functions. Comparando com o exemplo oficial da própria Vercel para
+NestJS (`github.com/vercel/vercel/tree/main/examples/nestjs`), confirmei que
+ele **não tem `vercel.json`, não tem `api/index.ts`, nada de rewrite** — é o
+`main.ts` padrão do Nest CLI (`NestFactory.create` + `app.listen()`) com
+`"build": "nest build"`. A Vercel detecta "NestJS" como Framework Preset
+nativamente (é um preset oficial, com wrapper próprio da plataforma) e
+empacota `dist/main.js` como Function sozinha.
+
+A suspeita mais provável para o `FUNCTION_INVOCATION_FAILED`: a Vercel
+precisava compilar `api/index.ts` + toda a árvore de `src/*.ts` com seu
+**próprio** compilador TypeScript (não o nosso `tsc`/`verify-nest-common.js`,
+que deliberadamente excluíam `api/` do build), sem garantia de que essa
+compilação paralela respeitasse `experimentalDecorators`/
+`emitDecoratorMetadata` — configurações das quais a injeção de dependência
+do NestJS depende inteiramente. Isso bateria exatamente com o padrão
+observado: build (nosso, controlado) verde, função (compilada pela Vercel,
+fora do nosso controle) quebrando na primeira invocação.
+
+**Correção — adotada a arquitetura nativa (sem entrypoint customizado):**
+- Removidos `backend/api/index.ts`, `backend/api/` e `backend/vercel.json`
+  por completo.
+- `backend/src/create-app.ts` simplificado: removida a lógica de
+  `ExpressAdapter`/`globalPrefix` que só existia para o handler abandonado —
+  volta a ser `NestFactory.create(AppModule)` puro.
+- `backend/src/main.ts`: comentário atualizado (nenhuma mudança de
+  comportamento — já fazia `app.listen()` corretamente).
+- `verify-nest-common.js` (integridade do `@nestjs/common`) **mantido** —
+  resolveu um problema real e independente, documentado na seção 11.5.
+
+Consequência para o frontend: como o backend volta a responder nas rotas
+sem prefixo (`/auth/login`, `/contracts`, etc.), a variável `BACKEND_URL` do
+frontend (ver seção 4) deve apontar diretamente para o domínio deste
+backend — o próprio `next.config.ts` já remove o `/api` antes de encaminhar,
+então nada muda do lado do frontend.
+
+Testado (Linux/Node 24.19.0/npm 11.17.0, instalação limpa): `npm ci`,
+`npm run build`, boot de `dist/main.js`, `GET /` → 200, `POST /auth/login`
+(credencial inválida) → 401, `GET /contracts|/users|/processes` (sem token)
+→ 401 — confirmando Prisma, autenticação e guards intactos.
+
+**Ainda não confirmado nesta etapa:** o comportamento real no domínio da
+Vercel após o próximo deploy — só o ambiente Linux/Docker local foi validado
+diretamente por mim.
+
 ## 11. Checklist final
 
 - [x] Auditoria da arquitetura atual

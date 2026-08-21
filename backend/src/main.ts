@@ -5,8 +5,10 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 import { createNestApp } from './create-app';
 
-// Bootstrap para execução local (nest start) e Docker (node dist/main).
-// Não é usado na Vercel — lá o entrypoint é api/index.ts.
+// Bootstrap padrão do NestJS — usado local (nest start), Docker (node dist/main)
+// e também na Vercel: o Framework Preset "NestJS" detecta este projeto
+// nativamente e empacota dist/main.js como Function automaticamente,
+// sem precisar de um entrypoint/handler customizado.
 async function bootstrap() {
   const app = await createNestApp();
 

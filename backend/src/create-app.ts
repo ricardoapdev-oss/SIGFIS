@@ -1,7 +1,5 @@
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { ExpressAdapter } from '@nestjs/platform-express';
-import type { Express } from 'express';
 import { AppModule } from './app.module';
 
 /**
@@ -22,36 +20,14 @@ export function resolveCorsOrigins(): string[] | boolean {
     .filter(Boolean);
 }
 
-export interface CreateNestAppOptions {
-  /**
-   * Prefixo global aplicado a todas as rotas (ex: "api" → "/contracts" vira "/api/contracts").
-   * Só é usado pelo entrypoint serverless da Vercel (api/index.ts): no projeto "Services"
-   * da Vercel, o rewrite de nível superior que expõe o backend preserva o path original da
-   * requisição (ex: uma chamada pública a "/api/contracts" chega ao serviço exatamente como
-   * "/api/contracts", sem remover o prefixo) — então o próprio Nest precisa responder nesse
-   * prefixo. Local/Docker (main.ts) não usa esta opção: lá o proxy do Next.js já remove o
-   * "/api" antes de encaminhar, então o Nest continua respondendo sem prefixo, como sempre.
-   */
-  globalPrefix?: string;
-}
-
 /**
- * Cria e configura a aplicação Nest (módulos, CORS, prefixo global) sem chamar `listen()`.
- * Usado tanto pelo bootstrap local/Docker (src/main.ts) quanto pelo handler
- * serverless da Vercel (api/index.ts), para que as duas formas de execução
- * fiquem sempre com a mesma configuração base.
+ * Cria e configura a aplicação Nest (módulos, CORS) sem chamar `listen()`.
+ * Usado pelo bootstrap local/Docker/Vercel (src/main.ts) — a Vercel detecta o
+ * projeto nativamente como NestJS (Framework Preset) e empacota o resultado
+ * de `dist/main.js` como Function automaticamente, sem entrypoint customizado.
  */
-export async function createNestApp(
-  expressInstance?: Express,
-  options: CreateNestAppOptions = {},
-): Promise<INestApplication> {
-  const app = expressInstance
-    ? await NestFactory.create(AppModule, new ExpressAdapter(expressInstance))
-    : await NestFactory.create(AppModule);
-
-  if (options.globalPrefix) {
-    app.setGlobalPrefix(options.globalPrefix);
-  }
+export async function createNestApp(): Promise<INestApplication> {
+  const app = await NestFactory.create(AppModule);
 
   app.enableCors({
     origin: resolveCorsOrigins(),
