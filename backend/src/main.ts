@@ -30,17 +30,36 @@ function resolveCorsOrigins(): string[] | boolean {
 // NestFactory.create(AppModule) e app.listen() — por isso a criação da
 // aplicação fica aqui, sem indireção por outro módulo/arquivo.
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  try {
+    console.log('[SIGFIS] iniciando bootstrap');
+    console.log('[SIGFIS] DATABASE_URL:', process.env.DATABASE_URL ? 'PRESENTE' : 'AUSENTE');
+    console.log('[SIGFIS] DIRECT_URL:', process.env.DIRECT_URL ? 'PRESENTE' : 'AUSENTE');
+    console.log('[SIGFIS] JWT_SECRET:', process.env.JWT_SECRET ? 'PRESENTE' : 'AUSENTE');
+    console.log('[SIGFIS] JWT_EXPIRATION:', process.env.JWT_EXPIRATION ? 'PRESENTE' : 'AUSENTE');
 
-  app.enableCors({
-    origin: resolveCorsOrigins(),
-    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  });
+    console.log('[SIGFIS] chamando NestFactory.create');
+    const app = await NestFactory.create(AppModule);
+    console.log('[SIGFIS] NestFactory.create concluído');
 
-  const port = process.env.PORT ?? 3001;
-  await app.listen(port);
-  console.log(`SIGFIS Backend rodando na porta ${port}`);
+    console.log('[SIGFIS] configurando CORS');
+    app.enableCors({
+      origin: resolveCorsOrigins(),
+      methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true,
+    });
+
+    const port = process.env.PORT ?? 3001;
+    console.log('[SIGFIS] iniciando app.listen');
+    await app.listen(port);
+    console.log(`SIGFIS Backend rodando na porta ${port}`);
+  } catch (error) {
+    console.error('========== SIGFIS BOOTSTRAP ERROR ==========');
+    console.error('Tipo:', error?.constructor?.name);
+    console.error('Mensagem:', error instanceof Error ? error.message : String(error));
+    console.error('Stack:', error instanceof Error ? error.stack : undefined);
+    console.error('============================================');
+    throw error;
+  }
 }
 bootstrap();
