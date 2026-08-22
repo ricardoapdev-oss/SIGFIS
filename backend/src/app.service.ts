@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
 
+export interface ApiStatus {
+  name: string;
+  status: string;
+}
+
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  getStatus(): ApiStatus {
+    return { name: 'SIGFIS API', status: 'ok' };
   }
 }
