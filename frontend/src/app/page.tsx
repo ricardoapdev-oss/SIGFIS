@@ -391,6 +391,8 @@ function MainAppShell() {
         onNavigate={(v) => handleNavigate(v)}
         onLogout={handleLogout}
         onEditProfile={() => setShowProfileModal(true)}
+        alwaysExpanded={!sidebarCollapsed}
+        onToggleAlwaysExpanded={toggleSidebarCollapsed}
         collapsed={sidebarCollapsed}
         mobileOpen={mobileSidebarOpen}
         onCloseMobile={() => setMobileSidebarOpen(false)}

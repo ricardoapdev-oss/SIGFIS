@@ -1,8 +1,9 @@
 'use client';
 
-import { Activity, FileSignature, LogOut, Shield, FolderOpen, ShieldCheck, Users, ShieldAlert, MessageSquare, History, Brain, UserCog, Crown, Database, X } from 'lucide-react';
+import { Activity, FileSignature, LogOut, Shield, FolderOpen, ShieldCheck, Users, ShieldAlert, MessageSquare, History, Brain, UserCog, Crown, Database, X, ChevronDown, Settings } from 'lucide-react';
 import { User } from '@/lib/api';
 import { Tooltip } from '@/components/ui/tooltip';
+import { Dropdown, DropdownItem, DropdownSeparator, DropdownLabel } from '@/components/ui/dropdown';
 
 type View = 'dashboard' | 'contracts' | 'details' | 'processes' | 'communications' | 'users' | 'pending' | 'risk' | 'audit' | 'ai' | 'backup';
 
@@ -12,6 +13,9 @@ interface SidebarProps {
   onNavigate: (view: View) => void;
   onLogout: () => void;
   onEditProfile?: () => void;
+  /** Estado real do menu (o mesmo alternado pelo botão ☰ do header) — exibido como "Preferências" no menu do usuário. */
+  alwaysExpanded: boolean;
+  onToggleAlwaysExpanded: () => void;
   collapsed: boolean;
   mobileOpen: boolean;
   onCloseMobile: () => void;
@@ -38,20 +42,22 @@ function RoleIcon({ role }: { role: string }) {
   );
 }
 
+// A separação entre grupos vem de espaçamento (gapAfter), não de linhas —
+// ver item "Separação Visual" do design da sidebar.
 const navItems = [
-  { view: 'dashboard' as View,      label: 'Painel Geral',            icon: Activity,      roles: ['ADMIN', 'GESTOR', 'FISCAL', 'ALTA_GESTAO'], dividerAfter: false },
-  { view: 'contracts' as View,      label: 'Contratos',               icon: FileSignature, roles: ['ADMIN', 'GESTOR', 'FISCAL', 'ALTA_GESTAO'], dividerAfter: false },
-  { view: 'processes' as View,      label: 'Processos',               icon: FolderOpen,    roles: ['ADMIN', 'GESTOR', 'FISCAL', 'ALTA_GESTAO'], dividerAfter: true  },
-  { view: 'pending' as View,        label: 'Fiscalizações',           icon: ShieldCheck,   roles: ['ADMIN', 'GESTOR', 'FISCAL'],                dividerAfter: false },
-  { view: 'risk' as View,           label: 'Painel de Risco',         icon: ShieldAlert,   roles: ['ADMIN', 'GESTOR', 'ALTA_GESTAO'],           dividerAfter: false },
-  { view: 'communications' as View, label: 'Comunicados',             icon: MessageSquare, roles: ['GESTOR', 'FISCAL', 'ALTA_GESTAO'],          dividerAfter: true  },
-  { view: 'ai' as View,             label: 'Inteligência Contratual', icon: Brain,         roles: ['ADMIN', 'GESTOR', 'ALTA_GESTAO'],           dividerAfter: false },
-  { view: 'audit' as View,          label: 'Auditoria',               icon: History,       roles: ['ADMIN', 'GESTOR', 'ALTA_GESTAO'],           dividerAfter: true  },
-  { view: 'users' as View,          label: 'Usuários',                icon: Users,         roles: ['ADMIN', 'GESTOR', 'ALTA_GESTAO'],           dividerAfter: true  },
-  { view: 'backup' as View,         label: 'Backup do Sistema',       icon: Database,      roles: ['ADMIN', 'GESTOR'],                          dividerAfter: false },
+  { view: 'dashboard' as View,      label: 'Painel Geral',            icon: Activity,      roles: ['ADMIN', 'GESTOR', 'FISCAL', 'ALTA_GESTAO'], gapAfter: false },
+  { view: 'contracts' as View,      label: 'Contratos',               icon: FileSignature, roles: ['ADMIN', 'GESTOR', 'FISCAL', 'ALTA_GESTAO'], gapAfter: false },
+  { view: 'processes' as View,      label: 'Processos',               icon: FolderOpen,    roles: ['ADMIN', 'GESTOR', 'FISCAL', 'ALTA_GESTAO'], gapAfter: true  },
+  { view: 'pending' as View,        label: 'Fiscalizações',           icon: ShieldCheck,   roles: ['ADMIN', 'GESTOR', 'FISCAL'],                gapAfter: false },
+  { view: 'risk' as View,           label: 'Painel de Risco',         icon: ShieldAlert,   roles: ['ADMIN', 'GESTOR', 'ALTA_GESTAO'],           gapAfter: false },
+  { view: 'communications' as View, label: 'Comunicados',             icon: MessageSquare, roles: ['GESTOR', 'FISCAL', 'ALTA_GESTAO'],          gapAfter: true  },
+  { view: 'ai' as View,             label: 'Inteligência Contratual', icon: Brain,         roles: ['ADMIN', 'GESTOR', 'ALTA_GESTAO'],           gapAfter: false },
+  { view: 'audit' as View,          label: 'Auditoria',               icon: History,       roles: ['ADMIN', 'GESTOR', 'ALTA_GESTAO'],           gapAfter: false },
+  { view: 'users' as View,          label: 'Usuários',                icon: Users,         roles: ['ADMIN', 'GESTOR', 'ALTA_GESTAO'],           gapAfter: true  },
+  { view: 'backup' as View,         label: 'Backup do Sistema',       icon: Database,      roles: ['ADMIN', 'GESTOR'],                          gapAfter: false },
 ];
 
-export function Sidebar({ user, activeView, onNavigate, onLogout, onEditProfile, collapsed, mobileOpen, onCloseMobile }: SidebarProps) {
+export function Sidebar({ user, activeView, onNavigate, onLogout, onEditProfile, alwaysExpanded, onToggleAlwaysExpanded, collapsed, mobileOpen, onCloseMobile }: SidebarProps) {
   const isActive = (view: View) =>
     view === 'contracts' ? activeView === 'contracts' || activeView === 'details' : activeView === view;
 
@@ -78,27 +84,28 @@ export function Sidebar({ user, activeView, onNavigate, onLogout, onEditProfile,
 
         {/* Nav */}
         <nav className="space-y-0.5 p-3">
-          {items.map(({ view, label, icon: Icon, dividerAfter }) => {
+          {items.map(({ view, label, icon: Icon, gapAfter }) => {
             const active = isActive(view);
             const button = (
               <button
                 onClick={() => onNavigate(view)}
-                className={`flex w-full cursor-pointer items-center gap-3 rounded-lg text-xs font-medium transition-colors ${
+                className={`relative flex w-full cursor-pointer items-center gap-3 rounded-lg text-xs font-medium transition-colors duration-150 ${
                   collapsedNow ? 'justify-center px-0 py-2.5' : 'px-3 py-2.5 text-left'
                 } ${
                   active
-                    ? 'bg-brand-blue text-white font-semibold shadow-[0_4px_12px_rgba(20,107,255,0.35)]'
+                    ? 'bg-brand-blue text-white font-semibold'
                     : 'text-slate-300 hover:bg-white/8 hover:text-white'
                 }`}
               >
                 <Icon className={`h-4 w-4 shrink-0 ${active ? 'text-white' : 'text-slate-400'}`} />
                 {!collapsedNow && label}
+                {active && <span className="absolute inset-y-1 right-0 w-1 rounded-l-full bg-brand-cyan" />}
               </button>
             );
             return (
               <div key={view}>
                 {collapsedNow ? <Tooltip content={label} side="right">{button}</Tooltip> : button}
-                {dividerAfter && <div className="mx-3 my-1.5 border-b border-white/8" />}
+                {gapAfter && <div className="h-3" />}
               </div>
             );
           })}
@@ -114,18 +121,39 @@ export function Sidebar({ user, activeView, onNavigate, onLogout, onEditProfile,
             </button>
           </Tooltip>
         ) : (
-          <button onClick={onEditProfile} title="Editar perfil" className="w-full group cursor-pointer">
-            <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:border-white/20 hover:bg-white/10">
-              <RoleIcon role={user.role} />
-              <div className="min-w-0 flex-1 text-left">
-                <p className="line-clamp-1 text-xs font-semibold text-white">{user.name}</p>
-                <span className={`mt-0.5 block w-max rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest ${(roleStyle[user.role] ?? roleStyle.FISCAL).badge}`}>
-                  {user.role}
-                </span>
-              </div>
-              <UserCog className="h-3.5 w-3.5 shrink-0 text-slate-400 transition-colors group-hover:text-white" />
+          <Dropdown
+            side="top"
+            align="start"
+            className="w-full"
+            panelClassName="w-full"
+            trigger={({ open, toggle }) => (
+              <button onClick={toggle} title="Menu do usuário" className="group w-full cursor-pointer">
+                <div className={`flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:border-white/20 hover:bg-white/10 ${open ? 'border-white/20 bg-white/10' : ''}`}>
+                  <RoleIcon role={user.role} />
+                  <div className="min-w-0 flex-1 text-left">
+                    <p className="line-clamp-1 text-xs font-semibold text-white">{user.name}</p>
+                    <span className={`mt-0.5 block w-max rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest ${(roleStyle[user.role] ?? roleStyle.FISCAL).badge}`}>
+                      {user.role}
+                    </span>
+                  </div>
+                  <ChevronDown className={`h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform group-hover:text-white ${open ? 'rotate-180' : ''}`} />
+                </div>
+              </button>
+            )}
+          >
+            <DropdownLabel>{user.name}</DropdownLabel>
+            <div className="-mt-1 px-3.5 pb-2">
+              <span className="text-[10px] text-muted-foreground">{user.email}</span>
             </div>
-          </button>
+            <DropdownSeparator />
+            <DropdownItem icon={UserCog} onClick={onEditProfile}>Meu Perfil</DropdownItem>
+            <DropdownItem icon={Settings} onClick={onToggleAlwaysExpanded}>
+              Preferências
+              <span className="ml-auto text-[10px] font-normal text-muted-foreground">{alwaysExpanded ? 'Menu expandido' : 'Menu recolhido'}</span>
+            </DropdownItem>
+            <DropdownSeparator />
+            <DropdownItem icon={LogOut} onClick={onLogout} className="text-brand-red hover:bg-brand-red/5">Sair</DropdownItem>
+          </Dropdown>
         )}
 
         {collapsedNow ? (

@@ -12,6 +12,7 @@ function Dropdown({
   trigger,
   children,
   align = "end",
+  side = "bottom",
   className,
   panelClassName,
   open: controlledOpen,
@@ -20,6 +21,8 @@ function Dropdown({
   trigger: (props: { open: boolean; toggle: () => void }) => React.ReactNode
   children: React.ReactNode
   align?: "start" | "end"
+  /** "top" abre o painel acima do gatilho — para gatilhos perto do rodapé da viewport (ex.: identidade na sidebar). */
+  side?: "top" | "bottom"
   className?: string
   panelClassName?: string
   open?: boolean
@@ -55,7 +58,8 @@ function Dropdown({
       {open && (
         <div
           className={cn(
-            "sigfis-fade-in absolute z-40 mt-2 min-w-56 overflow-hidden rounded-xl border border-border bg-popover shadow-popover",
+            "sigfis-fade-in absolute z-40 min-w-56 overflow-hidden rounded-xl border border-border bg-popover shadow-popover",
+            side === "top" ? "bottom-full mb-2" : "mt-2",
             align === "end" ? "right-0" : "left-0",
             panelClassName
           )}
