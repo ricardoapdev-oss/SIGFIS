@@ -127,12 +127,27 @@ export interface RiskItem {
   pendingItems: number; lastActivity: string;
 }
 
-export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'VIEW' | 'APPROVE' | 'REJECT' | 'LOGIN' | 'LOGOUT';
+export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'VIEW' | 'APPROVE' | 'REJECT' | 'LOGIN' | 'LOGOUT' | 'STATUS_CHANGE' | 'RESOLVE' | 'ASSIGN_FISCAL' | 'EXPORT' | 'RESTORE' | 'RESTORE_FAILED' | (string & {});
 
+// Trilha de auditoria real, persistida em backend/src/audit (tabela audit_logs).
+// Não depende mais de localStorage/writeAuditLog no navegador.
 export interface AuditLog {
-  id: string; userId: string; userName: string; userRole: UserRole; action: AuditAction;
-  entity: string; entityId: string; entityLabel: string; changes?: Record<string, { from: any; to: any }>;
-  ipAddress?: string; userAgent?: string; createdAt: string; deletedAt?: string;
+  id: string;
+  userId: string | null; userEmail: string | null; userName: string | null; userRole: string | null;
+  action: AuditAction; module: string | null; entity: string; entityId: string | null;
+  detail: string | null;
+  oldValues: Record<string, any> | null; newValues: Record<string, any> | null;
+  ipAddress: string | null; userAgent: string | null;
+  createdAt: string;
+}
+
+export interface AuditLogPage {
+  items: AuditLog[]; total: number; page: number; pageSize: number; totalPages: number;
+}
+
+export interface AuditLogQuery {
+  page?: number; pageSize?: number; userId?: string; module?: string; action?: string;
+  entity?: string; search?: string; dateFrom?: string; dateTo?: string; sortDir?: 'asc' | 'desc';
 }
 
 export interface AIInsight {
@@ -427,7 +442,20 @@ const SEED_COMMUNICATIONS: Communication[] = [
   { id: 'comm-2', contractId: 'cnt-c01', senderId: 'usr-gestor', subject: 'URGENTE — Relatório de Fiscalização Semestral 2026', message: 'Todos os fiscais devem submeter o relatório de fiscalização semestral até o dia 30/06/2026. O não cumprimento será registrado no processo administrativo.', isMandatory: true, readBy: ['usr-gestor'], createdAt: '2026-06-01T08:00:00Z' },
 ];
 
-const SEED_AUDIT_LOGS: AuditLog[] = [
+// Formato antigo, local-only, usado apenas pelo simulador de fallback abaixo
+// (handleLocalFallback / logAudit) para entidades cujos endpoints já são reais
+// (Contract, Process, Measurement, Occurrence, Alteration, Communication —
+// todos em REAL_CRUD_PREFIXES). Como request() nunca cai no fallback para esses
+// prefixos, todo este bloco é código morto mantido apenas para não quebrar o
+// arquivo; não tem relação com a trilha de auditoria real (AuditLog acima, que
+// é quem alimenta a tela de Auditoria) e não deve ser usado para exibir nada.
+interface LegacyLocalAuditEntry {
+  id: string; userId: string; userName: string; userRole: string;
+  action: string; entity: string; entityId: string; entityLabel: string;
+  createdAt: string; changes?: Record<string, { from: any; to: any }>;
+}
+
+const SEED_AUDIT_LOGS: LegacyLocalAuditEntry[] = [
   { id: 'aud-1', userId: 'usr-gestor', userName: 'Jairo', userRole: 'GESTOR', action: 'CREATE', entity: 'Contract', entityId: 'cnt-c01', entityLabel: 'Contrato 032/2023 — SESI', createdAt: '2024-01-02T10:00:00Z' },
   { id: 'aud-2', userId: 'usr-f01',    userName: 'Rogério B. da Silva', userRole: 'FISCAL', action: 'CREATE', entity: 'Occurrence', entityId: 'occ-2', entityLabel: 'Inconformidade em exames audiométricos', createdAt: '2026-05-28T10:15:00Z' },
   { id: 'aud-3', userId: 'usr-gestor', userName: 'Jairo', userRole: 'GESTOR', action: 'APPROVE', entity: 'Measurement', entityId: 'msr-1', entityLabel: 'Medição Jan-Fev/2026 — R$ 64.575', createdAt: '2026-03-10T16:00:00Z', changes: { status: { from: 'PENDING_GESTOR', to: 'APPROVED' } } },
@@ -457,7 +485,7 @@ interface LocalDB {
   measurements: InspectionMeasurement[]; alterations: ContractAlteration[];
   alerts: SystemAlert[]; contractAlerts: ContractAlert[];
   processPhases: ProcessPhase[]; communications: Communication[];
-  auditLogs: AuditLog[]; aiInsights: AIInsight[];
+  auditLogs: LegacyLocalAuditEntry[]; aiInsights: AIInsight[];
   documents: DocumentFile[];
 }
 
@@ -511,16 +539,16 @@ function logAudit(db: any, user: User, action: string, entity: string, entityId:
   });
 }
 
-export function writeAuditLog(user: User, action: string, entity: string, entityId: string, entityLabel: string, changes?: Record<string, { from: any; to: any }>) {
-  if (typeof window === 'undefined') return;
-  const db = getLocalDB();
-  if (!db.auditLogs) db.auditLogs = [];
-  db.auditLogs.push({
-    id: `audit-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-    userId: user.id, userName: user.name, userRole: user.role,
-    action: action as AuditAction, entity, entityId, entityLabel, changes: changes || {}, createdAt: new Date().toISOString(),
-  });
-  saveLocalDB(db);
+/**
+ * @deprecated A trilha de auditoria institucional agora é gravada
+ * automaticamente pelo backend (backend/src/audit — AuditInterceptor +
+ * chamadas diretas em serviços sensíveis), de forma real e persistida no
+ * banco, independente do navegador. Esta função não escreve mais em
+ * localStorage e é mantida apenas como no-op para não quebrar chamadas
+ * existentes no restante do frontend enquanto elas são removidas aos poucos.
+ */
+export function writeAuditLog(_user: User, _action: string, _entity: string, _entityId: string, _entityLabel: string, _changes?: Record<string, { from: any; to: any }>) {
+  // Intencionalmente vazio — ver comentário acima.
 }
 
 function notifyActiveFiscais(db: LocalDB, contractId: string, title: string, message: string) {
@@ -736,7 +764,10 @@ function processAlertResponse(alertId: string, response: ContractAlertResponse, 
 const BACKEND_URL = '/api';
 
 // Endpoints de CRUD real que devem ir direto ao backend (sem fallback localStorage)
-const REAL_CRUD_PREFIXES = ['/auth/', '/users', '/contractors', '/contracts', '/processes', '/occurrences', '/measurements', '/alterations', '/communications', '/payments'];
+// '/audit-logs' inclui também /audit-logs/summary e /audit-logs/filters (mesmo prefixo).
+// A trilha de auditoria é institucional: um erro (rede, permissão) deve aparecer
+// como erro real na tela, nunca cair em dado fictício de localStorage.
+const REAL_CRUD_PREFIXES = ['/auth/', '/users', '/contractors', '/contracts', '/processes', '/occurrences', '/measurements', '/alterations', '/communications', '/payments', '/audit-logs'];
 
 async function request(endpoint: string, options: RequestInit = {}) {
   const token = getStoredToken();
@@ -1764,18 +1795,9 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
   }
 
   // ── Auditoria ────────────────────────────────────────────────────────────────
-
-  if (endpoint === '/audit-logs' && method === 'GET') {
-    return { logs: [...(db.auditLogs || [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt)), total: (db.auditLogs || []).length };
-  }
-
-  if (endpoint.match(/^\/audit-logs\/[^/]+$/) && method === 'DELETE') {
-    if (user.role !== 'ADMIN') throw new Error('Acesso negado');
-    const id = endpoint.split('/')[2];
-    db.auditLogs = (db.auditLogs || []).filter(l => l.id !== id);
-    saveLocalDB(db);
-    return { ok: true };
-  }
+  // Removido: '/audit-logs' agora está em REAL_CRUD_PREFIXES e vai direto ao
+  // backend (backend/src/audit), que é a única fonte real e persistida da
+  // trilha de auditoria. Este fallback local nunca é mais alcançado.
 
   if (endpoint.match(/^\/alerts\/[^/]+$/) && method === 'DELETE') {
     if (user.role !== 'ADMIN') throw new Error('Acesso negado');
@@ -1909,8 +1931,24 @@ export const api = {
     panel: () => request('/risk-panel'),
   },
   audit: {
-    list: () => request('/audit-logs'),
-    delete: (id: string) => request(`/audit-logs/${id}`, { method: 'DELETE' }),
+    // Trilha de auditoria real, persistida no backend (backend/src/audit).
+    // Não existe endpoint de exclusão: registros são imutáveis por design.
+    list: (query?: AuditLogQuery): Promise<AuditLogPage> => {
+      const params = new URLSearchParams();
+      if (query) {
+        Object.entries(query).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.set(key, String(value));
+          }
+        });
+      }
+      const qs = params.toString();
+      return request(`/audit-logs${qs ? `?${qs}` : ''}`);
+    },
+    summary: (): Promise<{ eventsToday: number; eventsLast7Days: number; activeUsers: number; criticalActions: number }> =>
+      request('/audit-logs/summary'),
+    filters: (): Promise<{ modules: string[]; actions: string[]; entities: string[] }> =>
+      request('/audit-logs/filters'),
   },
   ai: {
     insights: () => request('/ai/insights'),

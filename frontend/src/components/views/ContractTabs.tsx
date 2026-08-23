@@ -1801,52 +1801,38 @@ function AlertsTab({ contractAlerts, user, queryClient }: { contractAlerts: Cont
   );
 }
 
-// ── Histórico (usa auditoria) ─────────────────────────────────────────────────
-function ContractHistory({ contractId, user }: { contractId: string; user: User }) {
-  const queryClient = useQueryClient();
-  const isAdmin = user.role === 'ADMIN';
-
-  const { data } = useQuery({
-    queryKey: ['audit-logs'],
-    queryFn: () => api.audit.list(),
+// ── Histórico (usa a trilha de auditoria real do backend) ────────────────────
+// Consulta a mesma API institucional da tela de Auditoria (backend/src/audit),
+// filtrando pelos eventos deste contrato. Registro imutável: não há mais
+// exclusão de itens do histórico a partir daqui.
+function ContractHistory({ contractId, user: _user }: { contractId: string; user: User }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['audit-logs', 'contract', contractId],
+    queryFn: () => api.audit.list({ search: contractId, pageSize: 50, sortDir: 'desc' }),
   });
-  const logs = ((data as any)?.logs || []).filter((l: any) => l.entityId === contractId || l.entityId.startsWith(contractId));
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.audit.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['audit-logs'] }),
-  });
+  const logs = (data?.items || []).filter((l) => l.entityId === contractId);
 
   return (
     <div className="space-y-3">
       <h4 className="text-xs font-semibold text-gray-700">Histórico de Movimentações</h4>
-      {logs.length > 0 ? (
+      {isLoading ? (
+        <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-14 bg-gray-100/60 rounded-xl animate-pulse" />)}</div>
+      ) : logs.length > 0 ? (
         <div className="relative">
           <div className="absolute left-4 top-0 bottom-0 w-px bg-gray-100" />
           <div className="space-y-4">
-            {logs.map((log: any) => (
+            {logs.map((log) => (
               <div key={log.id} className="relative pl-10">
                 <div className="absolute left-2.5 top-1 h-3 w-3 rounded-full bg-gray-200 border-2 border-gray-200" />
                 <div className="bg-blue-50/60 border border-gray-200 p-3 rounded-xl">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">{log.action}</p>
-                      <p className="text-xs text-gray-700 mt-0.5">{log.entityLabel}</p>
+                      <p className="text-xs text-gray-700 mt-0.5">{log.detail || (log.module ? `${log.module} atualizado` : 'Evento registrado')}</p>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0 ml-4">
-                      <p className="text-[10px] text-gray-400">{formatDateTime(log.createdAt)}</p>
-                      {isAdmin && (
-                        <button
-                          onClick={() => { if (confirm('Excluir este registro do histórico permanentemente?')) deleteMutation.mutate(log.id); }}
-                          disabled={deleteMutation.isPending}
-                          title="Excluir registro"
-                          className="p-1 text-red-500/60 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors cursor-pointer disabled:opacity-40">
-                          <Trash2 className="h-3 w-3" />
-                        </button>
-                      )}
-                    </div>
+                    <p className="text-[10px] text-gray-400 shrink-0 ml-4">{formatDateTime(log.createdAt)}</p>
                   </div>
-                  <p className="text-[10px] text-gray-500 mt-1">por <strong className="text-gray-500">{log.userName}</strong> ({log.userRole})</p>
+                  <p className="text-[10px] text-gray-500 mt-1">por <strong className="text-gray-500">{log.userName || 'Sistema'}</strong>{log.userRole ? ` (${log.userRole})` : ''}</p>
                 </div>
               </div>
             ))}

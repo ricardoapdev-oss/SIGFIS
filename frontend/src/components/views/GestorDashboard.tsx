@@ -1,740 +1,461 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Clock, AlertTriangle, CheckCircle, TrendingUp, Activity,
-  MessageSquare, RefreshCw, Users, Shield, DollarSign,
-  TrendingDown, Calendar, BarChart2, Building2, AlertOctagon,
-  ArrowDown, ArrowUp, Minus, ChevronRight, Info, Printer,
+  Clock, CheckCircle, AlertTriangle, Calendar as CalendarIcon,
+  DollarSign, TrendingUp, Users, Building2, BarChart2, ChevronRight,
+  RefreshCw, Printer, MoreVertical, ArrowRight, ShieldAlert, FileSignature,
 } from 'lucide-react';
 import {
-  Bar, ComposedChart, Line, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer,
+  PieChart, Pie, Cell,
 } from 'recharts';
 import { api, User, GestorDashboard as GestorDashboardType } from '@/lib/api';
-import { formatCurrency } from '@/lib/labels';
+import { formatCurrency, formatDate } from '@/lib/labels';
+import { StatCard } from '@/components/ui/stat-card';
+import { ChartContainer } from '@/components/ui/chart-container';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Dropdown, DropdownItem } from '@/components/ui/dropdown';
 import { ContractReport } from './ContractReport';
+
+type View = 'dashboard' | 'contracts' | 'details' | 'processes' | 'communications' | 'users' | 'pending' | 'risk' | 'audit' | 'ai' | 'backup';
 
 interface Props {
   user: User;
-  onNavigate: (view: any, contractId?: string, filter?: string) => void;
+  onNavigate: (view: View, contractId?: string, filter?: string) => void;
 }
 
-// -- Palette ------------------------------------------------------------------
-const PIE_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#a1a1aa', '#8b5cf6'];
+const RISK_COLORS: Record<string, string> = { critical: '#EF4444', high: '#F59E0B', medium: '#FACC15', low: '#32D583' };
+const PERIODS = [
+  { key: '30d', label: '30 dias' },
+  { key: '90d', label: '90 dias' },
+  { key: '6m', label: '6 meses' },
+  { key: '12m', label: '12 meses' },
+  { key: 'custom', label: 'Personalizado' },
+] as const;
+type PeriodKey = typeof PERIODS[number]['key'];
 
-// -- Info Tooltip --------------------------------------------------------------
-function InfoTooltip({ text }: { text: string }) {
-  return (
-    <div className="relative group inline-flex items-center shrink-0">
-      <Info className="h-3 w-3 text-gray-700 group-hover:text-gray-700 cursor-help transition-colors" />
-      <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-60 bg-gray-100 border border-gray-300 rounded-xl p-3 text-xs text-gray-700 leading-relaxed shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 text-left font-normal whitespace-normal">
-        {text}
-      </div>
-    </div>
-  );
-}
-
-// -- Alert Priority Card -------------------------------------------------------
-function AlertCard({
-  count, label, subLabel, severity, icon, onClick,
-}: {
-  count: number; label: string; subLabel?: string;
-  severity: 'critical' | 'high' | 'medium' | 'low' | 'info' | 'ok';
-  icon: React.ReactNode; onClick?: () => void;
-}) {
-  const cfg = {
-    critical: { wrap: 'bg-red-500/8 border-red-500/30 hover:border-red-500/50',   icon: 'bg-red-500/15 border-red-500/25 text-red-400',    num: 'text-red-400',    dot: 'bg-red-500' },
-    high:     { wrap: 'bg-orange-500/8 border-orange-500/30 hover:border-orange-500/50', icon: 'bg-orange-500/15 border-orange-500/25 text-orange-400', num: 'text-orange-400', dot: 'bg-orange-500' },
-    medium:   { wrap: 'bg-amber-500/8 border-amber-500/30 hover:border-amber-500/50',  icon: 'bg-amber-500/15 border-amber-500/25 text-amber-400',   num: 'text-amber-400',  dot: 'bg-amber-500' },
-    low:      { wrap: 'bg-emerald-500/8 border-emerald-500/30 hover:border-emerald-500/50', icon: 'bg-emerald-500/15 border-emerald-500/25 text-emerald-400', num: 'text-emerald-400', dot: 'bg-emerald-500' },
-    info:     { wrap: 'bg-blue-500/8 border-blue-500/30 hover:border-blue-500/50',   icon: 'bg-blue-500/15 border-blue-500/25 text-blue-400',    num: 'text-blue-400',   dot: 'bg-blue-500' },
-    ok:       { wrap: 'bg-gray-100/40 border-gray-300 hover:border-gray-300',        icon: 'bg-gray-100 border-gray-300 text-gray-700',          num: 'text-gray-700',   dot: 'bg-zinc-600' },
-  }[severity];
-
-  return (
-    <button
-      onClick={onClick}
-      disabled={!onClick}
-      className={`flex flex-col gap-2.5 p-4 rounded-xl border transition-all ${cfg.wrap} ${onClick ? 'cursor-pointer' : 'cursor-default'}`}
-    >
-      <div className="flex justify-between items-start">
-        <div className={`p-2 rounded-lg border ${cfg.icon}`}>{icon}</div>
-        {count > 0 && <span className={`h-2 w-2 rounded-full ${cfg.dot} animate-pulse mt-0.5`} />}
-      </div>
-      <div>
-        <p className={`text-3xl font-bold leading-none tabular-nums ${cfg.num}`}>{count}</p>
-        <p className="text-xs font-semibold text-gray-700 mt-1.5 leading-tight">{label}</p>
-        {subLabel && <p className="text-[11px] text-gray-700 mt-0.5">{subLabel}</p>}
-      </div>
-    </button>
-  );
-}
-
-// -- Financial KPI Card --------------------------------------------------------
-function FinancialCard({ label, value, sub, accent = 'zinc', trend, tooltip }: {
-  label: string; value: number; sub?: string;
-  accent?: 'emerald' | 'blue' | 'amber' | 'red' | 'zinc'; trend?: number;
-  tooltip?: string;
-}) {
-  const c = { emerald: 'text-emerald-700', blue: 'text-blue-700', amber: 'text-amber-700', red: 'text-red-700', zinc: 'text-slate-900' }[accent];
-  return (
-    <div className="bg-blue-50/60 border border-gray-200 rounded-xl p-3.5">
-      <div className="flex items-center gap-1.5 mb-1.5">
-        <p className="text-[11px] font-bold text-gray-700 uppercase tracking-widest">{label}</p>
-        {tooltip && <InfoTooltip text={tooltip} />}
-      </div>
-      <p className={`text-base font-bold leading-tight ${c} truncate`}>{formatCurrency(value)}</p>
-      {sub && <p className="text-xs text-gray-700 mt-1">{sub}</p>}
-      {trend !== undefined && (
-        <div className="flex items-center gap-1 mt-1.5">
-          {trend > 0 ? <ArrowUp className="h-3 w-3 text-emerald-400" /> : trend < 0 ? <ArrowDown className="h-3 w-3 text-red-400" /> : <Minus className="h-3 w-3 text-gray-700" />}
-          <span className={`text-[11px] font-semibold ${trend > 0 ? 'text-emerald-400' : trend < 0 ? 'text-red-400' : 'text-gray-700'}`}>
-            {Math.abs(trend)}% vs mês anterior
-          </span>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// -- Risk Count Card -----------------------------------------------------------
-function RiskCard({ label, count, variant, onClick, tooltip }: {
-  label: string; count: number; variant: 'critical' | 'high' | 'medium' | 'low'; onClick?: () => void; tooltip?: string;
-}) {
-  const cfg = {
-    critical: 'bg-red-500/10 border-red-500/30 text-red-400',
-    high:     'bg-orange-500/10 border-orange-500/30 text-orange-400',
-    medium:   'bg-amber-500/10 border-amber-500/30 text-amber-400',
-    low:      'bg-emerald-500/10 border-emerald-500/30 text-emerald-400',
-  }[variant];
-  return (
-    <button onClick={onClick} disabled={!onClick}
-      className={`${cfg} border rounded-xl p-3.5 text-center w-full transition-opacity ${onClick ? 'cursor-pointer hover:opacity-75' : 'cursor-default'}`}>
-      <p className="text-3xl font-bold tabular-nums">{count}</p>
-      <div className="flex items-center justify-center gap-1 mt-1">
-        <p className="text-[11px] font-bold uppercase tracking-wider opacity-80">{label}</p>
-        {tooltip && <InfoTooltip text={tooltip} />}
-      </div>
-    </button>
-  );
-}
-
-// -- Workload Bar Row ----------------------------------------------------------
-function WorkloadRow({ name, contracts, max, totalValue, pendingMeasurements, onClick }: {
-  name: string; contracts: number; max: number; totalValue: number; pendingMeasurements: number; onClick: () => void;
-}) {
-  const pct = max > 0 ? (contracts / max) * 100 : 0;
-  const overloaded = contracts >= 5;
-  const warn = contracts >= 3;
-  const barColor = overloaded ? 'from-red-600 to-red-500' : warn ? 'from-amber-600 to-amber-400' : 'from-emerald-600 to-emerald-400';
-  return (
-    <button onClick={onClick}
-      className="w-full text-left bg-gray-100/20 border border-gray-200 hover:border-gray-300 p-3 rounded-xl transition-colors group cursor-pointer">
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[11px] font-semibold text-gray-800 truncate max-w-[55%] group-hover:text-gray-900 transition-colors">{name}</span>
-        <div className="flex items-center gap-2 shrink-0">
-          {pendingMeasurements > 0 && (
-            <span className="text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded-full">
-              {pendingMeasurements} pend.
-            </span>
-          )}
-          <span className={`text-xs font-bold tabular-nums ${overloaded ? 'text-red-400' : warn ? 'text-amber-400' : 'text-gray-700'}`}>
-            {contracts} {contracts === 1 ? 'ctr.' : 'ctrs.'}
-          </span>
-        </div>
-      </div>
-      <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
-        <div className={`h-full bg-gradient-to-r ${barColor} rounded-full`} style={{ width: `${pct}%` }} />
-      </div>
-      <p className="text-[11px] text-gray-700 mt-1.5 truncate">{formatCurrency(totalValue)} sob fiscalização</p>
-    </button>
-  );
-}
-
-// -- Upcoming Event Row --------------------------------------------------------
-function EventRow({ type, contractNumber, description, daysUntil, severity, onClick }: {
-  type: string; contractNumber: string; description: string;
-  daysUntil: number; severity: string; onClick?: () => void;
-}) {
-  const cfg = {
-    red:   { wrap: 'border-red-500/25 bg-red-500/5 hover:border-red-500/40',      num: 'text-red-400',    dot: 'bg-red-500' },
-    amber: { wrap: 'border-amber-500/25 bg-amber-500/5 hover:border-amber-500/40', num: 'text-amber-400',  dot: 'bg-amber-500' },
-    green: { wrap: 'border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/30', num: 'text-emerald-400', dot: 'bg-emerald-500' },
-    blue:  { wrap: 'border-blue-500/20 bg-blue-500/5 hover:border-blue-500/30',    num: 'text-blue-400',   dot: 'bg-blue-500' },
-  }[severity] ?? { wrap: 'border-gray-300 bg-gray-100/30', num: 'text-gray-700', dot: 'bg-zinc-600' };
-
-  const typeLabel: Record<string, string> = { EXPIRATION: 'Venc.', PROCESS: 'Proc.', RENEWAL: 'Renov.', MEASUREMENT: 'Med.' };
-  return (
-    <button onClick={onClick} disabled={!onClick}
-      className={`w-full text-left p-3 rounded-xl border transition-all ${cfg.wrap} ${onClick ? 'cursor-pointer' : 'cursor-default'} flex items-center gap-3`}>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5 mb-0.5">
-          <span className="text-[11px]">{typeLabel[type] || '??'}</span>
-          <span className="text-xs font-bold text-gray-700 truncate">{contractNumber}</span>
-        </div>
-        <p className="text-xs text-gray-700 truncate">{description}</p>
-      </div>
-      <div className="shrink-0 text-right">
-        <p className={`text-base font-bold tabular-nums ${cfg.num}`}>{daysUntil}</p>
-        <p className="text-[11px] text-gray-700">dias</p>
-      </div>
-    </button>
-  );
-}
-
-// -- Section Header ------------------------------------------------------------
-function SectionHeader({ title, icon, badge, tooltip }: { title: string; icon: React.ReactNode; badge?: string; tooltip?: string }) {
-  return (
-    <div className="flex items-center gap-2 mb-4">
-      <span className="text-gray-700">{icon}</span>
-      <h3 className="text-[11px] font-bold text-gray-700 uppercase tracking-widest">{title}</h3>
-      {tooltip && <InfoTooltip text={tooltip} />}
-      {badge && (
-        <span className="text-[11px] font-bold bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded-full animate-pulse">
-          {badge}
-        </span>
-      )}
-    </div>
-  );
-}
-
-// -- Donut with legend ---------------------------------------------------------
-function DonutCard({ title, subtitle, data }: { title: string; subtitle: string; data: { name: string; value: number }[] }) {
-  const total = data.reduce((s, d) => s + d.value, 0);
-  return (
-    <div className="bg-gray-100/20 border border-gray-200 rounded-xl p-5">
-      <p className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-0.5">{title}</p>
-      <p className="text-xs text-gray-700 mb-4">{subtitle}</p>
-      <div className="flex items-center gap-4">
-        <div className="relative shrink-0">
-          <ResponsiveContainer width={120} height={120}>
-            <PieChart>
-              <Pie data={data} cx="50%" cy="50%" innerRadius={36} outerRadius={55} dataKey="value" paddingAngle={3} startAngle={90} endAngle={-270}>
-                {data.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} stroke="transparent" />)}
-              </Pie>
-              <Tooltip
-                contentStyle={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '8px', fontSize: '11px', color: '#e4e4e7' }}
-                itemStyle={{ color: '#a1a1aa' }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="text-lg font-bold text-gray-900">{total}</span>
-          </div>
-        </div>
-        <div className="flex-1 space-y-1.5 min-w-0">
-          {data.map((d, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full shrink-0" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
-              <span className="text-xs text-gray-700 flex-1 truncate">{d.name}</span>
-              <span className="text-xs font-bold text-gray-800 tabular-nums">{d.value}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// -- Monthly Evolution Tooltip -------------------------------------------------
-function MonthlyChartTooltip({ active, payload, label }: any) {
-  if (!active || !payload?.length) return null;
-  const bar  = payload.find((p: any) => p.dataKey === 'measuredK');
-  const line = payload.find((p: any) => p.dataKey === 'valueM');
-  const raw  = payload[0]?.payload;
-  return (
-    <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xl text-xs min-w-[200px]">
-      <p className="text-slate-800 font-bold mb-2.5 pb-2 border-b border-slate-200">{label}</p>
-      {bar && (
-        <div className="flex items-center justify-between gap-6 mb-1.5">
-          <span className="flex items-center gap-1.5 text-gray-700">
-            <span className="h-2.5 w-2.5 rounded-sm bg-emerald-400 inline-block shrink-0" />
-            Executado no mês
-          </span>
-          <span className="text-emerald-400 font-bold tabular-nums">{formatCurrency(Number(bar.value) * 1000)}</span>
-        </div>
-      )}
-      {line && (
-        <div className="flex items-center justify-between gap-6">
-          <span className="flex items-center gap-1.5 text-gray-700">
-            <span className="h-0.5 w-4 bg-indigo-400 inline-block rounded-full shrink-0" />
-            Valor da carteira
-          </span>
-          <span className="text-indigo-700 font-bold tabular-nums">{formatCurrency(Number(line.value) * 1_000_000)}</span>
-        </div>
-      )}
-      {raw?.contracts !== undefined && (
-        <div className="flex items-center justify-between gap-6 mt-2.5 pt-2.5 border-t border-gray-300">
-          <span className="text-gray-700">Contratos ativos</span>
-          <span className="text-gray-800 font-bold">{raw.contracts}</span>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// -- MAIN COMPONENT ------------------------------------------------------------
 export function GestorDashboard({ user, onNavigate }: Props) {
   const [showReport, setShowReport] = useState(false);
-  const { data, isLoading, refetch, isFetching } = useQuery<GestorDashboardType>({
+  const [period, setPeriod] = useState<PeriodKey>('6m');
+
+  const { data, isLoading, isError, refetch, isFetching, dataUpdatedAt } = useQuery<GestorDashboardType>({
     queryKey: ['dashboard-gestor', user.id],
     queryFn: () => api.dashboard.gestor(),
     enabled: !!user,
     staleTime: 300_000,
   });
 
+  const k = data?.kpis;
+  const c = data?.charts;
+  const f = data?.financial;
+  const rs = data?.riskSummary;
+  const ue = data?.upcomingEvents ?? [];
+  const fw = data?.fiscalWorkload ?? [];
+  const ea = data?.extendedAlerts;
+
+  const monthly = useMemo(() => (c?.monthlyEvolution ?? []).map((m) => ({ ...m, measured: Math.round(m.measured) })), [c]);
+  const displayedMonthly = useMemo(() => {
+    if (period === '30d') return monthly.slice(-1);
+    if (period === '90d') return monthly.slice(-3);
+    return monthly; // 6m/12m/custom — só há 6 meses computados hoje, ver nota abaixo do gráfico
+  }, [monthly, period]);
+  const periodTotal = displayedMonthly.reduce((s, m) => s + m.measured, 0);
+
+  const situacao = useMemo(() => {
+    if (!k) return [];
+    const statusMap = new Map((c?.byStatus ?? []).map((s) => [s.name, s.value]));
+    return [
+      { label: 'Ativos', value: k.activeContracts, tone: 'bg-brand-blue', filter: 'active' },
+      { label: 'A vencer (90 dias)', value: k.expiringIn90, tone: 'bg-brand-cyan', filter: 'expiring90' },
+      { label: 'Vencidos', value: k.expiredContracts, tone: 'bg-brand-red', filter: undefined },
+      { label: 'Suspensos', value: statusMap.get('Suspenso') ?? 0, tone: 'bg-brand-amber', filter: undefined },
+      { label: 'Encerrados', value: statusMap.get('Concluído') ?? 0, tone: 'bg-brand-gray', filter: undefined },
+    ];
+  }, [k, c]);
+  const maxSituacao = Math.max(1, ...situacao.map((s) => s.value));
+
+  const lastUpdateLabel = dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : null;
+  // eslint-disable-next-line react-hooks/purity -- leitura única de "agora" para estimar a data de eventos a partir de daysUntil; projeto não usa o React Compiler
+  const now = useMemo(() => Date.now(), []);
+
+  const firstName = user.name?.split(' ')[0] || user.name;
+
+  const canSeeAudit = ['ADMIN', 'GESTOR', 'ALTA_GESTAO'].includes(user.role);
+  const canSeeBackup = ['ADMIN', 'GESTOR'].includes(user.role);
+
   if (isLoading) {
     return (
-      <div className="space-y-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
-          {[...Array(8)].map((_, i) => <div key={i} className="h-28 bg-gray-100/40 rounded-xl animate-pulse" />)}
+      <div className="mx-auto max-w-7xl space-y-6">
+        <Skeleton className="h-16 w-full" />
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+          {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-32" />)}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {[...Array(6)].map((_, i) => <div key={i} className="h-48 bg-gray-100/40 rounded-xl animate-pulse" />)}
-        </div>
+        <Skeleton className="h-72 w-full" />
       </div>
     );
   }
 
-  const k = data?.kpis;
-  const c = data?.charts;
-  const f = data?.financial;
-  const ea = data?.extendedAlerts;
-  const rs = data?.riskSummary;
-  const fw = data?.fiscalWorkload ?? [];
-  const ue = data?.upcomingEvents ?? [];
-
-  const maxFiscalContracts = fw.length > 0 ? Math.max(...fw.map((w: any) => w.contracts)) : 1;
-
-  const monthlyData = (c?.monthlyEvolution ?? []).map(m => ({
-    ...m,
-    measuredK: Math.round(m.measured / 1000),
-    valueM: Number((m.value / 1_000_000).toFixed(3)),
-  }));
-  const lastMonth = monthlyData[monthlyData.length - 1];
-  const totalMeasuredPeriod = monthlyData.reduce((sum, m) => sum + m.measured, 0);
-  const avgMeasured = monthlyData.length > 0
-    ? totalMeasuredPeriod / monthlyData.length
-    : 0;
-
-  const totalAlerts = (k?.expiredContracts ?? 0) + (ea?.expiring30 ?? 0) + (k?.delayedProcesses ?? 0)
-    + (k?.pendingFiscalizacoes ?? 0);
+  if (isError || !data) {
+    return (
+      <div className="mx-auto max-w-7xl">
+        <EmptyState
+          icon={AlertTriangle}
+          title="Não foi possível carregar o painel"
+          description="Houve uma falha ao consultar os indicadores. Tente atualizar novamente."
+          action={
+            <button onClick={() => refetch()} className="mt-2 flex items-center gap-1.5 rounded-lg bg-brand-blue px-4 py-2 text-xs font-semibold text-white cursor-pointer">
+              <RefreshCw className="size-3.5" /> Tentar novamente
+            </button>
+          }
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
-
+    <div className="mx-auto max-w-7xl space-y-6">
       {showReport && <ContractReport user={user} onClose={() => setShowReport(false)} />}
 
-      {/* -- Header -- */}
-      <div className="flex justify-between items-start">
+      {/* Saudação + ações */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-base font-semibold text-gray-900">Centro de Gestão Contratual</h2>
-          <p className="text-xs text-gray-700 mt-0.5">
-            Visão executiva inteligente · Lei 13.303/2016 · RILC IQUEGO
-            {user.role === 'ADMIN' && <span className="ml-2 text-emerald-400 font-semibold">· ADMIN</span>}
-          </p>
+          <h2 className="text-lg font-bold text-foreground">Olá, {firstName} 👋</h2>
+          <p className="mt-0.5 text-xs text-muted-foreground">Bem-vindo ao SIGFIS. Aqui está o resumo da gestão contratual da IQUEGO.</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-60 cursor-pointer"
+          >
+            <RefreshCw className={`size-3.5 ${isFetching ? 'animate-spin' : ''}`} />
+            {isFetching ? 'Atualizando...' : 'Atualizar dados'}
+          </button>
           <button
             onClick={() => setShowReport(true)}
-            className="flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 px-3 py-1.5 rounded-lg transition-colors cursor-pointer font-semibold">
-            <Printer className="h-3 w-3" />
-            Imprimir Relatório
+            className="flex items-center gap-1.5 rounded-lg bg-brand-blue px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-brand-blue-dark cursor-pointer"
+          >
+            <Printer className="size-3.5" /> Relatório Executivo
           </button>
-          <button onClick={() => refetch()} disabled={isFetching}
-            className="flex items-center gap-1.5 text-xs text-gray-700 hover:text-gray-700 border border-gray-300 bg-gray-100/40 px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-50">
-            <RefreshCw className={`h-3 w-3 ${isFetching ? 'animate-spin' : ''}`} />
-            Atualizar
-          </button>
+          <Dropdown
+            trigger={({ toggle }) => (
+              <button onClick={toggle} className="flex size-9 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors hover:bg-muted cursor-pointer">
+                <MoreVertical className="size-4" />
+              </button>
+            )}
+          >
+            {canSeeAudit && <DropdownItem icon={ShieldAlert} onClick={() => onNavigate('audit')}>Ver trilha de Auditoria</DropdownItem>}
+            {canSeeBackup && <DropdownItem icon={FileSignature} onClick={() => onNavigate('backup')}>Backup do Sistema</DropdownItem>}
+            <DropdownItem icon={ArrowRight} onClick={() => onNavigate('contracts')}>Ver todos os contratos</DropdownItem>
+          </Dropdown>
         </div>
       </div>
 
-      {/* --------------------------------------------------------
-          BLOCO 1 — CENTRO DE ALERTAS
-      -------------------------------------------------------- */}
-      <div>
-        <SectionHeader
-          title="Centro de Alertas — Ação Imediata"
-          icon={<AlertOctagon className="h-3.5 w-3.5 text-red-400" />}
-          badge={totalAlerts > 0 ? `${totalAlerts} itens críticos` : undefined}
-        />
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-          <AlertCard
-            count={k?.expiredContracts ?? 0}
-            label="Contratos Vencidos"
-            subLabel="Providências urgentes"
-            severity="critical"
-            icon={<AlertTriangle className="h-4 w-4" />}
-          />
-          <AlertCard
-            count={ea?.expiring30 ?? 0}
-            label="Vencem em 30d"
-            subLabel="Risco crítico"
-            severity="critical"
-            icon={<Clock className="h-4 w-4" />}
-            onClick={() => onNavigate('contracts', undefined, 'expiring30')}
-          />
-          <AlertCard
-            count={ea?.expiring60 ?? 0}
-            label="Vencem em 60d"
-            subLabel="Atenção urgente"
-            severity="high"
-            icon={<Clock className="h-4 w-4" />}
-            onClick={() => onNavigate('contracts', undefined, 'expiring60')}
-          />
-          <AlertCard
-            count={k?.expiringIn90 ?? 0}
-            label="Vencem em 90d"
-            subLabel="Monitorar"
-            severity="medium"
-            icon={<Clock className="h-4 w-4" />}
-            onClick={() => onNavigate('contracts', undefined, 'expiring90')}
-          />
-          <AlertCard
-            count={k?.pendingFiscalizacoes ?? 0}
-            label="Fiscaliz. Pendentes"
-            severity="critical"
-            icon={<CheckCircle className="h-4 w-4" />}
-            onClick={() => onNavigate('contracts', undefined, 'pending_measurements')}
-          />
-          <AlertCard
-            count={k?.communicationsPendingReply ?? 0}
-            label="Comun. s/ Resposta"
-            severity="info"
-            icon={<MessageSquare className="h-4 w-4" />}
-            onClick={() => onNavigate('communications')}
-          />
-          <AlertCard
-            count={k?.delayedProcesses ?? 0}
-            label="Proc. Atrasados"
-            subLabel="Fases vencidas"
-            severity="critical"
-            icon={<TrendingDown className="h-4 w-4" />}
-            onClick={() => onNavigate('processes', undefined, 'DELAYED')}
-          />
-        </div>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <StatCard icon={FileSignature} label="Contratos Ativos" value={k?.activeContracts ?? '—'} tone="blue" onClick={() => onNavigate('contracts', undefined, 'active')} />
+        <StatCard icon={CheckCircle} label="Fiscalizações Pendentes" value={k?.pendingFiscalizacoes ?? '—'} tone="cyan" onClick={() => onNavigate('contracts', undefined, 'pending_measurements')} />
+        <StatCard icon={AlertTriangle} label="Alertas Críticos" value={rs?.critical ?? '—'} tone="red" onClick={() => onNavigate('risk')} />
+        <StatCard icon={Clock} label="Contratos a Vencer (90d)" value={k?.expiringIn90 ?? '—'} tone="amber" onClick={() => onNavigate('contracts', undefined, 'expiring90')} />
+        <StatCard icon={DollarSign} label="Valor Total Contratado" value={f ? formatCurrency(f.totalContracted) : '—'} tone="purple" />
+        <StatCard icon={TrendingUp} label="Execução Média" value={f ? `${f.executionPercent}%` : '—'} tone="green" />
       </div>
 
-      {/* --------------------------------------------------------
-          BLOCO 2 — VISÃO FINANCEIRA
-      -------------------------------------------------------- */}
-      <div className="bg-gray-100/20 border border-gray-200 rounded-xl p-5">
-        <SectionHeader title="Visão Financeira Executiva" icon={<DollarSign className="h-3.5 w-3.5" />} />
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
-          <FinancialCard label="Total Contratado" value={f?.totalContracted ?? 0} accent="zinc" sub="carteira ativa" />
-          <FinancialCard label="Total Executado" value={f?.totalExecuted ?? 0} accent="emerald" sub="medições aprovadas" />
-          <FinancialCard label="Saldo Contratual" value={f?.balance ?? 0} accent="blue" sub="disponível" />
-          <FinancialCard label="Valor Médio / Contrato" value={f?.avgContractValue ?? 0} accent="zinc" />
-          <FinancialCard label="Economia Estimada" value={f?.savingsEstimate ?? 0} accent="emerald" sub="vs valor estimado licitação"
-            tooltip="Diferença entre o valor estimado no edital de licitação e o valor efetivamente contratado. Um número positivo significa que as propostas foram competitivas e o IQUEGO pagará menos do que o previsto originalmente — um resultado direto de um processo licitatório bem conduzido." />
-          <div className="bg-blue-50/60 border border-gray-200 rounded-xl p-3.5 flex flex-col justify-center">
-            <p className="text-[11px] font-bold text-gray-700 uppercase tracking-widest mb-1.5">Execução Média</p>
-            <p className="text-2xl font-bold text-emerald-400 tabular-nums">{f?.executionPercent ?? 0}%</p>
-            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mt-2">
-              <div className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-full transition-all"
-                style={{ width: `${f?.executionPercent ?? 0}%` }} />
+      {/* Execução Financeira + Mapa de Riscos */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <ChartContainer
+          className="lg:col-span-2"
+          title="Execução Financeira"
+          description="Valor executado (medições aprovadas) por período"
+          action={
+            <div className="flex flex-wrap items-center gap-1 rounded-lg bg-muted p-1">
+              {PERIODS.map((p) => (
+                <button
+                  key={p.key}
+                  onClick={() => setPeriod(p.key)}
+                  className={`rounded-md px-2 py-1 text-[11px] font-semibold transition-colors cursor-pointer ${period === p.key ? 'bg-surface text-brand-blue shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          }
+        >
+          <p className="text-2xl font-bold text-foreground">{formatCurrency(periodTotal)}</p>
+          <p className="text-xs text-muted-foreground">Valor total executado no período selecionado</p>
+          {displayedMonthly.length > 0 ? (
+            <div className="mt-4 h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={displayedMonthly} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="execArea" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#146BFF" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="#146BFF" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E4E7EC" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1e6 ? `${(v / 1e6).toFixed(1)}mi` : v >= 1e3 ? `${(v / 1e3).toFixed(0)}mil` : v} width={52} />
+                  <RTooltip formatter={(v) => [formatCurrency(Number(v) || 0), 'Executado']} contentStyle={{ borderRadius: 12, border: '1px solid #E4E7EC', fontSize: 12 }} />
+                  <Area type="monotone" dataKey="measured" stroke="#146BFF" strokeWidth={2.5} fill="url(#execArea)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <EmptyState className="mt-4" icon={TrendingUp} title="Sem histórico suficiente" description="Ainda não há medições aprovadas para exibir evolução." />
+          )}
+          {(period === '12m' || period === 'custom') && (
+            <p className="mt-2 text-[11px] text-muted-foreground">Disponível apenas o histórico dos últimos 6 meses no momento — exibindo o período máximo calculado.</p>
+          )}
+          <div className="mt-4 grid grid-cols-3 gap-3 border-t border-border pt-4 text-center">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Contratado</p>
+              <p className="mt-0.5 text-sm font-bold text-foreground">{f ? formatCurrency(f.totalContracted) : '—'}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Executado</p>
+              <p className="mt-0.5 text-sm font-bold text-brand-green">{f ? formatCurrency(f.totalExecuted) : '—'}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Saldo</p>
+              <p className="mt-0.5 text-sm font-bold text-foreground">{f ? formatCurrency(f.balance) : '—'}</p>
             </div>
           </div>
-        </div>
+        </ChartContainer>
 
+        <ChartContainer title="Mapa de Riscos Contratuais" description="Distribuição dos contratos ativos por nível de risco">
+          {rs && (rs.critical + rs.high + rs.medium + rs.low) > 0 ? (
+            <>
+              <div className="relative mx-auto h-40 w-40">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={[{ name: 'Crítico', value: rs.critical }, { name: 'Alto', value: rs.high }, { name: 'Médio', value: rs.medium }, { name: 'Baixo', value: rs.low }]}
+                      dataKey="value" innerRadius={48} outerRadius={70} paddingAngle={3} startAngle={90} endAngle={-270}
+                    >
+                      {['critical', 'high', 'medium', 'low'].map((key) => <Cell key={key} fill={RISK_COLORS[key]} stroke="transparent" />)}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-xl font-bold text-foreground">{rs.critical + rs.high + rs.medium + rs.low}</span>
+                  <span className="text-[10px] text-muted-foreground">Total</span>
+                </div>
+              </div>
+              <div className="mt-4 space-y-2">
+                {[
+                  { label: 'Crítico', value: rs.critical, color: RISK_COLORS.critical },
+                  { label: 'Alto', value: rs.high, color: RISK_COLORS.high },
+                  { label: 'Médio', value: rs.medium, color: RISK_COLORS.medium },
+                  { label: 'Baixo', value: rs.low, color: RISK_COLORS.low },
+                ].map((r) => (
+                  <button key={r.label} onClick={() => onNavigate('risk')} className="flex w-full items-center gap-2 rounded-lg px-2 py-1 text-left transition-colors hover:bg-muted cursor-pointer">
+                    <span className="size-2.5 shrink-0 rounded-full" style={{ background: r.color }} />
+                    <span className="flex-1 text-xs text-muted-foreground">{r.label}</span>
+                    <span className="text-xs font-bold text-foreground">{r.value}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <EmptyState icon={ShieldAlert} title="Nenhum risco identificado" description="Todos os contratos ativos estão em situação regular." />
+          )}
+        </ChartContainer>
       </div>
 
-      {/* --------------------------------------------------------
-          BLOCO 4 — MAPA DE RISCOS  +  BLOCO 8 — CALENDÁRIO
-      -------------------------------------------------------- */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      {/* Próximos Eventos + Contratos por Situação */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <ChartContainer
+          className="lg:col-span-2"
+          title="Próximos Eventos Contratuais"
+          action={<button onClick={() => onNavigate('contracts', undefined, 'expiring180')} className="flex items-center gap-1 text-xs font-semibold text-brand-blue cursor-pointer">Ver todos <ArrowRight className="size-3" /></button>}
+        >
+          {ue.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-border text-[10px] uppercase tracking-wide text-muted-foreground">
+                    <th className="pb-2 font-semibold">Evento</th>
+                    <th className="pb-2 font-semibold">Contrato</th>
+                    <th className="pb-2 font-semibold">Data</th>
+                    <th className="pb-2 font-semibold text-right">Dias restantes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ue.map((ev, i) => {
+                    const eventDate = new Date(now + ev.daysUntil * 86400000);
+                    const typeLabel: Record<string, string> = { EXPIRATION: 'Vencimento contratual', PROCESS: 'Fase de processo' };
+                    return (
+                      <tr
+                        key={i}
+                        onClick={ev.contractId ? () => onNavigate('details', ev.contractId) : undefined}
+                        className={`border-b border-border last:border-0 ${ev.contractId ? 'cursor-pointer hover:bg-muted' : ''}`}
+                      >
+                        <td className="py-2.5 pr-2 text-foreground">{typeLabel[ev.type] || ev.description}</td>
+                        <td className="py-2.5 pr-2 font-semibold text-foreground">{ev.contractNumber || '—'}</td>
+                        <td className="py-2.5 pr-2 text-muted-foreground">{formatDate(eventDate)}</td>
+                        <td className="py-2.5 text-right">
+                          <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${ev.severity === 'red' ? 'bg-brand-red/10 text-brand-red' : ev.severity === 'amber' ? 'bg-brand-amber/10 text-amber-700' : 'bg-brand-green/10 text-emerald-700'}`}>
+                            {ev.daysUntil} dias
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <EmptyState icon={CalendarIcon} title="Nenhum evento nos próximos 90 dias" />
+          )}
+        </ChartContainer>
 
-        {/* Mapa de Riscos */}
-        <div className="bg-gray-100/20 border border-gray-200 rounded-xl p-5">
-          <SectionHeader title="Mapa de Riscos Contratuais" icon={<Shield className="h-3.5 w-3.5" />} />
-          <div className="grid grid-cols-4 gap-2.5 mb-4">
-            <RiskCard label="Crítico" count={rs?.critical ?? 0} variant="critical" onClick={() => onNavigate('risk')}
-              tooltip="Contratos que exigem ação imediata. Alta probabilidade de causar prejuízo significativo ao IQUEGO — geralmente contratos vencidos sem renovação, sem fiscal designado, com inadimplência grave da contratada ou processo judicial em aberto." />
-            <RiskCard label="Alto" count={rs?.high ?? 0} variant="high" onClick={() => onNavigate('risk')}
-              tooltip="Contratos em situação preocupante que pode se agravar rapidamente. Exemplos: vencendo em até 30 dias sem renovação em andamento, medições com grande atraso ou ocorrências críticas sem resposta da contratada. Exigem atenção urgente." />
-            <RiskCard label="Médio" count={rs?.medium ?? 0} variant="medium" onClick={() => onNavigate('risk')}
-              tooltip="Contratos que precisam de monitoramento ativo. A situação é controlável, mas pode piorar sem acompanhamento. Exemplos: vencendo entre 31 e 90 dias, processos com leve atraso ou pendências administrativas em aberto." />
-            <RiskCard label="Baixo" count={rs?.low ?? 0} variant="low" onClick={() => onNavigate('risk')}
-              tooltip="Contratos em situação regular, sem irregularidades identificadas no momento. Devem ser acompanhados conforme o cronograma normal de fiscalização, sem necessidade de ação urgente." />
+        <ChartContainer title="Contratos por Situação">
+          <div className="space-y-4">
+            {situacao.map((s) => (
+              <button
+                key={s.label}
+                onClick={s.filter ? () => onNavigate('contracts', undefined, s.filter) : undefined}
+                className={`block w-full text-left ${s.filter ? 'cursor-pointer' : ''}`}
+              >
+                <div className="mb-1 flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">{s.label}</span>
+                  <span className="font-bold text-foreground">{s.value}</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-muted">
+                  <div className={`h-full rounded-full ${s.tone}`} style={{ width: `${(s.value / maxSituacao) * 100}%` }} />
+                </div>
+              </button>
+            ))}
           </div>
+        </ChartContainer>
+      </div>
 
-          {/* Matriz Probabilidade × Impacto */}
-          <div className="bg-blue-50/60 border border-gray-200 rounded-xl p-4">
-            <p className="text-[11px] font-bold text-gray-700 uppercase tracking-widest mb-3 text-center">Matriz de Risco — Probabilidade × Impacto</p>
-            <div className="flex gap-2">
-              <div className="flex flex-col justify-around text-[8px] text-gray-700 shrink-0 text-right w-10">
-                <span>Alta</span><span>Média</span><span>Baixa</span>
-              </div>
-              <div className="flex-1">
-                <div className="grid grid-cols-3 gap-1" style={{ gridTemplateRows: 'repeat(3, 1fr)' }}>
-                  {[
-                    { label: 'M', c: 'bg-amber-500/20 text-amber-400 border-amber-500/20' },
-                    { label: 'A', c: 'bg-orange-500/20 text-orange-400 border-orange-500/20' },
-                    { label: 'C', c: 'bg-red-600/25 text-red-400 border-red-500/25' },
-                    { label: 'B', c: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20' },
-                    { label: 'M', c: 'bg-amber-500/20 text-amber-400 border-amber-500/20' },
-                    { label: 'A', c: 'bg-orange-500/20 text-orange-400 border-orange-500/20' },
-                    { label: 'B', c: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20' },
-                    { label: 'B', c: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20' },
-                    { label: 'M', c: 'bg-amber-500/20 text-amber-400 border-amber-500/20' },
-                  ].map((cell, i) => (
-                    <div key={i} className={`${cell.c} border rounded-lg h-9 flex items-center justify-center text-xs font-bold`}>
-                      {cell.label}
+      {/* Carga fiscal + Unidades administrativas */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <ChartContainer title="Carga de Trabalho — Fiscais" description="Contratos ativos por fiscal designado">
+          {fw.length > 0 ? (
+            <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
+              {fw.map((w) => {
+                const overloaded = w.contracts >= 5;
+                const warn = w.contracts >= 3;
+                return (
+                  <button key={w.id} onClick={() => onNavigate('contracts', undefined, `fiscal:${w.id}`)} className="block w-full rounded-lg border border-border p-3 text-left transition-colors hover:bg-muted cursor-pointer">
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <span className="text-xs font-semibold text-foreground">{w.shortName}</span>
+                      <span className={`text-xs font-bold ${overloaded ? 'text-brand-red' : warn ? 'text-amber-600' : 'text-muted-foreground'}`}>{w.contracts} ctr.</span>
                     </div>
-                  ))}
-                </div>
-                <div className="flex justify-between mt-1.5 text-[8px] text-gray-700">
-                  <span>Baixo</span><span className="text-center">Impacto</span><span>Alto</span>
-                </div>
-              </div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                      <div className={`h-full rounded-full ${overloaded ? 'bg-brand-red' : warn ? 'bg-brand-amber' : 'bg-brand-green'}`} style={{ width: `${Math.min(100, (w.contracts / 5) * 100)}%` }} />
+                    </div>
+                    <p className="mt-1 text-[11px] text-muted-foreground">{formatCurrency(w.totalValue)} sob fiscalização</p>
+                  </button>
+                );
+              })}
             </div>
-          </div>
+          ) : (
+            <EmptyState icon={Users} title="Nenhum fiscal com contratos ativos" />
+          )}
+        </ChartContainer>
 
-          {/* Stats complementares */}
-          <div className="grid grid-cols-2 gap-2.5 mt-3">
-            <div className="bg-blue-50/60 border border-gray-200 rounded-xl p-3 text-center">
-              <p className="text-lg font-bold text-red-400 tabular-nums">{ea?.openCriticalOccurrences ?? 0}</p>
-              <p className="text-[11px] text-gray-700 uppercase tracking-wide">Ocorrências Críticas</p>
-            </div>
-            <div className="bg-blue-50/60 border border-gray-200 rounded-xl p-3 text-center">
-              <p className="text-lg font-bold text-blue-400 tabular-nums">{ea?.pendingAlterations ?? 0}</p>
-              <p className="text-[11px] text-gray-700 uppercase tracking-wide">Aditivos Pendentes</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Calendário de Eventos */}
-        <div className="bg-gray-100/20 border border-gray-200 rounded-xl p-5">
-          <SectionHeader title="Próximos Eventos Contratuais" icon={<Calendar className="h-3.5 w-3.5" />} />
-          <div className="space-y-2 max-h-[340px] overflow-y-auto pr-0.5 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
-            {ue.length > 0 ? ue.map((ev, i) => (
-              <EventRow
-                key={i} type={ev.type} contractNumber={ev.contractNumber}
-                description={ev.description} daysUntil={ev.daysUntil} severity={ev.severity}
-                onClick={ev.contractId ? () => onNavigate('details', ev.contractId) : undefined}
-              />
-            )) : (
-              <div className="text-center py-10">
-                <Calendar className="h-8 w-8 text-gray-700 mx-auto mb-2" />
-                <p className="text-xs text-gray-700">Nenhum evento nos próximos 90 dias</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* --------------------------------------------------------
-          BLOCO 5 — EVOLUÇÃO CONTRATUAL
-      -------------------------------------------------------- */}
-      <div className="bg-gray-100/20 border border-gray-200 rounded-xl p-5">
-        <SectionHeader title="Evolução Contratual — Mensal" icon={<TrendingUp className="h-3.5 w-3.5" />} />
-
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-          <div className="bg-blue-50/50 border border-gray-200 rounded-xl p-3">
-            <p className="text-[11px] font-bold text-gray-700 uppercase tracking-widest mb-1">Total executado no período</p>
-            <p className="text-sm font-bold text-emerald-400">{formatCurrency(totalMeasuredPeriod)}</p>
-            <p className="text-xs text-gray-700 mt-0.5">Últimos {monthlyData.length} meses</p>
-          </div>
-          <div className="bg-blue-50/50 border border-gray-200 rounded-xl p-3">
-            <p className="text-[11px] font-bold text-gray-700 uppercase tracking-widest mb-1">Média mensal executada</p>
-            <p className="text-sm font-bold text-indigo-400">{formatCurrency(avgMeasured)}</p>
-            <p className="text-xs text-gray-700 mt-0.5">por mês no período</p>
-          </div>
-          <div className="bg-blue-50/50 border border-gray-200 rounded-xl p-3">
-            <p className="text-[11px] font-bold text-gray-700 uppercase tracking-widest mb-1">Carteira atual</p>
-            <p className="text-sm font-bold text-gray-800">
-              {lastMonth ? formatCurrency(lastMonth.value) : 'Sem dados'}
-            </p>
-            <p className="text-xs text-gray-700 mt-0.5">
-              {lastMonth ? `${lastMonth.contracts} contratos ativos` : ''}
-            </p>
-          </div>
-        </div>
-
-        {/* Chart */}
-        <ResponsiveContainer width="100%" height={260}>
-          <ComposedChart data={monthlyData} margin={{ top: 8, right: 56, bottom: 4, left: 8 }}>
-            <defs>
-              <linearGradient id="execBarGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%"   stopColor="#34d399" stopOpacity={0.95} />
-                <stop offset="100%" stopColor="#059669" stopOpacity={0.75} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-            <XAxis
-              dataKey="name"
-              tick={{ fill: '#71717a', fontSize: 10 }}
-              axisLine={false} tickLine={false} dy={8}
-            />
-            {/* Left axis — executed in R$ K */}
-            <YAxis
-              yAxisId="money"
-              tick={{ fill: '#52525b', fontSize: 10 }}
-              axisLine={false} tickLine={false}
-              width={68}
-              tickFormatter={(v) => v === 0 ? '0' : `${v} mil`}
-            />
-            {/* Right axis — portfolio in R$ M */}
-            <YAxis
-              yAxisId="portfolio"
-              orientation="right"
-              tick={{ fill: '#6366f1', fontSize: 10 }}
-              axisLine={false} tickLine={false}
-              width={52}
-              tickFormatter={(v) => `${v.toFixed(1)} mi`}
-            />
-            <Tooltip content={<MonthlyChartTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-            <Bar
-              yAxisId="money"
-              dataKey="measuredK"
-              name="Executado no mês"
-              fill="url(#execBarGradient)"
-              radius={[5, 5, 0, 0]}
-              maxBarSize={52}
-            />
-            <Line
-              yAxisId="portfolio"
-              type="monotone"
-              dataKey="valueM"
-              name="Valor da Carteira"
-              stroke="#818cf8"
-              strokeWidth={2.5}
-              dot={{ fill: '#818cf8', r: 4, strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: '#818cf8', stroke: '#312e81', strokeWidth: 2 }}
-            />
-          </ComposedChart>
-        </ResponsiveContainer>
-
-        {/* Legend */}
-        <div className="flex flex-wrap gap-5 mt-3 text-xs text-gray-700">
-          <span className="flex items-center gap-1.5">
-            <span className="h-3 w-3.5 rounded-sm bg-emerald-400/80 inline-block" />
-            Barras: valor executado (medições aprovadas) no mês — eixo esq.
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="h-0.5 w-5 bg-indigo-400 inline-block rounded-full" />
-            Linha: valor total da carteira de contratos ativos — eixo dir.
-          </span>
-        </div>
-        <p className="text-[11px] text-gray-700 mt-1.5">
-          O gráfico exibe os Últimos {monthlyData.length} meses e avança automaticamente a cada mês.
-        </p>
-      </div>
-
-      {/* --------------------------------------------------------
-          BLOCO 6 — CARGA FISCAL  +  BLOCO 7 — UNIDADES
-      -------------------------------------------------------- */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-
-        {/* Carga de Trabalho dos Fiscais */}
-        <div className="bg-gray-100/20 border border-gray-200 rounded-xl p-5">
-          <SectionHeader title="Carga de Trabalho — Fiscais" icon={<Users className="h-3.5 w-3.5" />} />
-          <div className="space-y-2 max-h-[300px] overflow-y-auto pr-0.5 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
-            {fw.length > 0 ? fw.map((w: any) => (
-              <WorkloadRow
-                key={w.id} name={w.shortName} contracts={w.contracts} max={maxFiscalContracts}
-                totalValue={w.totalValue} pendingMeasurements={w.pendingMeasurements}
-                onClick={() => onNavigate('contracts', undefined, `fiscal:${w.id}`)}
-              />
-            )) : (
-              <div className="text-center py-8">
-                <Users className="h-8 w-8 text-gray-700 mx-auto mb-2" />
-                <p className="text-xs text-gray-700">Nenhum fiscal com contratos ativos</p>
-              </div>
-            )}
-          </div>
-          <div className="flex gap-4 mt-3 text-[11px] text-gray-700">
-            <span className="flex items-center gap-1"><span className="h-2 w-2 bg-red-500 rounded-full" /> Sobrecarga (5+)</span>
-            <span className="flex items-center gap-1"><span className="h-2 w-2 bg-amber-500 rounded-full" /> Atenção (3-4)</span>
-            <span className="flex items-center gap-1"><span className="h-2 w-2 bg-emerald-500 rounded-full" /> Normal</span>
-          </div>
-        </div>
-
-        {/* Contratos por Unidade */}
-        <div className="bg-gray-100/20 border border-gray-200 rounded-xl p-5">
-          <SectionHeader title="Contratos por Unidade Administrativa" icon={<Building2 className="h-3.5 w-3.5" />} />
-          <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-0.5 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
-            {(c?.byUnit ?? []).slice(0, 12).map((u: any, i: number) => {
-              const maxVal = Math.max(...(c?.byUnit ?? []).map((x: any) => x.value), 1);
-              return (
-                <div key={i}>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-[11px] text-gray-700 truncate max-w-[78%]">{u.name}</span>
-                    <span className="text-xs font-bold text-gray-700 tabular-nums">{u.value}</span>
+        <ChartContainer title="Contratos por Unidade Administrativa">
+          {(c?.byUnit ?? []).length > 0 ? (
+            <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
+              {(c!.byUnit).slice(0, 12).map((u, i) => {
+                const maxVal = Math.max(1, ...c!.byUnit.map((x) => x.value));
+                return (
+                  <div key={i}>
+                    <div className="mb-1 flex items-center justify-between text-xs">
+                      <span className="truncate text-muted-foreground">{u.name}</span>
+                      <span className="font-bold text-foreground">{u.value}</span>
+                    </div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                      <div className="h-full rounded-full bg-brand-blue" style={{ width: `${(u.value / maxVal) * 100}%` }} />
+                    </div>
                   </div>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-blue-700 to-blue-400 rounded-full"
-                      style={{ width: `${(u.value / maxVal) * 100}%` }} />
-                  </div>
-                </div>
-              );
-            })}
-            {(c?.byUnit ?? []).length === 0 && (
-              <p className="text-xs text-gray-700 text-center py-4">Sem dados de unidade</p>
-            )}
-          </div>
-        </div>
+                );
+              })}
+            </div>
+          ) : (
+            <EmptyState icon={Building2} title="Sem dados de unidade" />
+          )}
+        </ChartContainer>
       </div>
 
-      {/* --------------------------------------------------------
-          ANÁLISE DA CARTEIRA — GRÁFICOS ANALÍTICOS
-      -------------------------------------------------------- */}
-      <div>
-        <SectionHeader title="Análise da Carteira" icon={<BarChart2 className="h-3.5 w-3.5" />} />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <DonutCard
-            title="Contratos por Situação"
-            subtitle="Status atual dos contratos"
-            data={c?.byStatus ?? []}
-          />
-          <DonutCard
-            title="Contratos por Modalidade"
-            subtitle="Distribuição por tipo licitatório"
-            data={c?.byModality ?? []}
-          />
-          <DonutCard
-            title="Processos por Fase"
-            subtitle="Fases em andamento"
-            data={c?.processesByPhase ?? []}
-          />
-        </div>
-      </div>
-
-      {/* -- KPIs secundários -- */}
-      <div>
-        <SectionHeader title="Indicadores Operacionais" icon={<Activity className="h-3.5 w-3.5" />} />
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      {/* Indicadores operacionais */}
+      <ChartContainer title="Indicadores Operacionais">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {[
-            { label: 'Contratos Vigentes', value: k?.activeContracts ?? 0, accent: 'emerald', nav: () => onNavigate('contracts', undefined, 'active') },
-            { label: 'Enc. em 180 dias', value: k?.expiringIn180 ?? 0, accent: 'amber', nav: () => onNavigate('contracts', undefined, 'expiring180') },
-            { label: 'Proc. em Andamento', value: k?.processesInProgress ?? 0, accent: 'blue', nav: () => onNavigate('processes', undefined, 'IN_PROGRESS') },
-            { label: 'Prorrogações Pend.', value: k?.pendingRenewals ?? 0, accent: 'amber', nav: () => onNavigate('pending') },
-            { label: 'Renov. Necessárias', value: k?.expiringIn90 ?? 0, accent: 'red', nav: () => onNavigate('contracts', undefined, 'expiring90') },
-            { label: 'Fiscais c/ Contratos', value: fw.length, accent: 'zinc', nav: undefined },
-          ].map(({ label, value, accent, nav }, i) => (
-            <button key={i} onClick={nav ?? undefined} disabled={!nav}
-              className={`bg-gray-100/30 border border-gray-200 hover:border-gray-300 p-4 rounded-xl text-left transition-all ${nav ? 'cursor-pointer' : 'cursor-default'}`}>
-              <p className="text-[11px] font-medium text-gray-700 uppercase tracking-widest mb-1.5">{label}</p>
-              <p className={`text-2xl font-bold tabular-nums ${ { emerald: 'text-emerald-700', amber: 'text-amber-700', red: 'text-red-700', blue: 'text-blue-700', zinc: 'text-slate-900' }[accent] }`}>
-                {value}
-              </p>
-              {nav && <ChevronRight className="h-3 w-3 text-gray-700 mt-1" />}
+            { label: 'Enc. em 180 dias', value: k?.expiringIn180, nav: () => onNavigate('contracts', undefined, 'expiring180') },
+            { label: 'Proc. em Andamento', value: k?.processesInProgress, nav: () => onNavigate('processes', undefined, 'IN_PROGRESS') },
+            { label: 'Proc. Atrasados', value: k?.delayedProcesses, nav: () => onNavigate('processes', undefined, 'DELAYED') },
+            { label: 'Prorrogações Pend.', value: k?.pendingRenewals, nav: () => onNavigate('pending') },
+            { label: 'Comun. s/ Resposta', value: k?.communicationsPendingReply, nav: () => onNavigate('communications') },
+            { label: 'Fiscais c/ Contratos', value: fw.length, nav: undefined },
+          ].map(({ label, value, nav }) => (
+            <button key={label} onClick={nav} disabled={!nav} className={`rounded-xl border border-border p-3 text-left transition-colors ${nav ? 'cursor-pointer hover:bg-muted' : ''}`}>
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+              <p className="mt-1 text-xl font-bold text-foreground">{value ?? '—'}</p>
+              {nav && <ChevronRight className="mt-1 size-3 text-muted-foreground" />}
             </button>
           ))}
         </div>
-      </div>
+      </ChartContainer>
 
-      {/* -- Footer legal -- */}
-      <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-4 flex flex-wrap gap-6 text-xs text-gray-700">
-        <span><strong className="text-emerald-400">Lei 13.303/2016</strong> — Contratos de empresas estatais</span>
-        <span><strong className="text-gray-700">Aditivo máx.:</strong> 25% serviços — 50% reformas</span>
-        <span><strong className="text-gray-700">Alerta 180d:</strong> vencimento contratual</span>
-        <span><strong className="text-gray-700">RILC IQUEGO</strong> — Regulamento Interno de Licitações</span>
-        <span className="ml-auto text-gray-700">v3.1 — {new Date().toLocaleDateString('pt-BR')}</span>
+      {/* Análise da carteira */}
+      <ChartContainer title="Análise da Carteira" description="Modalidade de contratação e fases de processo">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <MiniDonut title="Por Modalidade" data={c?.byModality ?? []} />
+          <MiniDonut title="Processos por Fase" data={c?.processesByPhase ?? []} />
+        </div>
+      </ChartContainer>
+
+      {/* Rodapé legal */}
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl border border-brand-green/20 bg-brand-green/5 p-4 text-xs text-muted-foreground">
+        <span><strong className="text-emerald-700">Lei 13.303/2016</strong> — Contratos de empresas estatais</span>
+        <span><strong className="text-foreground">Aditivo máx.:</strong> 25% serviços — 50% reformas</span>
+        <span><strong className="text-foreground">RILC IQUEGO</strong> — Regulamento Interno de Licitações</span>
+        {lastUpdateLabel && <span className="ml-auto">Última atualização: {lastUpdateLabel}</span>}
+      </div>
+      {ea && (ea.contractsWithoutFiscal > 0 || ea.openCriticalOccurrences > 0) && (
+        <p className="text-[11px] text-muted-foreground">
+          {ea.contractsWithoutFiscal > 0 && `${ea.contractsWithoutFiscal} contrato(s) sem fiscal designado. `}
+          {ea.openCriticalOccurrences > 0 && `${ea.openCriticalOccurrences} ocorrência(s) crítica(s) em aberto.`}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function MiniDonut({ title, data }: { title: string; data: { name: string; value: number }[] }) {
+  const colors = ['#146BFF', '#00D4B4', '#7C4DFF', '#F59E0B', '#32D583', '#EF4444'];
+  const total = data.reduce((s, d) => s + d.value, 0);
+  if (total === 0) return <EmptyState icon={BarChart2} title={title} description="Sem dados suficientes" />;
+  return (
+    <div>
+      <p className="mb-2 text-xs font-semibold text-foreground">{title}</p>
+      <div className="flex items-center gap-4">
+        <div className="h-24 w-24 shrink-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie data={data} dataKey="value" innerRadius={28} outerRadius={44} paddingAngle={2}>
+                {data.map((_, i) => <Cell key={i} fill={colors[i % colors.length]} stroke="transparent" />)}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="min-w-0 flex-1 space-y-1">
+          {data.map((d, i) => (
+            <div key={i} className="flex items-center gap-2 text-[11px]">
+              <span className="size-2 shrink-0 rounded-full" style={{ background: colors[i % colors.length] }} />
+              <span className="flex-1 truncate text-muted-foreground">{d.name}</span>
+              <span className="font-bold text-foreground">{d.value}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

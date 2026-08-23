@@ -4,6 +4,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '@prisma/client';
+import { Audit } from '../audit/audit-log.decorator';
 
 @Controller('contractors')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -22,12 +23,14 @@ export class ContractorsController {
 
   @Post()
   @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  @Audit({ module: 'Contratadas', action: 'CREATE', entity: 'Contractor' })
   create(@Body() body: any) {
     return this.contractorsService.create(body);
   }
 
   @Patch(':id')
   @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  @Audit({ module: 'Contratadas', action: 'UPDATE', entity: 'Contractor' })
   update(@Param('id') id: string, @Body() body: any) {
     return this.contractorsService.update(id, body);
   }

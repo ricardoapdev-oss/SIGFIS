@@ -9,6 +9,8 @@ import {
 } from 'lucide-react';
 import { api, User, ProcessPhase, ChecklistItem, PhaseStatus, writeAuditLog } from '@/lib/api';
 import { processStatusLabel, processStatusColor, modalityLabel, formatCurrency, formatDate } from '@/lib/labels';
+import { StatCard } from '@/components/ui/stat-card';
+import { EmptyState } from '@/components/ui/empty-state';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -171,17 +173,31 @@ export function ProcessesView({ user, initialFilter }: ProcessesViewProps) {
     });
   };
 
+  const kpi = {
+    active: (processes as any[]).filter((p: any) => p.status !== 'CONCLUDED' && p.status !== 'CANCELED').length,
+    delayed: (processes as any[]).filter(hasOverduePhase).length,
+    pending: (processes as any[]).filter((p: any) => p.status === 'PLANNING' || p.status === 'LEGAL_REVIEW').length,
+    concluded: (processes as any[]).filter((p: any) => p.status === 'CONCLUDED').length,
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-base font-semibold text-gray-900">Processos de Contratação</h2>
+          <h2 className="text-base font-semibold text-gray-900">Processos</h2>
           <p className="text-xs text-gray-500 mt-0.5">Ciclo de vida das contratações — desde o planejamento até a formalização</p>
         </div>
         <button onClick={() => { setIsNewOpen(true); setFormStep(1); }}
-          className="bg-emerald-500 hover:bg-emerald-400 text-zinc-950 px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer">
+          className="bg-brand-blue hover:bg-brand-blue-dark text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer">
           <Plus className="h-4 w-4" /> Novo Processo
         </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <StatCard icon={FolderOpen} label="Ativos" value={kpi.active} tone="blue" />
+        <StatCard icon={AlertTriangle} label="Atrasados" value={kpi.delayed} tone="red" />
+        <StatCard icon={Clock} label="Pendentes" value={kpi.pending} tone="amber" />
+        <StatCard icon={CheckCircle2} label="Concluídos" value={kpi.concluded} tone="green" />
       </div>
 
       {initialFilter && initialFilter !== 'ALL' && (
@@ -268,10 +284,7 @@ export function ProcessesView({ user, initialFilter }: ProcessesViewProps) {
           })}
         </div>
       ) : (
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-12 text-center">
-          <FolderOpen className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 text-sm">Nenhum processo encontrado.</p>
-        </div>
+        <EmptyState icon={FolderOpen} title="Nenhum processo encontrado" description="Ajuste a busca ou o filtro para ver resultados." />
       )}
 
       {/* Modal Novo Processo */}

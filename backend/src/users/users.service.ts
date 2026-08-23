@@ -1,5 +1,6 @@
 import { Injectable, ConflictException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditService } from '../audit/audit.service';
 import { UserRole, UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
@@ -7,7 +8,7 @@ const SELECT_USER = { id: true, name: true, email: true, role: true, registratio
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private auditService: AuditService) {}
 
   async listFiscais() {
     return this.prisma.user.findMany({
@@ -26,10 +27,22 @@ export class UsersService {
   }
 
   async listAll() {
-    return this.prisma.user.findMany({
+    const users = await this.prisma.user.findMany({
       select: { ...SELECT_USER, createdAt: true },
       orderBy: { name: 'asc' },
     });
+
+    // "Último acesso" real, derivado da trilha de auditoria (evento LOGIN),
+    // nunca inventado. Uma única consulta agregada — independe da quantidade
+    // de usuários, sem N+1.
+    const lastLogins = await this.prisma.auditLog.groupBy({
+      by: ['userId'],
+      where: { action: 'LOGIN', userId: { not: null } },
+      _max: { createdAt: true },
+    });
+    const lastLoginByUserId = new Map(lastLogins.map((l) => [l.userId, l._max.createdAt]));
+
+    return users.map((u) => ({ ...u, lastLoginAt: lastLoginByUserId.get(u.id) ?? null }));
   }
 
   async create(data: any, callerRole: string) {
@@ -73,11 +86,21 @@ export class UsersService {
     if (data.registrationNumber !== undefined) updateData.registrationNumber = data.registrationNumber || null;
     if (data.password) updateData.passwordHash = await bcrypt.hash(data.password, 10);
 
-    return this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: { id },
       data: updateData,
       select: { ...SELECT_USER },
     });
+
+    this.auditService.log({
+      userId: caller.id, userEmail: caller.email, userName: caller.name, userRole: caller.role,
+      action: 'UPDATE', module: 'Usuários', entity: 'User', entityId: id,
+      detail: `Perfil atualizado (${caller.id === id ? 'próprio usuário' : 'por ' + caller.name})`,
+      oldValues: { name: user.name, email: user.email, registrationNumber: user.registrationNumber },
+      newValues: { name: updated.name, email: updated.email, registrationNumber: updated.registrationNumber },
+    });
+
+    return updated;
   }
 
   async toggleStatus(id: string, status: string, caller: any) {
@@ -87,11 +110,21 @@ export class UsersService {
     if (target.role === UserRole.ADMIN && caller.role !== 'ADMIN') {
       throw new ForbiddenException('Apenas o ADMIN pode alterar o status de outro ADMIN');
     }
-    return this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: { id },
       data: { status: status as UserStatus },
       select: { ...SELECT_USER },
     });
+
+    this.auditService.log({
+      userId: caller.id, userEmail: caller.email, userName: caller.name, userRole: caller.role,
+      action: 'STATUS_CHANGE', module: 'Usuários', entity: 'User', entityId: id,
+      detail: `Status de ${target.name} alterado: ${target.status} → ${status}`,
+      oldValues: { status: target.status },
+      newValues: { status },
+    });
+
+    return updated;
   }
 
   async delete(id: string, caller: any) {
@@ -102,6 +135,14 @@ export class UsersService {
       throw new ForbiddenException('Apenas o ADMIN pode excluir outro ADMIN');
     }
     await this.prisma.user.delete({ where: { id } });
+
+    this.auditService.log({
+      userId: caller.id, userEmail: caller.email, userName: caller.name, userRole: caller.role,
+      action: 'DELETE', module: 'Usuários', entity: 'User', entityId: id,
+      detail: `Usuário ${target.name} (${target.email}) excluído por ${caller.name}`,
+      oldValues: { name: target.name, email: target.email, role: target.role, status: target.status },
+    });
+
     return { ok: true };
   }
 }

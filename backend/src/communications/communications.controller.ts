@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Param, UseGuards, Req, Patch } from '@nest
 import { CommunicationsService } from './communications.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
+import { Audit } from '../audit/audit-log.decorator';
 
 @Controller()
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -19,11 +20,13 @@ export class CommunicationsController {
   }
 
   @Post('communications')
+  @Audit({ module: 'Comunicações', action: 'CREATE', entity: 'Communication' })
   create(@Req() req, @Body() body: any) {
     return this.communicationsService.create(req.user.id, req.user.role, body);
   }
 
   @Post('communications/:id/complete')
+  @Audit({ module: 'Comunicações', action: 'UPDATE', entity: 'Communication' })
   complete(@Param('id') id: string) {
     return this.communicationsService.complete(id);
   }

@@ -4,6 +4,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '@prisma/client';
+import { Audit } from '../audit/audit-log.decorator';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -28,6 +29,7 @@ export class UsersController {
 
   @Post()
   @Roles(UserRole.ADMIN, UserRole.GESTOR, UserRole.ALTA_GESTAO)
+  @Audit({ module: 'Usuários', action: 'CREATE', entity: 'User' })
   create(@Body() body: any, @Req() req) {
     return this.usersService.create(body, req.user.role);
   }

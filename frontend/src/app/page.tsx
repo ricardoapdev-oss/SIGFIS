@@ -13,6 +13,7 @@ import {
 } from '@/lib/api';
 import Providers from './providers';
 import { Sidebar } from '@/components/layout/Sidebar';
+import { Header } from '@/components/layout/Header';
 import { GestorDashboard } from '@/components/views/GestorDashboard';
 import { FiscalDashboard } from '@/components/views/FiscalDashboard';
 import { ContractTabs } from '@/components/views/ContractTabs';
@@ -28,8 +29,10 @@ import { formatCurrency, formatDate } from '@/lib/labels';
 import {
   Mail, Lock, LogIn, Search, Filter, Plus,
   FileText, ArrowRight, X, Save, Eye, EyeOff, User2, Shield,
-  Clock, AlertTriangle
+  Clock, AlertTriangle, Download, ArrowUpDown,
 } from 'lucide-react';
+import { Pagination } from '@/components/ui/pagination';
+import { EmptyState } from '@/components/ui/empty-state';
 
 type View = 'dashboard' | 'contracts' | 'details' | 'processes' | 'communications' | 'users' | 'pending' | 'risk' | 'audit' | 'ai' | 'backup';
 type ContractFilter = 'ALL' | 'active' | 'expiring180' | 'expiring90' | 'expiring60' | 'expiring30' | 'pending_measurements' | 'delayed_processes' | (string & {});
@@ -175,6 +178,8 @@ function MainAppShell() {
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     const stored = getStoredUser();
@@ -186,8 +191,18 @@ function MainAppShell() {
         '#dashboard'
       );
     }
+    const storedCollapsed = window.localStorage.getItem('sigfis:sidebarCollapsed');
+    if (storedCollapsed === '1') setSidebarCollapsed(true);
     setIsLoadingUser(false);
   }, []);
+
+  const toggleSidebarCollapsed = () => {
+    setSidebarCollapsed((v) => {
+      const next = !v;
+      window.localStorage.setItem('sigfis:sidebarCollapsed', next ? '1' : '0');
+      return next;
+    });
+  };
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
@@ -230,6 +245,7 @@ function MainAppShell() {
   };
 
   const handleNavigate = (view: View, contractId?: string, filter?: string) => {
+    setMobileSidebarOpen(false);
     let newContractId: string | null = null;
     let newContractFilter: ContractFilter = 'ALL';
     let newProcessFilter = 'ALL';
@@ -271,10 +287,10 @@ function MainAppShell() {
 
   if (isLoadingUser) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-blue-50 text-gray-700">
+      <div className="flex min-h-screen items-center justify-center bg-brand-navy text-slate-400">
         <div className="flex flex-col items-center gap-3">
           <SigfisLogo className="h-12 w-12 animate-pulse" />
-          <span className="text-xs font-bold tracking-wider text-blue-400">CARREGANDO...</span>
+          <span className="text-xs font-bold tracking-wider text-brand-blue">CARREGANDO...</span>
         </div>
       </div>
     );
@@ -283,61 +299,72 @@ function MainAppShell() {
   // -- LOGIN SCREEN --
   if (!user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-blue-50 px-4">
-        <div className="w-full max-w-md bg-gray-100/40 border border-gray-200 rounded-2xl p-8 backdrop-blur-md">
-          <div className="flex flex-col items-center text-center mb-8">
-            <div className="mb-4">
-              <SigfisLogo className="h-16 w-16" />
-            </div>
-            <h1 className="text-xl font-bold text-gray-900 tracking-widest">SIGFIS <span className="text-blue-400">CONTRATOS</span></h1>
-            <p className="text-xs text-gray-700 tracking-wider uppercase mt-1">Gestão e Fiscalização de Contratos · IQUEGO</p>
+      <div className="sigfis-sidebar-texture relative flex min-h-screen items-center justify-center overflow-hidden px-4">
+        {/* Elementos geométricos discretos */}
+        <div className="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-brand-blue/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-brand-cyan/10 blur-3xl" />
+        <div className="pointer-events-none absolute right-1/4 top-1/4 hidden size-40 rotate-12 rounded-3xl border border-white/5 sm:block" />
+        <div className="pointer-events-none absolute left-1/3 bottom-1/4 hidden size-24 -rotate-12 rounded-2xl border border-white/5 md:block" />
+
+        <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-white/[0.04] p-8 shadow-2xl backdrop-blur-xl">
+          <div className="mb-8 flex flex-col items-center text-center">
+            <SigfisLogo className="mb-4 h-14 w-14" />
+            <h1 className="text-xl font-bold tracking-wide text-white">SIGFIS</h1>
+            <p className="mt-1 text-[11px] font-medium uppercase tracking-widest text-slate-400">Sistema de Fiscalização de Contratos</p>
+            <div className="mt-3 h-px w-10 bg-brand-blue/50" />
+            <p className="mt-3 text-[11px] text-slate-500">IQUEGO — Indústria Química do Estado de Goiás S/A</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="text-xs font-bold text-gray-700 uppercase tracking-widest block mb-1">E-mail</label>
+              <label className="mb-1 block text-[11px] font-bold uppercase tracking-widest text-slate-400">E-mail</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-2.5 h-4 w-4 text-gray-700" />
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                 <input
                   type="email"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
-                  placeholder="exemplo@sigecontratos.com"
-                  className="w-full bg-blue-50 border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                  placeholder="seu.email@iquego.com.br"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-4 text-xs text-white placeholder-slate-500 outline-none transition-colors focus:border-brand-blue/60 focus:bg-white/10 focus:ring-2 focus:ring-brand-blue/20"
                   required
+                  autoComplete="email"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-bold text-gray-700 uppercase tracking-widest block mb-1">Senha</label>
+              <label className="mb-1 block text-[11px] font-bold uppercase tracking-widest text-slate-400">Senha</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-gray-700" />
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                 <input
                   type="password"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-blue-50 border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-4 text-xs text-white placeholder-slate-500 outline-none transition-colors focus:border-brand-blue/60 focus:bg-white/10 focus:ring-2 focus:ring-brand-blue/20"
                   required
+                  autoComplete="current-password"
                 />
               </div>
             </div>
 
             {loginError && (
-              <p className="text-[11px] font-medium text-red-400 bg-red-500/5 border border-red-500/10 rounded-lg p-2 text-center">
+              <p className="rounded-lg border border-brand-red/20 bg-brand-red/10 p-2 text-center text-[11px] font-medium text-red-300">
                 {loginError}
               </p>
             )}
 
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 border border-blue-500/20 text-white rounded-xl py-2.5 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-blue-500/10"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-blue py-2.5 text-xs font-semibold text-white shadow-lg shadow-brand-blue/20 transition-all hover:bg-brand-blue-dark cursor-pointer"
             >
               <LogIn className="h-4 w-4" /> Entrar no Sistema
             </button>
           </form>
 
+          <p className="mt-6 text-center text-[10px] text-slate-500">
+            Acesso restrito a usuários autorizados da IQUEGO. Conexão segura.
+          </p>
         </div>
       </div>
     );
@@ -364,46 +391,79 @@ function MainAppShell() {
         onNavigate={(v) => handleNavigate(v)}
         onLogout={handleLogout}
         onEditProfile={() => setShowProfileModal(true)}
+        collapsed={sidebarCollapsed}
+        mobileOpen={mobileSidebarOpen}
+        onCloseMobile={() => setMobileSidebarOpen(false)}
       />
 
-      <main className="app-surface flex-1 overflow-y-auto bg-slate-50 p-8 border-l border-slate-200">
-        {activeView === 'dashboard' && (
-          user.role === 'FISCAL' ? (
-            <FiscalDashboard user={user} onNavigate={handleNavigate} />
-          ) : (
-            <GestorDashboard user={user} onNavigate={handleNavigate} />
-          )
-        )}
+      <div className="flex min-w-0 flex-1 flex-col">
+        <Header
+          user={user}
+          activeView={activeView}
+          onNavigate={handleNavigate}
+          onToggleSidebar={toggleSidebarCollapsed}
+          onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
+          onEditProfile={() => setShowProfileModal(true)}
+          onLogout={handleLogout}
+          sidebarAlwaysExpanded={!sidebarCollapsed}
+          onToggleSidebarAlwaysExpanded={toggleSidebarCollapsed}
+        />
 
-        {activeView === 'contracts' && (
-          <ContractsListView
-            key={contractFilter}
-            onSelectContract={(id) => handleNavigate('details', id)}
-            user={user}
-            initialFilter={contractFilter}
-          />
-        )}
+        <main className="app-surface flex-1 overflow-y-auto bg-slate-50 p-4 sm:p-8 border-l border-slate-200">
+          {activeView === 'dashboard' && (
+            user.role === 'FISCAL' ? (
+              <FiscalDashboard user={user} onNavigate={handleNavigate} />
+            ) : (
+              <GestorDashboard user={user} onNavigate={handleNavigate} />
+            )
+          )}
 
-        {activeView === 'details' && selectedContractId && (
-          <ContractTabs
-            key={selectedContractId}
-            contractId={selectedContractId}
-            user={user}
-            onBack={() => handleNavigate('contracts')}
-            onNavigate={(view, id, filter) => handleNavigate(view as View, id, filter)}
-          />
-        )}
+          {activeView === 'contracts' && (
+            <ContractsListView
+              key={contractFilter}
+              onSelectContract={(id) => handleNavigate('details', id)}
+              user={user}
+              initialFilter={contractFilter}
+            />
+          )}
 
-        {activeView === 'processes' && <ProcessesView key={processNavKey} user={user} initialFilter={processFilter} />}
-        {activeView === 'pending' && <PendingDashboard user={user} onNavigate={handleNavigate} />}
-        {activeView === 'risk' && <RiskPanel user={user} onNavigate={handleNavigate} />}
-        {activeView === 'communications' && <CommunicationsView user={user} onNavigate={(v, id) => handleNavigate(v as View, id)} />}
-        {activeView === 'users' && <UsersView user={user} />}
-        {activeView === 'audit' && <AuditView user={user} />}
-        {activeView === 'ai' && <AIInsightsPanel user={user} onNavigate={handleNavigate} />}
-        {activeView === 'backup' && <BackupView user={user} />}
-      </main>
+          {activeView === 'details' && selectedContractId && (
+            <ContractTabs
+              key={selectedContractId}
+              contractId={selectedContractId}
+              user={user}
+              onBack={() => handleNavigate('contracts')}
+              onNavigate={(view, id, filter) => handleNavigate(view as View, id, filter)}
+            />
+          )}
+
+          {activeView === 'processes' && <ProcessesView key={processNavKey} user={user} initialFilter={processFilter} />}
+          {activeView === 'pending' && <PendingDashboard user={user} onNavigate={handleNavigate} />}
+          {activeView === 'risk' && <RiskPanel user={user} onNavigate={handleNavigate} />}
+          {activeView === 'communications' && <CommunicationsView user={user} onNavigate={(v, id) => handleNavigate(v as View, id)} />}
+          {activeView === 'users' && <UsersView user={user} />}
+          {activeView === 'audit' && <AuditView user={user} />}
+          {activeView === 'ai' && <AIInsightsPanel user={user} onNavigate={handleNavigate} />}
+          {activeView === 'backup' && <BackupView user={user} />}
+        </main>
+      </div>
     </div>
+  );
+}
+
+// -- SORTABLE TABLE HEADER -----------------------------------------------------
+function SortableHeader({ label, col, sortBy, sortDir, onClick }: {
+  label: string; col: 'number' | 'value' | 'end'; sortBy: string; sortDir: 'asc' | 'desc'; onClick: (col: 'number' | 'value' | 'end') => void;
+}) {
+  const active = sortBy === col;
+  return (
+    <th className="px-4 py-2.5 font-semibold">
+      <button onClick={() => onClick(col)} className={`flex items-center gap-1 cursor-pointer transition-colors ${active ? 'text-brand-blue' : 'hover:text-gray-800'}`}>
+        {label}
+        <ArrowUpDown className={`h-3 w-3 ${active ? 'opacity-100' : 'opacity-40'}`} />
+        {active && <span className="text-[9px]">{sortDir === 'asc' ? '↑' : '↓'}</span>}
+      </button>
+    </th>
   );
 }
 
@@ -432,7 +492,6 @@ function ContractsListView({
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState(initialFilter === 'active' ? 'ACTIVE' : 'ALL');
-  const [showConcluded, setShowConcluded] = useState(false);
   const [showNewContractModal, setShowNewContractModal] = useState(false);
   const [ncNumSeq, setNcNumSeq] = useState('');
   const [ncNumYear, setNcNumYear] = useState(new Date().getFullYear().toString());
@@ -458,6 +517,23 @@ function ContractsListView({
     queryFn: () => api.processes.list(),
     staleTime: 300_000,
   });
+
+  // Nomes de gestor só são resolvíveis para papéis com acesso a /users;
+  // para FISCAL, a coluna Gestor mostra "—" em vez de inventar um nome.
+  const canResolveManagers = ['ADMIN', 'GESTOR', 'ALTA_GESTAO'].includes(user.role);
+  const { data: allUsersForLookup = [] } = useQuery<any[]>({
+    queryKey: ['users-manager-lookup'],
+    queryFn: () => api.users.listAll(),
+    staleTime: 300_000,
+    enabled: canResolveManagers,
+  });
+  const managerNameById = new Map<string, string>((allUsersForLookup || []).map((u: any) => [u.id, u.name]));
+
+  const [sortBy, setSortBy] = useState<'number' | 'value' | 'end'>('number');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [quickFilter, setQuickFilter] = useState<'ALL' | 'active' | 'expiring90' | 'expired' | 'suspended'>('ALL');
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 12;
 
   const createContractMutation = useMutation({
     mutationFn: (data: any) => api.contracts.create(data),
@@ -567,24 +643,65 @@ function ContractsListView({
       matchesKpi = (c.fiscalAssignments || []).some((a: any) => a.fiscal?.name === fiscalNameFromFilter);
     }
 
-    return matchesSearch && matchesStatus && matchesKpi;
+    let matchesQuick = true;
+    if (initialFilter === 'ALL') {
+      const days = daysUntil(c.endDate);
+      if (quickFilter === 'active') matchesQuick = c.status === 'ACTIVE';
+      else if (quickFilter === 'expiring90') matchesQuick = c.status === 'ACTIVE' && days > 0 && days <= 90;
+      else if (quickFilter === 'expired') matchesQuick = c.status === 'ACTIVE' && days <= 0;
+      else if (quickFilter === 'suspended') matchesQuick = c.status === 'SUSPENDED';
+    }
+
+    return matchesSearch && matchesStatus && matchesKpi && matchesQuick;
   });
 
-  // Sort: expiring filters by urgency, default by startDate newest first
-  if (['expiring180', 'expiring90', 'expiring60', 'expiring30'].includes(initialFilter)) {
-    filtered.sort((a, b) => daysUntil(a.endDate) - daysUntil(b.endDate));
-  } else {
-    filtered.sort((a, b) => {
+  // Ordenação: escolhida pelo usuário (colunas clicáveis), com direção configurável.
+  filtered.sort((a, b) => {
+    let cmp = 0;
+    if (sortBy === 'value') {
+      cmp = (a.currentValue ?? 0) - (b.currentValue ?? 0);
+    } else if (sortBy === 'end') {
+      cmp = new Date(a.endDate).getTime() - new Date(b.endDate).getTime();
+    } else {
       const [numA, yearA] = (a.contractNumber || '').split('/');
       const [numB, yearB] = (b.contractNumber || '').split('/');
       const yA = parseInt(yearA || '0'), yB = parseInt(yearB || '0');
-      if (yB !== yA) return yB - yA;
-      return parseInt(numB || '0') - parseInt(numA || '0');
-    });
-  }
+      cmp = yA !== yB ? yA - yB : parseInt(numA || '0') - parseInt(numB || '0');
+    }
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
 
-  const activeFiltered = filtered.filter(c => c.status !== 'CONCLUDED');
-  const concludedFiltered = filtered.filter(c => c.status === 'CONCLUDED');
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pageClamped = Math.min(page, totalPages);
+  const paginated = filtered.slice((pageClamped - 1) * PAGE_SIZE, pageClamped * PAGE_SIZE);
+
+  const toggleSort = (col: 'number' | 'value' | 'end') => {
+    if (sortBy === col) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    else { setSortBy(col); setSortDir('desc'); }
+  };
+
+  const portfolioIndicators = {
+    active: (contracts || []).filter((c) => c.status === 'ACTIVE').length,
+    expiring90: (contracts || []).filter((c) => c.status === 'ACTIVE' && daysUntil(c.endDate) > 0 && daysUntil(c.endDate) <= 90).length,
+    expired: (contracts || []).filter((c) => c.status === 'ACTIVE' && daysUntil(c.endDate) <= 0).length,
+    suspended: (contracts || []).filter((c) => c.status === 'SUSPENDED').length,
+  };
+
+  const exportCsv = () => {
+    const header = ['Contrato', 'Objeto', 'Fornecedor', 'Valor', 'Início', 'Fim', 'Gestor', 'Fiscal', 'Status'];
+    const rows = filtered.map((c) => {
+      const fiscal = (c.fiscalAssignments || []).find((a: any) => a.isActive)?.fiscal?.name || '';
+      const manager = c.managerId ? (managerNameById.get(c.managerId) || '') : '';
+      return [c.contractNumber, c.objectDescription, c.contractor?.corporateName || '', String(c.currentValue ?? ''), c.startDate, c.endDate, manager, fiscal, statusLabels[c.status] || c.status];
+    });
+    const csv = [header, ...rows].map((r) => r.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';')).join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `contratos_sigfis_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   const statusColors: Record<string, string> = {
     DRAFT: 'text-gray-700 bg-gray-100 border-gray-300',
@@ -597,22 +714,53 @@ function ContractsListView({
     DRAFT: 'Rascunho', ACTIVE: 'Ativo', SUSPENDED: 'Suspenso', CONCLUDED: 'Concluído', RESCINDED: 'Rescindido',
   };
 
-  const showDaysBadge = ['expiring180', 'expiring90', 'expiring60', 'expiring30'].includes(initialFilter);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h2 className="text-base font-semibold text-gray-900">Contratos Administrativos</h2>
-          <p className="text-xs text-gray-700 mt-0.5">Listagem e detalhamento de contratos vigentes e históricos</p>
+          <h2 className="text-base font-semibold text-gray-900">Contratos</h2>
+          <p className="text-xs text-gray-700 mt-0.5">Central de gestão dos contratos administrativos da IQUEGO</p>
         </div>
-        <button
-          onClick={() => setShowNewContractModal(true)}
-          className="shrink-0 bg-emerald-500 hover:bg-emerald-400 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-        >
-          <Plus className="h-3.5 w-3.5" /> Novo Contrato
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            onClick={exportCsv}
+            disabled={filtered.length === 0}
+            className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-40 cursor-pointer"
+          >
+            <Download className="h-3.5 w-3.5" /> Exportar
+          </button>
+          <button
+            onClick={() => setShowNewContractModal(true)}
+            className="bg-brand-blue hover:bg-brand-blue-dark text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <Plus className="h-3.5 w-3.5" /> Novo Contrato
+          </button>
+        </div>
+      </div>
+
+      {/* Indicadores do portfólio (independentes do filtro ativo) */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <button onClick={() => { setQuickFilter('active'); setPage(1); }} className={`rounded-xl border p-3.5 text-left transition-colors cursor-pointer ${quickFilter === 'active' ? 'border-brand-blue bg-brand-blue/5' : 'border-gray-200 bg-white hover:bg-gray-50'}`}>
+          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">Ativos</p>
+          <p className="mt-1 text-xl font-bold text-gray-900">{portfolioIndicators.active}</p>
+        </button>
+        <button onClick={() => { setQuickFilter('expiring90'); setPage(1); }} className={`rounded-xl border p-3.5 text-left transition-colors cursor-pointer ${quickFilter === 'expiring90' ? 'border-brand-amber bg-brand-amber/5' : 'border-gray-200 bg-white hover:bg-gray-50'}`}>
+          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">A vencer (90d)</p>
+          <p className="mt-1 text-xl font-bold text-amber-600">{portfolioIndicators.expiring90}</p>
+        </button>
+        <button onClick={() => { setQuickFilter('expired'); setPage(1); }} className={`rounded-xl border p-3.5 text-left transition-colors cursor-pointer ${quickFilter === 'expired' ? 'border-brand-red bg-brand-red/5' : 'border-gray-200 bg-white hover:bg-gray-50'}`}>
+          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">Vencidos</p>
+          <p className="mt-1 text-xl font-bold text-red-600">{portfolioIndicators.expired}</p>
+        </button>
+        <button onClick={() => { setQuickFilter('suspended'); setPage(1); }} className={`rounded-xl border p-3.5 text-left transition-colors cursor-pointer ${quickFilter === 'suspended' ? 'border-gray-400 bg-gray-100' : 'border-gray-200 bg-white hover:bg-gray-50'}`}>
+          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">Suspensos</p>
+          <p className="mt-1 text-xl font-bold text-gray-700">{portfolioIndicators.suspended}</p>
         </button>
       </div>
+      {quickFilter !== 'ALL' && (
+        <button onClick={() => setQuickFilter('ALL')} className="text-xs font-semibold text-brand-blue cursor-pointer">✕ Limpar indicador selecionado</button>
+      )}
 
       {/* Modal Novo Contrato */}
       {showNewContractModal && (
@@ -799,109 +947,82 @@ function ContractsListView({
         )}
       </div>
 
-      {activeFiltered.length > 0 ? (
-        <div className="space-y-3">
-          {activeFiltered.map((c) => {
-            const days = daysUntil(c.endDate);
-            return (
-              <div
-                key={c.id}
-                onClick={() => onSelectContract(c.id)}
-                className="bg-gray-100/30 border border-gray-200 hover:border-gray-300 p-5 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all group cursor-pointer"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                    <span className="text-xs font-bold text-gray-900 group-hover:text-emerald-400 transition-colors">{c.contractNumber}</span>
-                    <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${statusColors[c.status] || ''}`}>
-                      {statusLabels[c.status] || c.status}
-                    </span>
-                    <span className="text-xs text-gray-700">| {c.contractor?.corporateName || 'Empresa não associada'}</span>
-                    {showDaysBadge && days > 0 && (
-                      <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${days <= 90 ? 'text-red-400 bg-red-500/10 border-red-500/20' : 'text-amber-400 bg-amber-500/10 border-amber-500/20'}`}>
-                        {days}d restantes
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-700 line-clamp-1">{c.objectDescription}</p>
-                </div>
-                <div className="flex items-center gap-4 text-xs text-right shrink-0">
-                  <div>
-                    <span className="text-gray-700 block text-[11px] uppercase tracking-wider">Vigência até</span>
-                    <span className="text-gray-700 font-semibold">{formatDate(c.endDate)}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-700 block text-[11px] uppercase tracking-wider">Valor Atual</span>
-                    <span className="text-emerald-400 font-bold">{formatCurrency(c.currentValue)}</span>
-                  </div>
-                  {user.role === 'ADMIN' && (
-                    <button onClick={(e) => { e.stopPropagation(); if (confirm(`Excluir contrato ${c.contractNumber} permanentemente?`)) deleteMutation.mutate(c.id); }}
-                      disabled={deleteMutation.isPending}
-                      className="p-1.5 text-red-500/50 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 rounded-lg transition-colors cursor-pointer disabled:opacity-40"
-                      title="Excluir contrato">
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
-                  <div className="p-1.5 bg-white border border-gray-300 rounded-lg text-gray-700 group-hover:text-gray-900 transition-colors">
-                    <ArrowRight className="h-4 w-4" />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+      {filtered.length > 0 ? (
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[880px] text-left text-xs">
+              <thead>
+                <tr className="border-b border-gray-200 bg-gray-50/60 text-[10px] uppercase tracking-wide text-gray-500">
+                  <SortableHeader label="Contrato" col="number" sortBy={sortBy} sortDir={sortDir} onClick={toggleSort} />
+                  <th className="px-4 py-2.5 font-semibold">Objeto</th>
+                  <th className="px-4 py-2.5 font-semibold">Fornecedor</th>
+                  <SortableHeader label="Valor" col="value" sortBy={sortBy} sortDir={sortDir} onClick={toggleSort} />
+                  <SortableHeader label="Vigência" col="end" sortBy={sortBy} sortDir={sortDir} onClick={toggleSort} />
+                  <th className="px-4 py-2.5 font-semibold">Gestor</th>
+                  <th className="px-4 py-2.5 font-semibold">Fiscal</th>
+                  <th className="px-4 py-2.5 font-semibold">Status</th>
+                  <th className="px-4 py-2.5 font-semibold text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginated.map((c) => {
+                  const days = daysUntil(c.endDate);
+                  const fiscalName = (c.fiscalAssignments || []).find((a: any) => a.isActive)?.fiscal?.name;
+                  const managerName = c.managerId ? managerNameById.get(c.managerId) : undefined;
+                  return (
+                    <tr
+                      key={c.id}
+                      onClick={() => onSelectContract(c.id)}
+                      className="cursor-pointer border-b border-gray-100 transition-colors last:border-0 hover:bg-gray-50"
+                    >
+                      <td className="px-4 py-3 font-bold text-gray-900">{c.contractNumber}</td>
+                      <td className="max-w-[220px] px-4 py-3 text-gray-700"><span className="line-clamp-1">{c.objectDescription}</span></td>
+                      <td className="max-w-[160px] px-4 py-3 text-gray-700"><span className="line-clamp-1">{c.contractor?.corporateName || '—'}</span></td>
+                      <td className="px-4 py-3 font-semibold text-emerald-700">{formatCurrency(c.currentValue)}</td>
+                      <td className="px-4 py-3 text-gray-700">
+                        {formatDate(c.endDate)}
+                        {c.status === 'ACTIVE' && days > 0 && days <= 90 && (
+                          <span className="ml-1.5 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">{days}d</span>
+                        )}
+                        {c.status === 'ACTIVE' && days <= 0 && (
+                          <span className="ml-1.5 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-700">vencido</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-gray-700">{managerName || (canResolveManagers ? '—' : <span title="Não disponível para seu perfil">—</span>)}</td>
+                      <td className="px-4 py-3 text-gray-700">{fiscalName || '—'}</td>
+                      <td className="px-4 py-3">
+                        <span className={`rounded px-2 py-0.5 text-[11px] font-bold border ${statusColors[c.status] || ''}`}>
+                          {statusLabels[c.status] || c.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {user.role === 'ADMIN' && (
+                            <button onClick={(e) => { e.stopPropagation(); if (confirm(`Excluir contrato ${c.contractNumber} permanentemente?`)) deleteMutation.mutate(c.id); }}
+                              disabled={deleteMutation.isPending}
+                              className="rounded-lg p-1.5 text-red-500/60 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-40 cursor-pointer"
+                              title="Excluir contrato">
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          )}
+                          <div className="rounded-lg border border-gray-200 p-1.5 text-gray-500">
+                            <ArrowRight className="h-3.5 w-3.5" />
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex flex-col items-center justify-between gap-3 border-t border-gray-200 px-4 py-3 sm:flex-row">
+            <span className="text-[11px] text-gray-500">{filtered.length} contrato{filtered.length !== 1 ? 's' : ''} · página {pageClamped} de {totalPages}</span>
+            <Pagination page={pageClamped} totalPages={totalPages} onPageChange={setPage} />
+          </div>
         </div>
       ) : (
-        <div className="bg-gray-100/10 border border-gray-200 rounded-xl p-12 text-center">
-          <FileText className="h-8 w-8 text-gray-700 mx-auto mb-3" />
-          <p className="text-xs text-gray-700">Nenhum contrato encontrado para este filtro.</p>
-        </div>
-      )}
-
-      {/* Contratos Encerrados */}
-      {concludedFiltered.length > 0 && (
-        <div className="mt-6">
-          <button onClick={() => setShowConcluded(v => !v)}
-            className="flex items-center gap-2 text-xs font-semibold text-gray-700 hover:text-gray-800 transition-colors cursor-pointer mb-3">
-            <span className={`transition-transform inline-block ${showConcluded ? 'rotate-90' : ''}`}>?</span>
-            Contratos Encerrados ({concludedFiltered.length})
-          </button>
-          {showConcluded && (
-            <div className="space-y-3">
-              {concludedFiltered.map((c) => (
-                <div
-                  key={c.id}
-                  onClick={() => onSelectContract(c.id)}
-                  className="bg-gray-100/10 border border-gray-200 hover:border-gray-300 p-4 rounded-xl flex justify-between items-center gap-4 transition-all group opacity-70 hover:opacity-100 cursor-pointer"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="text-xs font-bold text-gray-700 group-hover:text-gray-800 transition-colors">{c.contractNumber}</span>
-                      <span className="px-2 py-0.5 rounded text-[11px] font-bold border text-blue-400 bg-blue-500/10 border-blue-500/20">Encerrado</span>
-                      <span className="text-xs text-gray-700">| {c.contractor?.corporateName || '—'}</span>
-                    </div>
-                    <p className="text-xs text-gray-700 line-clamp-1">{c.objectDescription}</p>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <div className="text-right">
-                      <span className="text-gray-700 block text-[11px] uppercase tracking-wider">Encerrado em</span>
-                      <span className="text-gray-700 font-semibold text-xs">{formatDate(c.endDate)}</span>
-                    </div>
-                    {user.role === 'ADMIN' && (
-                      <button onClick={(e) => { e.stopPropagation(); if (confirm(`Excluir contrato ${c.contractNumber} permanentemente?`)) deleteMutation.mutate(c.id); }}
-                        disabled={deleteMutation.isPending}
-                        className="p-1.5 text-red-500/50 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer disabled:opacity-40"
-                        title="Excluir contrato">
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                    <div className="p-1.5 bg-white border border-gray-300 rounded-lg text-gray-700 group-hover:text-gray-700 transition-colors">
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <EmptyState icon={FileText} title="Nenhum contrato encontrado" description="Ajuste a busca ou os filtros para ver resultados." />
       )}
     </div>
   );

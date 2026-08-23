@@ -50,7 +50,12 @@ model Contractor {
   corporateName        String     @db.VarChar(255)
   tradeName            String?    @db.VarChar(255)
   cnpjCpf              String     @unique @db.VarChar(20)
-  email                String     @db.VarChar(255)
+  // Opcional desde a migração da base histórica de contratos (ETAPA 6):
+  // nenhuma das 36 contratadas históricas tem e-mail confirmado por fonte
+  // oficial, e o campo não tem nenhum uso funcional em backend/src/contractors
+  // (confirmado por busca no código antes desta alteração). Nunca preenchido
+  // com valor fictício.
+  email                String?    @db.VarChar(255)
   phone                String?    @db.VarChar(20)
   postalCode           String?    @db.VarChar(10)
   addressStreet        String?    @db.VarChar(255)
@@ -326,17 +331,29 @@ model ContractPayment {
   @@map("contract_payments")
 }
 
+// Trilha de auditoria institucional — persistida e centralizada no backend
+// (ETAPA 3, item "Auditoria"). Nunca editada/apagada após gravada; correções
+// geram um novo registro (ver AuditService.log), nunca sobrescrevem o anterior.
 model AuditLog {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String?  @db.Uuid
-  userEmail String?  @db.VarChar(255)
-  action    String   @db.VarChar(100)
-  entity    String   @db.VarChar(100)
-  entityId  String?  @db.VarChar(100)
-  detail    String?
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String?  @db.Uuid
+  userEmail  String?  @db.VarChar(255)
+  userName   String?  @db.VarChar(255)
+  userRole   String?  @db.VarChar(50)
+  action     String   @db.VarChar(100)
+  module     String?  @db.VarChar(100)
+  entity     String   @db.VarChar(100)
+  entityId   String?  @db.VarChar(100)
+  detail     String?
+  oldValues  Json?
+  newValues  Json?
+  ipAddress  String?  @db.VarChar(64)
+  userAgent  String?  @db.VarChar(255)
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
 
   @@index([entity, entityId], map: "idx_audit_entity")
+  @@index([userId], map: "idx_audit_user")
+  @@index([createdAt], map: "idx_audit_created")
   @@map("audit_logs")
 }
 

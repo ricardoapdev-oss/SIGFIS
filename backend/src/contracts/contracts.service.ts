@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditService } from '../audit/audit.service';
 import { AlterationStatus, ContractStatus, FiscalRole, MeasurementStatus, OccurrenceStatus, UserRole } from '@prisma/client';
 
 @Injectable()
 export class ContractsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private auditService: AuditService) {}
 
   async findAll(userId: string, role: string) {
     const sharedInclude = {
@@ -152,7 +153,7 @@ export class ContractsService {
     });
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: any, caller?: any) {
     const contract = await this.prisma.contract.findUnique({ where: { id } });
     if (!contract) throw new NotFoundException('Contrato não encontrado');
 
@@ -164,7 +165,23 @@ export class ContractsService {
     if (data.department !== undefined) updateData.department = data.department;
     if (data.objectDescription) updateData.objectDescription = data.objectDescription;
 
-    return this.prisma.contract.update({ where: { id }, data: updateData });
+    const updated = await this.prisma.contract.update({ where: { id }, data: updateData });
+
+    const oldValues: Record<string, any> = {};
+    const newValues: Record<string, any> = {};
+    for (const key of Object.keys(updateData)) {
+      oldValues[key] = (contract as any)[key];
+      newValues[key] = (updated as any)[key];
+    }
+
+    this.auditService.log({
+      userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
+      action: 'UPDATE', module: 'Contratos', entity: 'Contract', entityId: id,
+      detail: `Contrato ${contract.contractNumber} atualizado`,
+      oldValues, newValues,
+    });
+
+    return updated;
   }
 
   async deactivateAssignment(contractId: string, assignmentId: string) {

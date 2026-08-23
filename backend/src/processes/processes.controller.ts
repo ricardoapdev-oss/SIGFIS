@@ -4,6 +4,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '@prisma/client';
+import { Audit } from '../audit/audit-log.decorator';
 
 @Controller('processes')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -21,24 +22,28 @@ export class ProcessesController {
   }
 
   @Post()
+  @Audit({ module: 'Processos', action: 'CREATE', entity: 'ProcurementProcess' })
   create(@Req() req, @Body() body: any) {
     return this.processesService.create(req.user.id, body);
   }
 
   @Patch(':id')
   @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  @Audit({ module: 'Processos', action: 'UPDATE', entity: 'ProcurementProcess' })
   update(@Param('id') id: string, @Body() body: any) {
     return this.processesService.update(id, body);
   }
 
   @Patch(':id/status')
   @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  @Audit({ module: 'Processos', action: 'STATUS_CHANGE', entity: 'ProcurementProcess' })
   updateStatus(@Param('id') id: string, @Body() body: { status: string }) {
     return this.processesService.updateStatus(id, body.status);
   }
 
   @Delete(':id')
   @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  @Audit({ module: 'Processos', action: 'DELETE', entity: 'ProcurementProcess' })
   delete(@Param('id') id: string) {
     return this.processesService.delete(id);
   }
@@ -50,12 +55,14 @@ export class ProcessesController {
 
   @Post(':id/phases')
   @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  @Audit({ module: 'Processos', action: 'CREATE', entity: 'ProcurementPhase' })
   addPhase(@Param('id') id: string, @Body() body: any) {
     return this.processesService.addPhase(id, body);
   }
 
   @Patch(':id/phases/:phaseId')
   @Roles(UserRole.ADMIN, UserRole.GESTOR, UserRole.FISCAL)
+  @Audit({ module: 'Processos', action: 'UPDATE', entity: 'ProcurementPhase' })
   updatePhase(@Param('id') id: string, @Param('phaseId') phaseId: string, @Body() body: any) {
     return this.processesService.updatePhase(id, phaseId, body);
   }
