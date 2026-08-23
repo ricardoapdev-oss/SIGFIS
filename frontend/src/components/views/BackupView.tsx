@@ -123,7 +123,7 @@ export function BackupView({ user }: BackupViewProps) {
         <div>
           <p className="text-xs font-semibold text-amber-800">Operação Crítica</p>
           <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">
-            O backup exporta todos os dados do sistema (contratos, processos, usuários, medições, etc.) para um arquivo seguro no formato <code className="bg-amber-100 px-1 rounded">.dump</code>.
+            O backup exporta todos os dados do sistema (contratos, processos, usuários, medições, etc.) para um arquivo seguro no formato <code className="bg-amber-100 px-1 rounded">.json</code>.
             A restauração <strong>substitui permanentemente</strong> todos os dados atuais pelos dados do arquivo selecionado. Execute com cautela.
           </p>
         </div>
