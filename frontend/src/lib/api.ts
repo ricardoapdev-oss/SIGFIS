@@ -1034,6 +1034,8 @@ export const api = {
     create: (data: any) => request('/communications', { method: 'POST', body: JSON.stringify(data) }),
     reply: (data: any) => request('/communications', { method: 'POST', body: JSON.stringify(data) }),
     complete: (id: string) => request(`/communications/${id}/complete`, { method: 'POST' }),
+    // Exclusão definitiva — restrita ao ADMIN no backend.
+    remove: (id: string) => request(`/communications/${id}`, { method: 'DELETE' }),
   },
   measurements: {
     create: (data: any) => request('/measurements', { method: 'POST', body: JSON.stringify(data) }),
@@ -1116,7 +1118,6 @@ export const api = {
   },
   audit: {
     // Trilha de auditoria real, persistida no backend (backend/src/audit).
-    // Não existe endpoint de exclusão: registros são imutáveis por design.
     list: (query?: AuditLogQuery): Promise<AuditLogPage> => {
       const params = new URLSearchParams();
       if (query) {
@@ -1133,6 +1134,8 @@ export const api = {
       request('/audit-logs/summary'),
     filters: (): Promise<{ modules: string[]; actions: string[]; entities: string[] }> =>
       request('/audit-logs/filters'),
+    // Exclusão definitiva — restrita ao ADMIN no backend.
+    remove: (id: string) => request(`/audit-logs/${id}`, { method: 'DELETE' }),
   },
   ai: {
     insights: () => request('/ai/insights'),

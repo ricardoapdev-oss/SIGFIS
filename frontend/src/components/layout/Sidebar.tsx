@@ -56,7 +56,7 @@ const navItems = [
   { view: 'processes' as View,      label: 'Processos',               icon: FolderOpen,    roles: ['ADMIN', 'GESTOR', 'FISCAL', 'ALTA_GESTAO'], gapAfter: true  },
   { view: 'pending' as View,        label: 'Fiscalizações',           icon: ShieldCheck,   roles: ['ADMIN', 'GESTOR', 'FISCAL'],                gapAfter: false },
   { view: 'risk' as View,           label: 'Painel de Risco',         icon: ShieldAlert,   roles: ['ADMIN', 'GESTOR', 'ALTA_GESTAO'],           gapAfter: false },
-  { view: 'communications' as View, label: 'Comunicados',             icon: MessageSquare, roles: ['GESTOR', 'FISCAL', 'ALTA_GESTAO'],          gapAfter: true  },
+  { view: 'communications' as View, label: 'Comunicados',             icon: MessageSquare, roles: ['ADMIN', 'GESTOR', 'FISCAL', 'ALTA_GESTAO'],  gapAfter: true  },
   { view: 'ai' as View,             label: 'Inteligência Contratual', icon: Brain,         roles: ['ADMIN', 'GESTOR', 'ALTA_GESTAO'],           gapAfter: false },
   { view: 'audit' as View,          label: 'Auditoria',               icon: ClipboardList, roles: ['ADMIN', 'GESTOR', 'ALTA_GESTAO'],           gapAfter: false },
   { view: 'users' as View,          label: 'Usuários',                icon: Users,         roles: ['ADMIN', 'GESTOR', 'ALTA_GESTAO'],           gapAfter: true  },
@@ -146,8 +146,8 @@ export function Sidebar({ user, activeView, onNavigate, onLogout, onEditProfile,
               <span className="text-[10px] text-muted-foreground">{user.email}</span>
             </div>
             <DropdownSeparator />
-            <DropdownItem icon={UserCog} onClick={onEditProfile}>Meu Perfil</DropdownItem>
-            <DropdownItem icon={Settings} onClick={onToggleAlwaysExpanded}>
+            <DropdownItem icon={UserCog} onClick={onEditProfile} className="text-slate-300 hover:bg-white/8 hover:text-white">Meu Perfil</DropdownItem>
+            <DropdownItem icon={Settings} onClick={onToggleAlwaysExpanded} className="text-slate-300 hover:bg-white/8 hover:text-white">
               Preferências
               <span className="ml-auto text-[10px] font-normal text-muted-foreground">{alwaysExpanded ? 'Menu expandido' : 'Menu recolhido'}</span>
             </DropdownItem>

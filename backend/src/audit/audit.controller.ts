@@ -1,9 +1,10 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Delete, Param, Query, UseGuards } from '@nestjs/common';
 import { AuditService } from './audit.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '@prisma/client';
+import { Audit } from './audit-log.decorator';
 
 // Mesma regra de acesso já usada em toda a aplicação para telas
 // administrativas (Usuários, Relatório de Contratos, Backup): FISCAL não
@@ -44,9 +45,14 @@ export class AuditController {
     return this.auditService.getFilterOptions();
   }
 
-  // Propositalmente NÃO existe endpoint de DELETE/PATCH aqui — a trilha de
-  // auditoria é somente-leitura pela API pública. Uma correção excepcional
-  // deve ser feita por acesso direto e controlado ao banco, e o próprio ato
-  // de investigar/corrigir deveria, por si, virar um novo registro em outra
-  // camada (fora do escopo desta etapa), nunca uma edição do registro original.
+  // Exclusão definitiva de um registro — restrita ao ADMIN (o auditor do
+  // sistema). Não existe endpoint de PATCH/edição: um registro só pode ser
+  // removido por inteiro, nunca alterado — a exclusão em si fica registrada
+  // como um novo evento de auditoria.
+  @Delete(':id')
+  @Roles(UserRole.ADMIN)
+  @Audit({ module: 'Auditoria', action: 'DELETE', entity: 'AuditLog' })
+  remove(@Param('id') id: string) {
+    return this.auditService.remove(id);
+  }
 }

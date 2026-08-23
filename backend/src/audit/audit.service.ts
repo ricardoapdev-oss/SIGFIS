@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface CreateAuditLogInput {
@@ -153,5 +153,14 @@ export class AuditService {
       actions: actions.map((a) => a.action),
       entities: entities.map((e) => e.entity),
     };
+  }
+
+  /** Exclusão definitiva de um registro de auditoria — restrita ao ADMIN
+   *  (ver controller). A própria exclusão gera um novo registro de auditoria. */
+  async remove(id: string) {
+    const log = await this.prisma.auditLog.findUnique({ where: { id } });
+    if (!log) throw new NotFoundException('Registro de auditoria não encontrado.');
+    await this.prisma.auditLog.delete({ where: { id } });
+    return { ok: true };
   }
 }

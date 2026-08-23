@@ -2,9 +2,13 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MessageSquare, Plus, Send, ChevronRight, X, CheckCircle, Archive } from 'lucide-react';
+import { MessageSquare, Plus, Send, ChevronRight, X, CheckCircle, Archive, Trash2 } from 'lucide-react';
 import { api, User } from '@/lib/api';
 import { formatDateTime } from '@/lib/labels';
+
+// Sentinela usado no campo "Contrato de referência" para representar a
+// difusão para todos os contratos de uma vez (não é um UUID de contrato real).
+const ALL_CONTRACTS = 'ALL';
 
 interface CommunicationsViewProps {
   user: User;
@@ -72,9 +76,62 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
     onError: (err: any) => alert(`Erro ao concluir: ${err.message}`),
   });
 
+  // Exclusão definitiva — restrita ao ADMIN (o auditor do sistema), que pode
+  // remover qualquer comunicado ou resposta entre quaisquer partes.
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.communications.remove(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['all-communications'] });
+      setSelectedComm(null);
+    },
+    onError: (err: any) => alert(`Erro ao excluir: ${err.message}`),
+  });
+
   // Agregar comunicados por contrato — listar de todos os contratos acessíveis
   const allContracts: any[] = contracts ?? [];
   const contractIds = allContracts.map((c: any) => c.id);
+
+  // ── Novo Comunicado: seleção dinâmica e bidirecional de Contrato ↔ Fiscal ──
+  const isGestorOrAdmin = user.role === 'GESTOR' || user.role === 'ADMIN';
+
+  const activeFiscaisOfContract = (contract: any): any[] =>
+    (contract?.fiscalAssignments || [])
+      .filter((a: any) => a.isActive && a.fiscal)
+      .map((a: any) => a.fiscal);
+
+  const selectedContract = fContractId && fContractId !== ALL_CONTRACTS
+    ? allContracts.find((c: any) => c.id === fContractId)
+    : undefined;
+
+  // Destinatário (Fiscal): sem contrato específico (vazio ou "Todos os
+  // contratos") mostra o universo completo de fiscais cadastrados; com um
+  // contrato específico, mostra somente os fiscais vinculados a ele.
+  const recipientOptions: any[] = selectedContract
+    ? activeFiscaisOfContract(selectedContract)
+    : ((fiscais as any[]) ?? []);
+
+  const recipientAllLabel = selectedContract
+    ? 'Todos os fiscais do contrato selecionado'
+    : fContractId === ALL_CONTRACTS
+      ? 'Todos os fiscais cadastrados'
+      : 'Todos os fiscais de contratos';
+
+  // Contrato de referência: quando um fiscal específico já foi escolhido,
+  // mostra somente os contratos vinculados a ele (e oculta "Todos os
+  // contratos", incompatível com um destinatário único).
+  const contractOptions: any[] = fRecipientId
+    ? allContracts.filter((c: any) => activeFiscaisOfContract(c).some((f: any) => f.id === fRecipientId))
+    : allContracts;
+  const showAllContractsOption = isGestorOrAdmin && !fRecipientId;
+
+  // Reconciliação: "Todos os contratos" + um fiscal específico é uma
+  // combinação incompatível (o fiscal está ligado a contratos específicos,
+  // não a todos) — ao escolher um fiscal nesse estado, o contrato volta a
+  // ser filtrado para os dele, preservando o restante da seleção.
+  const handleRecipientChange = (value: string) => {
+    setFRecipientId(value);
+    if (value && fContractId === ALL_CONTRACTS) setFContractId('');
+  };
 
   const { data: allComms } = useQuery({
     queryKey: ['all-communications', contractIds.join(',')],
@@ -141,6 +198,22 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
             {replies.length > 0 && (
               <span className="text-[10px] text-gray-500">{replies.length} resposta{replies.length > 1 ? 's' : ''}</span>
             )}
+            {user.role === 'ADMIN' && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const msg = replies.length > 0
+                    ? 'Excluir permanentemente este comunicado e todas as suas respostas?'
+                    : 'Excluir permanentemente este comunicado?';
+                  if (confirm(msg)) deleteMutation.mutate(comm.id);
+                }}
+                disabled={deleteMutation.isPending}
+                title="Excluir comunicado (Auditor/Admin)"
+                className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            )}
             <ChevronRight className={`h-4 w-4 text-gray-500 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
           </div>
         </button>
@@ -157,8 +230,18 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
               <div className="space-y-3 pl-4 border-l-2 border-gray-300">
                 {replies.map((reply: any) => (
                   <div key={reply.id} className="bg-blue-50 p-3 rounded-lg border border-gray-200">
-                    <p className="text-[10px] text-gray-500 mb-1">
-                      <span className="text-gray-500 font-medium">{reply.sender?.name}</span> • {formatDateTime(reply.createdAt)}
+                    <p className="text-[10px] text-gray-500 mb-1 flex items-center justify-between gap-2">
+                      <span><span className="text-gray-500 font-medium">{reply.sender?.name}</span> • {formatDateTime(reply.createdAt)}</span>
+                      {user.role === 'ADMIN' && (
+                        <button
+                          onClick={() => { if (confirm('Excluir permanentemente esta resposta?')) deleteMutation.mutate(reply.id); }}
+                          disabled={deleteMutation.isPending}
+                          title="Excluir resposta (Auditor/Admin)"
+                          className="p-0.5 text-gray-400 hover:text-red-500 hover:bg-red-100 rounded transition-colors cursor-pointer disabled:opacity-50 shrink-0"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      )}
                     </p>
                     <p className="text-xs text-gray-700 leading-relaxed">{reply.message}</p>
                   </div>
@@ -306,7 +389,9 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
               <X className="h-4 w-4" />
             </button>
             <h3 className="text-sm font-bold text-gray-900 mb-2">Novo Comunicado Oficial</h3>
-            <p className="text-xs text-gray-500 mb-5 border-b border-gray-300 pb-3">Mensagem vinculada a um contrato específico.</p>
+            <p className="text-xs text-gray-500 mb-5 border-b border-gray-300 pb-3">
+              {isGestorOrAdmin ? 'Mensagem vinculada a um contrato específico ou a todos os contratos.' : 'Mensagem vinculada a um contrato específico.'}
+            </p>
 
             <form
               onSubmit={(e) => {
@@ -325,22 +410,29 @@ export function CommunicationsView({ user, onNavigate }: CommunicationsViewProps
                 <select value={fContractId} onChange={(e) => setFContractId(e.target.value)} required
                   className="w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500/50">
                   <option value="">Selecione um contrato...</option>
-                  {allContracts.map((c: any) => (
+                  {showAllContractsOption && <option value={ALL_CONTRACTS}>Todos os contratos</option>}
+                  {contractOptions.map((c: any) => (
                     <option key={c.id} value={c.id}>{c.contractNumber} — {c.contractor?.tradeName || c.contractor?.corporateName}</option>
                   ))}
                 </select>
+                {fRecipientId && contractOptions.length === 0 && (
+                  <p className="text-[10px] text-amber-600 mt-1">Este fiscal não possui contratos vinculados.</p>
+                )}
               </div>
 
-              {(user.role === 'GESTOR' || user.role === 'ADMIN') && fiscais && (
+              {isGestorOrAdmin && fiscais && (
                 <div>
                   <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">Destinatário (Fiscal)</label>
-                  <select value={fRecipientId} onChange={(e) => setFRecipientId(e.target.value)}
+                  <select value={fRecipientId} onChange={(e) => handleRecipientChange(e.target.value)}
                     className="w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500/50">
-                    <option value="">Todos os fiscais do contrato</option>
-                    {(fiscais as any[]).map((f: any) => (
+                    <option value="">{recipientAllLabel}</option>
+                    {recipientOptions.map((f: any) => (
                       <option key={f.id} value={f.id}>{f.name}</option>
                     ))}
                   </select>
+                  {selectedContract && recipientOptions.length === 0 && (
+                    <p className="text-[10px] text-amber-600 mt-1">Este contrato não possui fiscais designados.</p>
+                  )}
                 </div>
               )}
               {user.role === 'ALTA_GESTAO' && (

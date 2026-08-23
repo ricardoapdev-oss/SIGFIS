@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Shield, Search, X, Eye, Clock, CalendarRange, Users as UsersIcon, AlertOctagon,
   LogIn, LogOut, PlusCircle, Pencil, Trash2, CheckCircle2, XCircle, UserCog,
@@ -138,6 +138,7 @@ function DetailModal({ log, onClose }: { log: AuditLog; onClose: () => void }) {
 }
 
 export function AuditView({ user }: Props) {
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [userIdFilter, setUserIdFilter] = useState('');
   const [moduleFilter, setModuleFilter] = useState('');
@@ -189,6 +190,17 @@ export function AuditView({ user }: Props) {
   const logs = data?.items || [];
   const totalPages = data?.totalPages || 1;
   const total = data?.total || 0;
+
+  // Exclusão definitiva de um registro — restrita ao ADMIN (o auditor do sistema).
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.audit.remove(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['audit-logs'] });
+      queryClient.invalidateQueries({ queryKey: ['audit-summary'] });
+      setSelectedLog(null);
+    },
+    onError: (err: any) => alert(`Erro ao excluir: ${err.message}`),
+  });
 
   const hasActiveFilters = !!(search || userIdFilter || moduleFilter || actionFilter || entityFilter || dateFrom || dateTo);
   const clearFilters = () => {
@@ -309,10 +321,21 @@ export function AuditView({ user }: Props) {
                       <td className="px-4 py-2.5 text-gray-600 max-w-xs truncate" title={log.detail || undefined}>{log.detail || '—'}</td>
                       <td className="px-4 py-2.5 text-gray-500 font-mono whitespace-nowrap">{log.ipAddress || '—'}</td>
                       <td className="px-4 py-2.5 text-center">
-                        <button onClick={() => setSelectedLog(log)} title="Ver detalhes"
-                          className="p-1.5 text-gray-400 hover:text-brand-blue hover:bg-blue-50 rounded-lg transition-colors cursor-pointer">
-                          <Eye className="h-3.5 w-3.5" />
-                        </button>
+                        <div className="flex items-center justify-center gap-1">
+                          <button onClick={() => setSelectedLog(log)} title="Ver detalhes"
+                            className="p-1.5 text-gray-400 hover:text-brand-blue hover:bg-blue-50 rounded-lg transition-colors cursor-pointer">
+                            <Eye className="h-3.5 w-3.5" />
+                          </button>
+                          {user.role === 'ADMIN' && (
+                            <button
+                              onClick={() => { if (confirm('Excluir permanentemente este registro de auditoria? Esta ação não pode ser desfeita.')) deleteMutation.mutate(log.id); }}
+                              disabled={deleteMutation.isPending}
+                              title="Excluir registro (Auditor/Admin)"
+                              className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50">
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
