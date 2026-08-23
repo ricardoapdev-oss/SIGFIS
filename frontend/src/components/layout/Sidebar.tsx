@@ -21,8 +21,12 @@ interface SidebarProps {
   onCloseMobile: () => void;
 }
 
+// sigfis-logo.png é o lockup vertical (ícone + "SIGFIS" + tagline); aqui só o
+// símbolo é usado (object-cover/object-top recorta o texto embutido para
+// fora da área visível) — o nome/tagline seguem digitados ao lado, como já
+// eram, evitando duplicar o texto da marca.
 function SigfisLogo({ className }: { className?: string }) {
-  return <img src="/sigfis-logo.svg" alt="SIGFIS" className={className} />;
+  return <img src="/sigfis-logo.png" alt="SIGFIS" className={`object-cover object-top ${className || ''}`} />;
 }
 
 const roleStyle: Record<string, { icon: typeof Shield; wrap: string; badge: string }> = {
@@ -70,7 +74,7 @@ export function Sidebar({ user, activeView, onNavigate, onLogout, onEditProfile,
       <div className="min-h-0 flex-1 overflow-y-auto sigfis-scrollbar-thin">
         {/* Logo */}
         <div className={`flex items-center gap-3 border-b border-sidebar-border p-5 ${collapsedNow ? 'justify-center px-3' : ''}`}>
-          <SigfisLogo className="h-8 w-8 shrink-0" />
+          <SigfisLogo className="h-9 w-[54px] shrink-0" />
           {!collapsedNow && (
             <div className="min-w-0">
               <h2 className="font-bold tracking-wide text-sm text-white leading-tight">SIGFIS</h2>

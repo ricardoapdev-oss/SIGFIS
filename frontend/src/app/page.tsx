@@ -38,8 +38,12 @@ type View = 'dashboard' | 'contracts' | 'details' | 'processes' | 'communication
 type ContractFilter = 'ALL' | 'active' | 'expiring180' | 'expiring90' | 'expiring60' | 'expiring30' | 'pending_measurements' | 'delayed_processes' | (string & {});
 
 // -- SIGFIS Logo ---------------------------------------------------------------
+// sigfis-logo.png é o lockup vertical (ícone + "SIGFIS" + tagline). Nos usos
+// compactos (ícone), recortamos só o símbolo via object-cover/object-top —
+// o texto embutido na imagem fica fora da área visível, evitando duplicar o
+// nome ao lado de um texto digitado à parte.
 function SigfisLogo({ className }: { className?: string }) {
-  return <img src="/sigfis-logo.svg" alt="SIGFIS" className={className} />;
+  return <img src="/sigfis-logo.png" alt="SIGFIS" className={`object-cover object-top ${className || ''}`} />;
 }
 
 // -- USER PROFILE MODAL -------------------------------------------------------
@@ -289,7 +293,7 @@ function MainAppShell() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-brand-navy text-slate-400">
         <div className="flex flex-col items-center gap-3">
-          <SigfisLogo className="h-12 w-12 animate-pulse" />
+          <SigfisLogo className="h-12 w-[72px] animate-pulse" />
           <span className="text-xs font-bold tracking-wider text-brand-blue">CARREGANDO...</span>
         </div>
       </div>
@@ -308,11 +312,8 @@ function MainAppShell() {
 
         <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-white/[0.04] p-8 shadow-2xl backdrop-blur-xl">
           <div className="mb-8 flex flex-col items-center text-center">
-            <SigfisLogo className="mb-4 h-14 w-14" />
-            <h1 className="text-xl font-bold tracking-wide text-white">SIGFIS</h1>
-            <p className="mt-1 text-[11px] font-medium uppercase tracking-widest text-slate-400">Sistema de Fiscalização de Contratos</p>
-            <div className="mt-3 h-px w-10 bg-brand-blue/50" />
-            <p className="mt-3 text-[11px] text-slate-500">IQUEGO — Indústria Química do Estado de Goiás S/A</p>
+            {/* eslint-disable-next-line @next/next/no-img-element -- asset de marca fornecido, não passa por otimização do Next */}
+            <img src="/sigfis-login-hero.png" alt="SIGFIS — Sistema de Fiscalização de Contratos — IQUEGO" className="w-full max-w-sm" />
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
