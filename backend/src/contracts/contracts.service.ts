@@ -215,37 +215,13 @@ export class ContractsService {
     return { ok: true };
   }
 
-  async assignFiscal(contractId: string, data: any) {
-    // Verificar se contrato existe
-    const contract = await this.prisma.contract.findUnique({ where: { id: contractId } });
-    if (!contract) {
-      throw new NotFoundException('Contrato não encontrado');
-    }
-
-    // Desativar atribuições anteriores para o mesmo papel
-    await this.prisma.fiscalAssignment.updateMany({
-      where: {
-        contractId,
-        role: data.role,
-        isActive: true,
-      },
-      data: { isActive: false },
-    });
-
-    return this.prisma.fiscalAssignment.create({
-      data: {
-        contractId,
-        fiscalId: data.fiscalId,
-        role: data.role,
-        designationAct: data.designationAct,
-        designationDate: new Date(data.designationDate),
-        startDate: new Date(data.startDate),
-        endDate: data.endDate ? new Date(data.endDate) : null,
-        isActive: true,
-      },
-    });
-  }
-
+  /**
+   * Designa um fiscal ao contrato. Não desativa outras designações do mesmo
+   * papel — a comissão de fiscalização é uma equipe: pode haver mais de um
+   * Titular (ou Substituto/Suplente) simultaneamente. Se o mesmo fiscal já
+   * tiver uma designação para esse papel neste contrato, ela é atualizada
+   * (reativada/renovada) em vez de duplicada.
+   */
   async assignFiscalSafe(contractId: string, data: any) {
     const contract = await this.prisma.contract.findUnique({ where: { id: contractId } });
     if (!contract) {
@@ -268,15 +244,6 @@ export class ContractsService {
     if (!fiscal) {
       throw new BadRequestException('Fiscal não encontrado ou inativo.');
     }
-
-    await this.prisma.fiscalAssignment.updateMany({
-      where: {
-        contractId,
-        role: normalizedRole,
-        isActive: true,
-      },
-      data: { isActive: false, endDate: new Date() },
-    });
 
     const payload = {
       designationAct: data.designationAct,
@@ -304,6 +271,35 @@ export class ContractsService {
         role: normalizedRole,
         ...payload,
       },
+    });
+  }
+
+  /** Muda o papel (Titular/Substituto/Suplente) de uma designação já existente. */
+  async updateAssignmentRole(contractId: string, assignmentId: string, role: string) {
+    const normalizedRole = role as FiscalRole;
+    if (!Object.values(FiscalRole).includes(normalizedRole)) {
+      throw new BadRequestException('Função de fiscal inválida.');
+    }
+
+    const assignment = await this.prisma.fiscalAssignment.findUnique({ where: { id: assignmentId } });
+    if (!assignment || assignment.contractId !== contractId) {
+      throw new NotFoundException('Designação não encontrada neste contrato.');
+    }
+
+    if (assignment.role === normalizedRole) {
+      return assignment;
+    }
+
+    const conflict = await this.prisma.fiscalAssignment.findFirst({
+      where: { contractId, fiscalId: assignment.fiscalId, role: normalizedRole },
+    });
+    if (conflict) {
+      throw new BadRequestException('Este fiscal já possui uma designação com essa função neste contrato.');
+    }
+
+    return this.prisma.fiscalAssignment.update({
+      where: { id: assignmentId },
+      data: { role: normalizedRole },
     });
   }
 

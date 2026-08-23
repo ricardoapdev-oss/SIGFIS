@@ -458,6 +458,12 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
     onError: (e: any) => alert(`Erro: ${e.message}`),
   });
 
+  const updateAssignmentRoleMutation = useMutation({
+    mutationFn: ({ id, role }: { id: string; role: string }) => api.contracts.updateAssignmentRole(contractId, id, role),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contract', contractId] }),
+    onError: (e: any) => alert(`Erro: ${e.message}`),
+  });
+
   const updateAlterationMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => api.alterations.update(id, data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['contract', contractId] }); setEditingAltId(null); setAltEdits({}); },
@@ -1000,7 +1006,24 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                         </div>
                         <div>
                           <p className="text-xs font-semibold text-gray-700">{asg.fiscal?.name}</p>
-                          <span className="text-[10px] text-gray-500">{asg.fiscal?.registrationNumber} · {fiscalRoleLabel[asg.role]}</span>
+                          {isGestor ? (
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <span className="text-[10px] text-gray-500">{asg.fiscal?.registrationNumber} ·</span>
+                              <select
+                                value={asg.role}
+                                onChange={(e) => updateAssignmentRoleMutation.mutate({ id: asg.id, role: e.target.value })}
+                                disabled={updateAssignmentRoleMutation.isPending}
+                                title="Alterar função do fiscal"
+                                className="text-[10px] font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded px-1 py-0.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500/50 disabled:opacity-50"
+                              >
+                                {Object.entries(fiscalRoleLabel).map(([value, label]) => (
+                                  <option key={value} value={value}>{label}</option>
+                                ))}
+                              </select>
+                            </div>
+                          ) : (
+                            <span className="text-[10px] text-gray-500">{asg.fiscal?.registrationNumber} · {fiscalRoleLabel[asg.role]}</span>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-3">

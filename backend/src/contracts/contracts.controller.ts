@@ -64,4 +64,11 @@ export class ContractsController {
   removeAssignment(@Param('id') id: string, @Param('assignmentId') assignmentId: string) {
     return this.contractsService.removeAssignment(id, assignmentId);
   }
+
+  @Patch(':id/assignments/:assignmentId/role')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  @Audit({ module: 'Fiscalização', action: 'UPDATE', entity: 'FiscalAssignment' })
+  updateAssignmentRole(@Param('id') id: string, @Param('assignmentId') assignmentId: string, @Body() body: { role: string }) {
+    return this.contractsService.updateAssignmentRole(id, assignmentId, body.role);
+  }
 }

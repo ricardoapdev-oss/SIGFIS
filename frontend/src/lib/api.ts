@@ -1082,6 +1082,8 @@ export const api = {
     // fiscalização — diferente de deactivateAssignment.
     removeAssignment: (contractId: string, assignmentId: string) =>
       request(`/contracts/${contractId}/assignments/${assignmentId}`, { method: 'DELETE' }),
+    updateAssignmentRole: (contractId: string, assignmentId: string, role: string) =>
+      request(`/contracts/${contractId}/assignments/${assignmentId}/role`, { method: 'PATCH', body: JSON.stringify({ role }) }),
   },
   processes: {
     list: () => request('/processes'),

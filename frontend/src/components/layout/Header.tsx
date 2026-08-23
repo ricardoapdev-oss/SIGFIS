@@ -281,7 +281,7 @@ export function Header({ user, activeView, onNavigate, onToggleSidebar, onOpenMo
           <div className="rounded-xl border border-border bg-muted/40 p-4">
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Precisa de mais ajuda?</p>
             <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-              Entre em contato com a área de Tecnologia da Informação da IQUEGO ou com o administrador do sistema para dúvidas não cobertas por esta central.
+              Entre em contato com o administrador do sistema para dúvidas não cobertas por esta central.
             </p>
           </div>
         </div>
