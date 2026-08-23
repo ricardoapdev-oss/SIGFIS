@@ -47,21 +47,39 @@ function ExecutiveKpiCard({
   onClick?: () => void;
 }) {
   const Comp = onClick ? 'button' : 'div';
+  const strVal = typeof value === 'string' || typeof value === 'number' ? String(value) : '';
+  const isLong = strVal.length > 11;
+  const isMedium = strVal.length > 6;
+
   return (
     <Comp
       onClick={onClick}
-      className={`flex flex-col justify-between rounded-2xl border border-border bg-surface p-4 text-left shadow-card transition-shadow min-w-0 ${onClick ? 'cursor-pointer hover:shadow-card-hover' : ''}`}
+      className={`flex flex-col justify-between rounded-2xl border border-border bg-surface p-3.5 sm:p-4 text-left shadow-card transition-all overflow-hidden ${
+        onClick ? 'cursor-pointer hover:shadow-card-hover hover:border-brand-blue/30' : ''
+      }`}
     >
       <div>
-        <div className="flex items-center gap-2 min-w-0">
-          <span className={`flex size-7 shrink-0 items-center justify-center rounded-full ${KPI_TONE[tone]}`}>
-            <Icon className="size-4" />
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className={`flex size-6 shrink-0 items-center justify-center rounded-lg ${KPI_TONE[tone]}`}>
+            <Icon className="size-3.5" />
           </span>
-          <p className="text-[12px] font-medium text-muted-foreground truncate" title={title}>{title}</p>
+          <p className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground leading-tight truncate" title={title}>
+            {title}
+          </p>
         </div>
-        <p className="mt-3 font-bold leading-tight text-foreground text-[20px] xl:text-[24px] 2xl:text-[28px] break-all whitespace-normal">{value}</p>
+        <div className="mt-2.5 flex items-baseline overflow-hidden">
+          <p className={`font-bold leading-none text-foreground whitespace-nowrap tracking-tight ${
+            isLong
+              ? 'text-[13px] sm:text-[14px] xl:text-[15.5px] 2xl:text-[17px]'
+              : isMedium
+              ? 'text-[18px] sm:text-[20px] xl:text-[22px] 2xl:text-[24px]'
+              : 'text-[22px] sm:text-[24px] xl:text-[26px] 2xl:text-[28px]'
+          }`}>
+            {value}
+          </p>
+        </div>
       </div>
-      {description && <p className="mt-1 text-[10px] text-muted-foreground truncate">{description}</p>}
+      {description && <p className="mt-2 text-[10px] text-muted-foreground whitespace-nowrap">{description}</p>}
     </Comp>
   );
 }
@@ -194,11 +212,11 @@ export function GestorDashboard({ user, onNavigate }: Props) {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <ExecutiveKpiCard icon={FileSignature} title="Contratos Ativos" value={k?.activeContracts ?? '—'} tone="blue" onClick={() => onNavigate('contracts', undefined, 'active')} />
         <ExecutiveKpiCard icon={CheckCircle} title="Fiscalizações Pendentes" value={k?.pendingFiscalizacoes ?? '—'} tone="cyan" onClick={() => onNavigate('contracts', undefined, 'pending_measurements')} />
         <ExecutiveKpiCard icon={AlertTriangle} title="Alertas Críticos" value={rs?.critical ?? '—'} tone="red" onClick={() => onNavigate('risk')} />
-        <ExecutiveKpiCard icon={Clock} title="Contratos a Vencer" description="Próximos 90 dias" value={k?.expiringIn90 ?? '—'} tone="amber" onClick={() => onNavigate('contracts', undefined, 'expiring90')} />
+        <ExecutiveKpiCard icon={Clock} title="Contratos a Vencer (90d)" description="Próx. 90 dias" value={k?.expiringIn90 ?? '—'} tone="amber" onClick={() => onNavigate('contracts', undefined, 'expiring90')} />
         <ExecutiveKpiCard icon={DollarSign} title="Valor Total Contratado" value={f ? formatCurrency(f.totalContracted) : '—'} tone="purple" />
         <ExecutiveKpiCard icon={TrendingUp} title="Execução Média" value={f ? `${f.executionPercent}%` : '—'} tone="green" />
       </div>

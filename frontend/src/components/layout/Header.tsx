@@ -124,10 +124,11 @@ export function Header({ user, activeView, onNavigate, onToggleSidebar, onOpenMo
       {/* Title */}
       <div className="min-w-0 hidden sm:block">
         <h1 className="truncate text-sm font-bold text-foreground leading-tight">{meta.title}</h1>
-        <p className="truncate text-[11px] text-muted-foreground leading-tight">
-          {meta.description}
-          {activeView === 'dashboard' && user.role === 'ADMIN' && <span className="ml-1.5 font-semibold text-brand-green">· ADMIN</span>}
-        </p>
+        {activeView !== 'dashboard' && meta.description && (
+          <p className="truncate text-[11px] text-muted-foreground leading-tight">
+            {meta.description}
+          </p>
+        )}
       </div>
 
       {/* Busca global */}
