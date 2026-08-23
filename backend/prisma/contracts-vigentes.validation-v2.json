@@ -1,0 +1,3944 @@
+{
+  "metadata": {
+    "generatedAt": "2026-08-22T20:06:32.312Z",
+    "sourceFiles": [
+      "backend/prisma/contracts-vigentes.data.ts (fonte original, NÃO alterada)",
+      "backend/prisma/contracts-vigentes.validation.json (ETAPA 1, NÃO alterada)"
+    ],
+    "externalSourcesUsed": [
+      {
+        "name": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+        "url": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+        "page": "https://goias.gov.br/iquego/contratos/",
+        "note": "Arquivo XLSX publicado pela própria IQUEGO (dados até aprox. julho/2025). Baixado e parseado localmente nesta sessão; NÃO foi alterado."
+      },
+      {
+        "name": "Busca web (agregadores CNPJ + contrato público SEINFRA-GO)",
+        "url": null,
+        "note": "Usado apenas para EQUATORIAL GOIÁS, por ser concessionária única e de baixo risco de confusão."
+      }
+    ],
+    "purpose": "ETAPA 2 — complementação e validação externa. NÃO é apta para importação; nenhum registro deve ser tratado como \"APTO PARA PROD\".",
+    "rule": "Todo campo tem sua origem explícita: fromSource (arquivo original) vs validatedExternally (fonte externa, com confidence/status/note) vs pendências explícitas em stillPending."
+  },
+  "contracts": [
+    {
+      "ordem": 1,
+      "fromSource": {
+        "processNumber": "202300055000054",
+        "relatedProcessNumbers": [
+          "202500055000266"
+        ],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "SERVIÇO SOCIAL DA INDÚSTRIA - SESI",
+        "unit": "Segurança do Trabalho",
+        "fiscal": "Rogério B. da Silva",
+        "ordinance": "Portaria nº 059/2025",
+        "contractNumber": "Contrato 011/2023",
+        "addendum": "(2º Termo Aditivo)",
+        "value": "R$ 11.025,60",
+        "start": "2025-06-16",
+        "end": "2026-06-15",
+        "observation": "*INICIADO OS PROCEDIMENTOS PARA A PRORROGAÇÃO"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "03.786.187/0001-99",
+          "companyOriginal": "SERVIÇO SOCIAL DA INDÚSTRIA - SESI",
+          "companyValidated": "SERVIÇO SOCIAL DA INDÚSTRIA - SESI",
+          "officialContractNumber": "011/2023",
+          "officialModality": "Dispensa de licitação",
+          "officialSigningDate": "2024-06-14",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Rogério B. da Silva",
+          "devUserKey": "f01",
+          "devUserName": "Rogério B. da Silva",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f01).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": "Rogério Brasilino da Silva",
+          "officialEvidence": "Planilha oficial IQUEGO cita \"Rogério Brasilino da Silva\" — \"B.\" bate com \"Brasilino\"."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202300055000054",
+        "normalized": "202300055000054",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 011/2023",
+        "normalized": "011/2023",
+        "collisionKey": "011/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Dispensa de licitação",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2025-06-16",
+        "end": "2026-06-15",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-06-14",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 11.025,60",
+        "normalized": "11025.60",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "A",
+      "overallStatusLabel": "A — COMPLEMENTAÇÃO PENDENTE, SEM INCONSISTÊNCIA IDENTIFICADA"
+    },
+    {
+      "ordem": 2,
+      "fromSource": {
+        "processNumber": "2.02400055000297E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "HEALTH SAÚDE E SEGURANÇA DO TRABALHO LTDA",
+        "unit": "Segurança do Trabalho",
+        "fiscal": "Rogério B. da Silva",
+        "ordinance": "Portaria nº 080/2025",
+        "contractNumber": "Contrato 016/2025",
+        "addendum": "NÃO INFORMADO NA FONTE",
+        "value": "R$ 49.300,00",
+        "start": "2025-06-16",
+        "end": "2026-06-15",
+        "observation": "*INICIADO OS PROCEDIMENTOS PARA A PRORROGAÇÃO"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "NÃO LOCALIZADO",
+          "companyOriginal": "HEALTH SAÚDE E SEGURANÇA DO TRABALHO LTDA",
+          "companyValidated": "NÃO LOCALIZADO",
+          "officialContractNumber": null,
+          "officialModality": null,
+          "officialSigningDate": null,
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "NENHUMA FONTE CONFIÁVEL LOCALIZOU ESTA EMPRESA",
+          "sourceUrl": null,
+          "confidence": "LOW",
+          "status": "NOT_FOUND",
+          "note": "HEALTH SAÚDE E SEGURANÇA DO TRABALHO LTDA não aparece em nenhuma linha da planilha oficial (busca por \"HEALTH\" e por \"SEGURANÇA DO TRABALHO\" no objeto/empresa, 0 resultados). Contrato iniciado em 2025-06-16, possivelmente fora da janela coberta pela planilha (que tem apenas 11 linhas de 2025 e 10 de 2026, concentrando-se em 2021-2024)."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Rogério B. da Silva",
+          "devUserKey": "f01",
+          "devUserName": "Rogério B. da Silva",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f01).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": "Rogério Brasilino da Silva",
+          "officialEvidence": "Planilha oficial IQUEGO cita \"Rogério Brasilino da Silva\" — \"B.\" bate com \"Brasilino\"."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02400055000297E14",
+        "normalized": "202400055000297",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 016/2025",
+        "normalized": "016/2025",
+        "collisionKey": "016/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": null,
+        "modalityFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "dateValidation": {
+        "start": "2025-06-16",
+        "end": "2026-06-15",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": null,
+        "signingDateFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "valueValidation": {
+        "original": "R$ 49.300,00",
+        "normalized": "49300.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "CNPJ da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Data de assinatura (signingDate)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 3,
+      "fromSource": {
+        "processNumber": "202300055000136",
+        "relatedProcessNumbers": [],
+        "legalBasis": "Art. 30, I, Lei 13.303/2016",
+        "company": "REDEMOB CONSÓRCIO",
+        "unit": "Gerência de Gestão de Pessoas",
+        "fiscal": "Maria do Carmo C. Silva",
+        "ordinance": "Portaria nº 099/2023",
+        "contractNumber": "Contrato 025/2023",
+        "addendum": "2º TERMO ADITIVO",
+        "value": "R$ 340.560,00",
+        "start": "2025-10-26",
+        "end": "2026-10-25",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "10.636.142/0001-01",
+          "companyOriginal": "REDEMOB CONSÓRCIO",
+          "companyValidated": "REDEMOB CONSÓRCIO",
+          "officialContractNumber": "025/2023",
+          "officialModality": "Inexigibilidade de licitação",
+          "officialSigningDate": "2024-10-04",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Maria do Carmo C. Silva",
+          "devUserKey": "f02",
+          "devUserName": "Maria do Carmo C. Silva",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f02).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202300055000136",
+        "normalized": "202300055000136",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 025/2023",
+        "normalized": "025/2023",
+        "collisionKey": "025/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": "Art. 30, I, Lei 13.303/2016",
+        "inferredModality": "INEXIGIBILIDADE",
+        "modalityStatus": "INFERÊNCIA — NÃO VALIDADA",
+        "note": "Inferência baseada apenas na citação do artigo da Lei 13.303/2016; não é um dado explícito de \"modality\" na fonte.",
+        "modalityDocumentedOfficially": "Inexigibilidade de licitação",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2025-10-26",
+        "end": "2026-10-25",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-10-04",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 340.560,00",
+        "normalized": "340560.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "A",
+      "overallStatusLabel": "A — COMPLEMENTAÇÃO PENDENTE, SEM INCONSISTÊNCIA IDENTIFICADA"
+    },
+    {
+      "ordem": 4,
+      "fromSource": {
+        "processNumber": "2.02300055000104E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "PLUXEE BENEFÍCIOS BRASIL S.A",
+        "unit": "Gerência de Gestão de Pessoas",
+        "fiscal": "Maria do Carmo C. Silva",
+        "ordinance": "Portaria nº 064/2023",
+        "contractNumber": "Contrato 019/2023",
+        "addendum": "(2º Termo Aditivo)",
+        "value": "R$ 1.503.836,40",
+        "start": "2025-07-04",
+        "end": "2026-07-03",
+        "observation": "*INICIADO OS PROCEDIMENTOS PARA A PRORROGAÇÃO"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "69.034.668/0001-56",
+          "companyOriginal": "PLUXEE BENEFÍCIOS BRASIL S.A",
+          "companyValidated": "PLUXEE BENEFÍCIOS BRASIL S.A.",
+          "officialContractNumber": "019/2023",
+          "officialModality": "Pregão Eletrônico nº 006/2023",
+          "officialSigningDate": "2024-06-21",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Maria do Carmo C. Silva",
+          "devUserKey": "f02",
+          "devUserName": "Maria do Carmo C. Silva",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f02).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02300055000104E14",
+        "normalized": "202300055000104",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 019/2023",
+        "normalized": "019/2023",
+        "collisionKey": "019/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Pregão Eletrônico nº 006/2023",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2025-07-04",
+        "end": "2026-07-03",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-06-21",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 1.503.836,40",
+        "normalized": "1503836.40",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 5,
+      "fromSource": {
+        "processNumber": "2.02300055000401E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "LE CARD ADMINISTRADORA DE CARTÕES LTDA",
+        "unit": "Gerência de Gestão de Pessoas",
+        "fiscal": "Edilson Martins Garcia",
+        "ordinance": "Portaria nº 030/2025",
+        "contractNumber": "Contrato 030/2023",
+        "addendum": "(2º Termo Aditivo)",
+        "value": "R$ 3.417.810,00",
+        "start": "2025-11-08",
+        "end": "2026-11-07",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "19.207.352/0001-40",
+          "companyOriginal": "LE CARD ADMINISTRADORA DE CARTÕES LTDA",
+          "companyValidated": "LE CARD ADMINISTRADORA DE CARTÕES LTDA",
+          "officialContractNumber": "030/2023",
+          "officialModality": "Pregão Eletrônico nº 009/2023",
+          "officialSigningDate": "2024-10-09",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Edilson Martins Garcia",
+          "devUserKey": "f03",
+          "devUserName": "Edilson Martins Garcia",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f03).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02300055000401E14",
+        "normalized": "202300055000401",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 030/2023",
+        "normalized": "030/2023",
+        "collisionKey": "030/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Pregão Eletrônico nº 009/2023",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2025-11-08",
+        "end": "2026-11-07",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-10-09",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 3.417.810,00",
+        "normalized": "3417810.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 6,
+      "fromSource": {
+        "processNumber": "202300055000119",
+        "relatedProcessNumbers": [
+          "202400055000337"
+        ],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "GENESIS PRESTADORA DE SERVIÇOS LTDA",
+        "unit": "Coordenação de Serviços Gerais",
+        "fiscal": "Eunice Maria C Oliveira",
+        "ordinance": "Portaria nº 078/2023",
+        "contractNumber": "Contrato 021/2023",
+        "addendum": "5º Termo Aditivo",
+        "value": "R$ 358.716,96",
+        "start": "2025-07-19",
+        "end": "2026-07-18",
+        "observation": "*INICIADO OS PROCEDIMENTOS PARA A PRORROGAÇÃO"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "31.549.836/0001-73",
+          "companyOriginal": "GENESIS PRESTADORA DE SERVIÇOS LTDA",
+          "companyValidated": "GENESIS PRESTADORA DE SERVIÇOS LTDA",
+          "officialContractNumber": "021/2023",
+          "officialModality": "Pregão Eletrônico nº 008/2023",
+          "officialSigningDate": "2024-06-12",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Eunice Maria C Oliveira",
+          "devUserKey": "f04",
+          "devUserName": "Eunice Maria C. Oliveira",
+          "matchDegree": "MINOR_VARIANT",
+          "observation": "Fonte grafa sem ponto (\"C Oliveira\"); seed.ts usa \"C. Oliveira\". Diferença apenas de pontuação.",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": "Eunice Maria Chagas Oliveira",
+          "officialEvidence": "Planilha oficial confirma \"Chagas\" por extenso."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202300055000119",
+        "normalized": "202300055000119",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 021/2023",
+        "normalized": "021/2023",
+        "collisionKey": "021/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Pregão Eletrônico nº 008/2023",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2025-07-19",
+        "end": "2026-07-18",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-06-12",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 358.716,96",
+        "normalized": "358716.96",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "Confirmação humana da identidade do fiscal",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 7,
+      "fromSource": {
+        "processNumber": "202200055000417",
+        "relatedProcessNumbers": [
+          "202500055000163"
+        ],
+        "legalBasis": "Art. 29, II, Lei 13.303/2016",
+        "company": "PADA PÃES E SABORES LTDA",
+        "unit": "Coordenação de Serviços Gerais",
+        "fiscal": "Eunice Maria C Oliveira",
+        "ordinance": "Portaria nº 028/2023",
+        "contractNumber": "Contrato 08/2023",
+        "addendum": "(4º Termo Aditivo)",
+        "value": "R$ 34.370,66",
+        "start": "2026-04-20",
+        "end": "2027-04-19",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "12.577.632/0003‐63",
+          "companyOriginal": "PADA PÃES E SABORES LTDA",
+          "companyValidated": "PADA PÃES E SABORES LTDA",
+          "officialContractNumber": "008/2023",
+          "officialModality": "Dispensa de licitação",
+          "officialSigningDate": "2024-05-28",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Eunice Maria C Oliveira",
+          "devUserKey": "f04",
+          "devUserName": "Eunice Maria C. Oliveira",
+          "matchDegree": "MINOR_VARIANT",
+          "observation": "Fonte grafa sem ponto (\"C Oliveira\"); seed.ts usa \"C. Oliveira\". Diferença apenas de pontuação.",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": "Eunice Maria Chagas Oliveira",
+          "officialEvidence": "Planilha oficial confirma \"Chagas\" por extenso."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202200055000417",
+        "normalized": "202200055000417",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 08/2023",
+        "normalized": "08/2023",
+        "collisionKey": "08/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": "Art. 29, II, Lei 13.303/2016",
+        "inferredModality": "DISPENSA_13303",
+        "modalityStatus": "INFERÊNCIA — NÃO VALIDADA",
+        "note": "Inferência baseada apenas na citação do artigo da Lei 13.303/2016; não é um dado explícito de \"modality\" na fonte.",
+        "modalityDocumentedOfficially": "Dispensa de licitação",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2026-04-20",
+        "end": "2027-04-19",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-05-28",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 34.370,66",
+        "normalized": "34370.66",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "Confirmação humana da identidade do fiscal",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 8,
+      "fromSource": {
+        "processNumber": "2.02200055000273E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "FONSECA E MARTINS COMÉRCIO DE GÁS EIRELI",
+        "unit": "Coordenação de Serviços Gerais",
+        "fiscal": "Eliety Rodrigues Pereira",
+        "ordinance": "Portaria nº 031/2026",
+        "contractNumber": "Contrato 019/2022",
+        "addendum": "(3º Termo Aditivo)",
+        "value": "R$ 14.279,40",
+        "start": "2025-10-22",
+        "end": "2026-10-21",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "00.961.053/0001-79",
+          "companyOriginal": "FONSECA E MARTINS COMÉRCIO DE GÁS EIRELI",
+          "companyValidated": "FONSECA E MARTINS COMÉRCIO DE GÁS EIRELI",
+          "officialContractNumber": "019/2022",
+          "officialModality": "Pregão Eletrônico nº 008/2022",
+          "officialSigningDate": "2024-09-23",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Eliety Rodrigues Pereira",
+          "devUserKey": "f05",
+          "devUserName": "Eliety Rodrigues Pereira",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f05).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02200055000273E14",
+        "normalized": "202200055000273",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 019/2022",
+        "normalized": "019/2022",
+        "collisionKey": "019/2022",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Pregão Eletrônico nº 008/2022",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2025-10-22",
+        "end": "2026-10-21",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-09-23",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 14.279,40",
+        "normalized": "14279.40",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 9,
+      "fromSource": {
+        "processNumber": "202300055000247",
+        "relatedProcessNumbers": [
+          "202200055000105"
+        ],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "JVS PARTICIPAÇÕES EIRELI",
+        "unit": "Gerência de Logística",
+        "fiscal": "Weverson de Oliveira",
+        "ordinance": "Portaria nº 47/2025",
+        "contractNumber": "Contrato 09/2022",
+        "addendum": "(4º Termo Aditivo)",
+        "value": "R$ 51.766,44",
+        "start": "2025-11-16",
+        "end": "2026-11-15",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "28.028.063/0001-75",
+          "companyOriginal": "JVS PARTICIPAÇÕES EIRELI",
+          "companyValidated": "JVS PARTICIPAÇÕES EIRELI",
+          "officialContractNumber": "009/2022",
+          "officialModality": "Ata de Registro de Preços nº 01/2022",
+          "officialSigningDate": "2024-06-07",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Weverson de Oliveira",
+          "devUserKey": "f06",
+          "devUserName": "Weverson de Oliveira",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f06).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202300055000247",
+        "normalized": "202300055000247",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 09/2022",
+        "normalized": "09/2022",
+        "collisionKey": "09/2022",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Ata de Registro de Preços nº 01/2022",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2025-11-16",
+        "end": "2026-11-15",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-06-07",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 51.766,44",
+        "normalized": "51766.44",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "A",
+      "overallStatusLabel": "A — COMPLEMENTAÇÃO PENDENTE, SEM INCONSISTÊNCIA IDENTIFICADA"
+    },
+    {
+      "ordem": 10,
+      "fromSource": {
+        "processNumber": "202400055000006",
+        "relatedProcessNumbers": [
+          "202300055000354",
+          "202400055000668"
+        ],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "LS PRODUTOS E SERVIÇOS LTDA",
+        "unit": "Gerência de Logística",
+        "fiscal": "Weverson de Oliveira",
+        "ordinance": "Portaria nº 48/2025",
+        "contractNumber": "Contrato 29/2023",
+        "addendum": "(2º Termo Aditivo)",
+        "value": "R$ 63.046,80",
+        "start": "2025-10-28",
+        "end": "2026-10-27",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "08.532.353/0001-44",
+          "companyOriginal": "LS PRODUTOS E SERVIÇOS LTDA",
+          "companyValidated": "LS PRODUTOS E SERVIÇOS LTDA",
+          "officialContractNumber": "029/2023",
+          "officialModality": "Ata de Registro de Preços nº 02/2023",
+          "officialSigningDate": "2024-09-26",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Weverson de Oliveira",
+          "devUserKey": "f06",
+          "devUserName": "Weverson de Oliveira",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f06).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202400055000006",
+        "normalized": "202400055000006",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 29/2023",
+        "normalized": "29/2023",
+        "collisionKey": "29/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Ata de Registro de Preços nº 02/2023",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2025-10-28",
+        "end": "2026-10-27",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-09-26",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 63.046,80",
+        "normalized": "63046.80",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "A",
+      "overallStatusLabel": "A — COMPLEMENTAÇÃO PENDENTE, SEM INCONSISTÊNCIA IDENTIFICADA"
+    },
+    {
+      "ordem": 11,
+      "fromSource": {
+        "processNumber": "202400055000728",
+        "relatedProcessNumbers": [
+          "202500055000828"
+        ],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "ALTERDATA TECNOLOGIA EM INFORMÁTICA LTDA",
+        "unit": "Tecnologia da Informação e Comunicação - TIC",
+        "fiscal": "Cleiton de Sá Silva Vieira",
+        "ordinance": "Portaria nº 008/2025",
+        "contractNumber": "Contrato 01/2025",
+        "addendum": "(1º Termo Aditivo)",
+        "value": "R$56.145,96",
+        "start": "2026-01-17",
+        "end": "2027-01-16",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "36.462.778/0001-60",
+          "companyOriginal": "ALTERDATA TECNOLOGIA EM INFORMÁTICA LTDA",
+          "companyValidated": "ALTERDATA TECNOLOGIA EM INFORMÁTICA LTDA",
+          "officialContractNumber": "01/2025",
+          "officialModality": "Dispensa de licitação",
+          "officialSigningDate": "2025-01-13",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Cleiton de Sá Silva Vieira",
+          "devUserKey": "f07",
+          "devUserName": "Cleiton de Sá Silva",
+          "matchDegree": "AMBIGUOUS_HUMAN_REVIEW",
+          "observation": "Fonte cita \"Vieira\" apenas neste registro (ord 11); seed.ts e demais registros da própria fonte (ord 12) usam \"Cleiton de Sá Silva\" sem \"Vieira\". NÃO presumir que é a mesma pessoa sem confirmação humana.",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "A planilha oficial só registra \"Cleiton de Sá Silva\" (sem \"Vieira\") em todas as ocorrências localizadas — indício de que \"Vieira\" é erro na fonte original, mas não confirmado documentalmente."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202400055000728",
+        "normalized": "202400055000728",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 01/2025",
+        "normalized": "01/2025",
+        "collisionKey": "01/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Dispensa de licitação",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2026-01-17",
+        "end": "2027-01-16",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2025-01-13",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$56.145,96",
+        "normalized": "56145.96",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "Confirmação humana da identidade do fiscal",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "C",
+      "overallStatusLabel": "C — IDENTIDADE/RELAÇÃO AMBÍGUA"
+    },
+    {
+      "ordem": 12,
+      "fromSource": {
+        "processNumber": "202000055000104",
+        "relatedProcessNumbers": [
+          "202500055000828"
+        ],
+        "legalBasis": "Art. 29, III, Lei 13.303/2016",
+        "company": "INTEGRA AUTOMAÇÃO E CONTROLE LTDA",
+        "unit": "Tecnologia da Informação e Comunicação - TIC",
+        "fiscal": "Cleiton de Sá Silva",
+        "ordinance": "Portaria nº 024/2025",
+        "contractNumber": "Contrato 006/2025",
+        "addendum": "(1º Termo Aditivo)",
+        "value": "R$ 30.893,40",
+        "start": "2026-02-28",
+        "end": "2027-02-27",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "07.121.081/0001-27",
+          "companyOriginal": "INTEGRA AUTOMAÇÃO E CONTROLE LTDA",
+          "companyValidated": "INTEGRA AUTOMAÇÃO ECONTROLE LTDA",
+          "officialContractNumber": "06/2025",
+          "officialModality": "Pregão Eletrônico nº 90012/2024",
+          "officialSigningDate": "2025-02-12",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Cleiton de Sá Silva",
+          "devUserKey": "f07",
+          "devUserName": "Cleiton de Sá Silva",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f07).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": "Cleiton de Sá Silva",
+          "officialEvidence": "Confirmado na planilha oficial, sem \"Vieira\"."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202000055000104",
+        "normalized": "202000055000104",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 006/2025",
+        "normalized": "006/2025",
+        "collisionKey": "006/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": "Art. 29, III, Lei 13.303/2016",
+        "inferredModality": "DISPENSA_13303",
+        "modalityStatus": "INFERÊNCIA — NÃO VALIDADA",
+        "note": "Inferência baseada apenas na citação do artigo da Lei 13.303/2016; não é um dado explícito de \"modality\" na fonte.",
+        "modalityDocumentedOfficially": "Pregão Eletrônico nº 90012/2024",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2026-02-28",
+        "end": "2027-02-27",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2025-02-12",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 30.893,40",
+        "normalized": "30893.40",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "A",
+      "overallStatusLabel": "A — COMPLEMENTAÇÃO PENDENTE, SEM INCONSISTÊNCIA IDENTIFICADA"
+    },
+    {
+      "ordem": 13,
+      "fromSource": {
+        "processNumber": "202100055000133",
+        "relatedProcessNumbers": [
+          "202200055000094"
+        ],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "MPS BRASIL OUTSOURCING DE IMPRESSÃO LTDA",
+        "unit": "Tecnologia da Informação e Comunicação - TIC",
+        "fiscal": "Robson Policeno de Rezende",
+        "ordinance": "Portaria nº 35/2026",
+        "contractNumber": "Contrato 002/2021",
+        "addendum": "(4° Termo aditivo)",
+        "value": "R$ 31.346,88",
+        "start": "2025-07-15",
+        "end": "2026-07-14",
+        "observation": "EM ANDAMENTO O PROCESSO DE NOVA CONTRATAÇÃO"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "33.091.401/0001-53",
+          "companyOriginal": "MPS BRASIL OUTSOURCING DE IMPRESSÃO LTDA",
+          "companyValidated": "MPS BRASIL OUTSOURCING DE IMPRESSÃO EIRELI",
+          "officialContractNumber": "002/2021",
+          "officialModality": "Pregão Eletrônico nº 003/2021",
+          "officialSigningDate": "2024-07-09",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Robson Policeno de Rezende",
+          "devUserKey": "f08",
+          "devUserName": "Robson Policeno de Rezende",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f08).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202100055000133",
+        "normalized": "202100055000133",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 002/2021",
+        "normalized": "002/2021",
+        "collisionKey": "002/2021",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Pregão Eletrônico nº 003/2021",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2025-07-15",
+        "end": "2026-07-14",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-07-09",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 31.346,88",
+        "normalized": "31346.88",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "A",
+      "overallStatusLabel": "A — COMPLEMENTAÇÃO PENDENTE, SEM INCONSISTÊNCIA IDENTIFICADA"
+    },
+    {
+      "ordem": 14,
+      "fromSource": {
+        "processNumber": "202200055000327",
+        "relatedProcessNumbers": [
+          "202600055000123"
+        ],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "GOIAS TELECOMUNICAÇÕES S/A - GOIASTELECOM",
+        "unit": "Tecnologia da Informação e Comunicação - TIC",
+        "fiscal": "Robson Policeno de Rezende",
+        "ordinance": "Portaria nº 200/2024",
+        "contractNumber": "Contrato 006/2023",
+        "addendum": "1º Termo Aditivo",
+        "value": "R$ 47.123,52",
+        "start": "2026-06-02",
+        "end": "2028-06-01",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "10.268.439/0001-53",
+          "companyOriginal": "GOIAS TELECOMUNICAÇÕES S/A - GOIASTELECOM",
+          "companyValidated": "GOIÁS TELECOMUNICAÇÕES S.A. – GOIASTELECOM",
+          "officialContractNumber": "006/2023",
+          "officialModality": "Dispensa de Licitação",
+          "officialSigningDate": "2023-05-11",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Robson Policeno de Rezende",
+          "devUserKey": "f08",
+          "devUserName": "Robson Policeno de Rezende",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f08).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202200055000327",
+        "normalized": "202200055000327",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 006/2023",
+        "normalized": "006/2023",
+        "collisionKey": "006/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Dispensa de Licitação",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2026-06-02",
+        "end": "2028-06-01",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2023-05-11",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 47.123,52",
+        "normalized": "47123.52",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "A",
+      "overallStatusLabel": "A — COMPLEMENTAÇÃO PENDENTE, SEM INCONSISTÊNCIA IDENTIFICADA"
+    },
+    {
+      "ordem": 15,
+      "fromSource": {
+        "processNumber": "202400055000042",
+        "relatedProcessNumbers": [],
+        "legalBasis": "Art. 29, XI, Lei 13.303/2016",
+        "company": "GOIAS TELECOMUNICAÇÕES S/A - GOIAS TELECOM",
+        "unit": "Tecnologia da Informação e Comunicação - TIC",
+        "fiscal": "Robson Policeno de Rezende",
+        "ordinance": "Portaria nº 202/2024",
+        "contractNumber": "Contrato 005/2024",
+        "addendum": "NÃO INFORMADO NA FONTE",
+        "value": "R$ 136.900,00",
+        "start": "2024-10-04",
+        "end": "2026-09-04",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "10.268.439/0001-53",
+          "companyOriginal": "GOIAS TELECOMUNICAÇÕES S/A - GOIAS TELECOM",
+          "companyValidated": "GOIÁS TELECOMUNICAÇÕES S.A.-GOIASTELECOM",
+          "officialContractNumber": "005/2024",
+          "officialModality": "Dispensa de licitação",
+          "officialSigningDate": "2024-04-10",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Robson Policeno de Rezende",
+          "devUserKey": "f08",
+          "devUserName": "Robson Policeno de Rezende",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f08).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202400055000042",
+        "normalized": "202400055000042",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 005/2024",
+        "normalized": "005/2024",
+        "collisionKey": "005/2024",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": "Art. 29, XI, Lei 13.303/2016",
+        "inferredModality": "DISPENSA_13303",
+        "modalityStatus": "INFERÊNCIA — NÃO VALIDADA",
+        "note": "Inferência baseada apenas na citação do artigo da Lei 13.303/2016; não é um dado explícito de \"modality\" na fonte.",
+        "modalityDocumentedOfficially": "Dispensa de licitação",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2024-10-04",
+        "end": "2026-09-04",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-04-10",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 136.900,00",
+        "normalized": "136900.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "A",
+      "overallStatusLabel": "A — COMPLEMENTAÇÃO PENDENTE, SEM INCONSISTÊNCIA IDENTIFICADA"
+    },
+    {
+      "ordem": 16,
+      "fromSource": {
+        "processNumber": "202100055000217",
+        "relatedProcessNumbers": [],
+        "legalBasis": "Art. 30, caput, Lei 13.303/2016",
+        "company": "SANEAGO",
+        "unit": "Engenharia",
+        "fiscal": "Pedro Henrique Martins",
+        "ordinance": "Portaria nº 19/2021",
+        "contractNumber": "Contrato 003/202",
+        "addendum": "5º Termo de Apostilamento",
+        "value": "R$ 67.373,16",
+        "start": "2024-09-13",
+        "end": "2025-09-12",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "01.616.929/0001-02",
+          "companyOriginal": "SANEAGO",
+          "companyValidated": "Saneamento de Goiás S/A – SANEAGO",
+          "officialContractNumber": "003/2021",
+          "officialModality": "Inexigibilidade de Licitação",
+          "officialSigningDate": "2021-09-13",
+          "officialInitialValue": "257821.74",
+          "officialAdditiveValue": "132310.27",
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\") (busca direcionada por nome)",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "FOUND_VIA_TARGETED_SEARCH",
+          "note": "Busca direta por \"SANEAGO\" na planilha oficial encontrou o contrato \"003/2021\" — consistente com o número truncado \"003/202\" da fonte original (falta apenas o último dígito \"1\"). Forte indício, mas não é confirmação documental definitiva do dígito faltante — REQUER CONFIRMAÇÃO HUMANA."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Pedro Henrique Martins",
+          "devUserKey": "f09",
+          "devUserName": "Pedro Henrique Martins",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f09).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": "Pedro Henrique Santos Martins",
+          "officialEvidence": "Planilha oficial confirma \"Santos\" por extenso."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202100055000217",
+        "normalized": "202100055000217",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 003/202",
+        "normalized": "003/202",
+        "collisionKey": "003/202",
+        "status": "MALFORMED_YEAR",
+        "note": "Ano com menos de 4 dígitos (\"202\"). Provável erro de digitação na planilha original (dígito faltante). NÃO corrigido automaticamente."
+      },
+      "legalBasisValidation": {
+        "original": "Art. 30, caput, Lei 13.303/2016",
+        "inferredModality": "INEXIGIBILIDADE",
+        "modalityStatus": "INFERÊNCIA — NÃO VALIDADA",
+        "note": "Inferência baseada apenas na citação do artigo da Lei 13.303/2016; não é um dado explícito de \"modality\" na fonte.",
+        "modalityDocumentedOfficially": "Inexigibilidade de Licitação",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2024-09-13",
+        "end": "2025-09-12",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2021-09-13",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 67.373,16",
+        "normalized": "67373.16",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": "257821.74",
+        "initialValueFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO, coluna VALOR)"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)"
+      ],
+      "overallStatus": "D",
+      "overallStatusLabel": "D — INCONSISTÊNCIA ESTRUTURAL"
+    },
+    {
+      "ordem": 17,
+      "fromSource": {
+        "processNumber": "202300055000551",
+        "relatedProcessNumbers": [],
+        "legalBasis": "Art. 29, X, Lei 13.303/2016",
+        "company": "EQUATORIAL",
+        "unit": "Engenharia",
+        "fiscal": "Pedro Henrique Martins",
+        "ordinance": "Portaria nº 44/2019",
+        "contractNumber": "Contrato nº CCER GOV 325/2019",
+        "addendum": "(5º Termo de Apostilamento)",
+        "value": "R$ 264.688,38",
+        "start": "2025-10-09",
+        "end": "2026-10-08",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "01.543.032/0001-04",
+          "companyOriginal": "EQUATORIAL",
+          "companyValidated": "EQUATORIAL GOIÁS DISTRIBUIDORA DE ENERGIA S.A.",
+          "officialContractNumber": "NÃO LOCALIZADO na planilha oficial da IQUEGO (contratos de concessionária de energia parecem não constar nesta planilha específica)",
+          "officialModality": null,
+          "officialSigningDate": null,
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\") (busca direcionada por nome)",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "FOUND_VIA_WEB_SEARCH_MULTIPLE_SOURCES",
+          "note": "CNPJ confirmado por convergência de múltiplas fontes independentes (agregadores CNPJ + um contrato público de outro órgão estadual — SEINFRA-GO — citando a razão social idêntica) e pelo fato de ser a concessionária única de distribuição de energia elétrica do Estado de Goiás (risco de confusão com outra empresa é baixo). NÃO localizado, porém, o contrato específico com a IQUEGO na planilha oficial consultada — esta planilha parece não cobrir contratos de concessionárias de utilidade pública."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Pedro Henrique Martins",
+          "devUserKey": "f09",
+          "devUserName": "Pedro Henrique Martins",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f09).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": "Pedro Henrique Santos Martins",
+          "officialEvidence": "Planilha oficial confirma \"Santos\" por extenso."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202300055000551",
+        "normalized": "202300055000551",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº CCER GOV 325/2019",
+        "normalized": "CCER GOV 325/2019",
+        "collisionKey": "325/2019",
+        "status": "NON_STANDARD_FORMAT",
+        "note": "Contém prefixo/sufixo não numérico além do padrão número/ano (\"CCER GOV 325/2019\"). Núcleo numérico identificado: \"325/2019\"."
+      },
+      "legalBasisValidation": {
+        "original": "Art. 29, X, Lei 13.303/2016",
+        "inferredModality": "DISPENSA_13303",
+        "modalityStatus": "INFERÊNCIA — NÃO VALIDADA",
+        "note": "Inferência baseada apenas na citação do artigo da Lei 13.303/2016; não é um dado explícito de \"modality\" na fonte.",
+        "modalityDocumentedOfficially": null,
+        "modalityFinalStatus": "INFERÊNCIA — NÃO VALIDADA"
+      },
+      "dateValidation": {
+        "start": "2025-10-09",
+        "end": "2026-10-08",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": null,
+        "signingDateFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "valueValidation": {
+        "original": "R$ 264.688,38",
+        "normalized": "264688.38",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Data de assinatura (signingDate)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "A",
+      "overallStatusLabel": "A — COMPLEMENTAÇÃO PENDENTE, SEM INCONSISTÊNCIA IDENTIFICADA"
+    },
+    {
+      "ordem": 18,
+      "fromSource": {
+        "processNumber": "202300055000690",
+        "relatedProcessNumbers": [
+          "202500055000417"
+        ],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "GENESIS COMÉRCIO E MANUTENÇÕES LTDA",
+        "unit": "Gerência de Engenharia",
+        "fiscal": "Pedro H. S. Martins",
+        "ordinance": "Portaria nº 106/2024",
+        "contractNumber": "Contrato 011/2024",
+        "addendum": "(1º Termo Aditivo)",
+        "value": "R$ 88.471,71",
+        "start": "2025-07-26",
+        "end": "2026-07-25",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "17.596.391/0001-51",
+          "companyOriginal": "GENESIS COMÉRCIO E MANUTENÇÕES LTDA",
+          "companyValidated": "GENESIS COMÉRCIO E MANUTENÇÕES LTDA-ME",
+          "officialContractNumber": "011/2024",
+          "officialModality": "Pregão Eletrônico nº 90001/2024",
+          "officialSigningDate": "2024-07-25",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Pedro H. S. Martins",
+          "devUserKey": "f09",
+          "devUserName": "Pedro Henrique Martins",
+          "matchDegree": "MINOR_VARIANT",
+          "observation": "Nome abreviado (\"H. S.\"); presumível ser a mesma pessoa do f09, mas não confirmado por identificador estável.",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": "Pedro Henrique Santos Martins",
+          "officialEvidence": "Planilha oficial confirma que \"H. S.\" = \"Henrique Santos\" — mesma pessoa de \"Pedro Henrique Martins\"."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202300055000690",
+        "normalized": "202300055000690",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 011/2024",
+        "normalized": "011/2024",
+        "collisionKey": "011/2024",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Pregão Eletrônico nº 90001/2024",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2025-07-26",
+        "end": "2026-07-25",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-07-25",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 88.471,71",
+        "normalized": "88471.71",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "Confirmação humana da identidade do fiscal",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 19,
+      "fromSource": {
+        "processNumber": "202300055000144",
+        "relatedProcessNumbers": [
+          "202400055000415"
+        ],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "PRIME CONSULTORIA E ASSES. EMPRESARIAL LTDA",
+        "unit": "Gerência de Logística",
+        "fiscal": "Weverson de Oliveira",
+        "ordinance": "Portaria nº 070/2023",
+        "contractNumber": "Contrato 020/2023",
+        "addendum": "(2º Termo Aditivo)",
+        "value": "R$ 194.481,20",
+        "start": "2025-07-19",
+        "end": "2026-07-18",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "05.340.639/0001-30",
+          "companyOriginal": "PRIME CONSULTORIA E ASSES. EMPRESARIAL LTDA",
+          "companyValidated": "PRIME CONSULTORIA E ASSESSORIA EMPRESARIAL LTDA",
+          "officialContractNumber": "020/2023",
+          "officialModality": "Pregão Eletrônico nº 007/2023",
+          "officialSigningDate": "2023-07-19",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Weverson de Oliveira",
+          "devUserKey": "f06",
+          "devUserName": "Weverson de Oliveira",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f06).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202300055000144",
+        "normalized": "202300055000144",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 020/2023",
+        "normalized": "020/2023",
+        "collisionKey": "020/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Pregão Eletrônico nº 007/2023",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2025-07-19",
+        "end": "2026-07-18",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2023-07-19",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 194.481,20",
+        "normalized": "194481.20",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "A",
+      "overallStatusLabel": "A — COMPLEMENTAÇÃO PENDENTE, SEM INCONSISTÊNCIA IDENTIFICADA"
+    },
+    {
+      "ordem": 20,
+      "fromSource": {
+        "processNumber": "202100055000360",
+        "relatedProcessNumbers": [
+          "202200055000418",
+          "202500055000798"
+        ],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "GIBBOR BRASIL PUBLICIDADE E PROPAGANDA LTDA - EPP",
+        "unit": "Assessoria de Compras Governamentais",
+        "fiscal": "Sabrina Maria Barbosa",
+        "ordinance": "Portaria nº 053/2026",
+        "contractNumber": "Contrato 001/2022",
+        "addendum": "(5º Termo Aditivo)",
+        "value": "R$ 42.498,80",
+        "start": "2026-01-29",
+        "end": "2027-01-28",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "08.329.433/0001-05",
+          "companyOriginal": "GIBBOR BRASIL PUBLICIDADE E PROPAGANDA LTDA - EPP",
+          "companyValidated": "GIBBOR BRASIL PUBLICIDADE E PROPAGANDA LTDA-EPP",
+          "officialContractNumber": "001/2022",
+          "officialModality": "Pregão Eletrônico nº 005/2021",
+          "officialSigningDate": "2024-01-19",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Sabrina Maria Barbosa",
+          "devUserKey": "f14",
+          "devUserName": "Sabrina Maria Barbosa",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f14).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202100055000360",
+        "normalized": "202100055000360",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 001/2022",
+        "normalized": "001/2022",
+        "collisionKey": "001/2022",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Pregão Eletrônico nº 005/2021",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2026-01-29",
+        "end": "2027-01-28",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-01-19",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 42.498,80",
+        "normalized": "42498.80",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "A",
+      "overallStatusLabel": "A — COMPLEMENTAÇÃO PENDENTE, SEM INCONSISTÊNCIA IDENTIFICADA"
+    },
+    {
+      "ordem": 21,
+      "fromSource": {
+        "processNumber": "202300055000052",
+        "relatedProcessNumbers": [
+          "202500055000278",
+          "202600055000058"
+        ],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "WEGH ASSESSORIA E LOGÍSTICA INTERNACIONAL",
+        "unit": "Assessoria Especial da Presidência",
+        "fiscal": "Wenderson de Souza",
+        "ordinance": "Portaria nº 150/2024",
+        "contractNumber": "Contrato 009/2023",
+        "addendum": "(3º Termo Aditivo)",
+        "value": "R$ 10.003.600,00",
+        "start": "2026-05-08",
+        "end": "2027-05-07",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "65.494.742/0001-66",
+          "companyOriginal": "WEGH ASSESSORIA E LOGÍSTICA INTERNACIONAL",
+          "companyValidated": "WEGH ASSESSORIA E LOGÍSTICA INTERNACIONAL LTDA",
+          "officialContractNumber": "009/2023",
+          "officialModality": "Pregão Eletrônico nº 004/2023",
+          "officialSigningDate": "2023-05-08",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Wenderson de Souza",
+          "devUserKey": "f15",
+          "devUserName": "Wenderson de Souza",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f15).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "202300055000052",
+        "normalized": "202300055000052",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 009/2023",
+        "normalized": "009/2023",
+        "collisionKey": "009/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Pregão Eletrônico nº 004/2023",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2026-05-08",
+        "end": "2027-05-07",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2023-05-08",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 10.003.600,00",
+        "normalized": "10003600.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "A",
+      "overallStatusLabel": "A — COMPLEMENTAÇÃO PENDENTE, SEM INCONSISTÊNCIA IDENTIFICADA"
+    },
+    {
+      "ordem": 22,
+      "fromSource": {
+        "processNumber": "2.02200055000192E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "AVISO URGENTE TECNOLOGIA E INFORMAÇÃO LTDA",
+        "unit": "Gerência Jurídica",
+        "fiscal": "Patrícia Sodré",
+        "ordinance": "Portaria nº 069/2022",
+        "contractNumber": "Contrato 011/2022",
+        "addendum": "(3º Termo Aditivo)",
+        "value": "R$ 477,84",
+        "start": "2025-08-26",
+        "end": "2026-08-25",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "14.774.075/0001-34",
+          "companyOriginal": "AVISO URGENTE TECNOLOGIA E INFORMAÇÃO LTDA",
+          "companyValidated": "AVISO URGENTE TECNOLOGIA E INFORMAÇÃO LTDA",
+          "officialContractNumber": "011/2022",
+          "officialModality": "Dispensa de licitação",
+          "officialSigningDate": "2024-07-31",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Patrícia Sodré",
+          "devUserKey": "f16",
+          "devUserName": "Patrícia Sodré",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f16).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02200055000192E14",
+        "normalized": "202200055000192",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 011/2022",
+        "normalized": "011/2022",
+        "collisionKey": "011/2022",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Dispensa de licitação",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2025-08-26",
+        "end": "2026-08-25",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-07-31",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 477,84",
+        "normalized": "477.84",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 23,
+      "fromSource": {
+        "processNumber": "2.02400055000064E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "DELTA ENGENHARIA E ARQUITETURA LTDA",
+        "unit": "Gerência de Engenharia",
+        "fiscal": "Thalita Guaribaldine da Silva Guimaraes",
+        "ordinance": "Portaria nº 152/2024",
+        "contractNumber": "Contrato nº 022/2024",
+        "addendum": "1º Termo Aditivo",
+        "value": "R$156.000,00",
+        "start": "2024-10-01",
+        "end": "2025-09-30",
+        "observation": "SOLICITADA A PRORROGAÇÃO"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "54.001.411.0001-20",
+          "companyOriginal": "DELTA ENGENHARIA E ARQUITETURA LTDA",
+          "companyValidated": "DELTA ENGENHARIA E ARQUITETURA LTDA",
+          "officialContractNumber": "022/2024",
+          "officialModality": "Pregão Eletrônico nº 004/2024",
+          "officialSigningDate": "2024-10-01",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Thalita Guaribaldine da Silva Guimaraes",
+          "devUserKey": "f10",
+          "devUserName": "Thalita Guaribaldine S. Guimaraes",
+          "matchDegree": "MINOR_VARIANT",
+          "observation": "seed.ts abrevia como \"Thalita Guaribaldine S. Guimaraes\" (S. em vez de \"da Silva\").",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": "Thalita Guaribaldine da Silva Guimarães",
+          "officialEvidence": "Planilha oficial confirma nome quase idêntico ao da fonte original (diferença só de acentuação); é o seed.ts que está abreviado, não a fonte original."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02400055000064E14",
+        "normalized": "202400055000064",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº 022/2024",
+        "normalized": "022/2024",
+        "collisionKey": "022/2024",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Pregão Eletrônico nº 004/2024",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2024-10-01",
+        "end": "2025-09-30",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-10-01",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$156.000,00",
+        "normalized": "156000.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "Confirmação humana da identidade do fiscal",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 24,
+      "fromSource": {
+        "processNumber": "2.0240005500033E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "SHIELD SEGURANÇA DA INFORMAÇÃO E CONSULTORIA EMPRESARIAL LTDA",
+        "unit": "Assessoria Especial da Presidência",
+        "fiscal": "Fábio Gonçalves da Silva",
+        "ordinance": "Portaria nº 015/2025",
+        "contractNumber": "Contrato nº 05/2025",
+        "addendum": "(1º Termo Aditivo)",
+        "value": "R$ 77.000,00",
+        "start": "2025-02-19",
+        "end": "2026-02-18",
+        "observation": "PRORROGADO POR MAIS 90 DIAS"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "15.809.115/0001-07",
+          "companyOriginal": "SHIELD SEGURANÇA DA INFORMAÇÃO E CONSULTORIA EMPRESARIAL LTDA",
+          "companyValidated": "SHIELD SEGURANÇA DA INFORMAÇÃO E CONSULTORIA EMPRESARIAL LTDA",
+          "officialContractNumber": "05/2025",
+          "officialModality": "Pregão Eletrônico nº 90013/2024",
+          "officialSigningDate": "2025-02-19",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Fábio Gonçalves da Silva",
+          "devUserKey": "f11",
+          "devUserName": "Fábio Gonçalves da Silva",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f11).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.0240005500033E14",
+        "normalized": "202400055000330",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº 05/2025",
+        "normalized": "05/2025",
+        "collisionKey": "05/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Pregão Eletrônico nº 90013/2024",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2025-02-19",
+        "end": "2026-02-18",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2025-02-19",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 77.000,00",
+        "normalized": "77000.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 25,
+      "fromSource": {
+        "processNumber": "2.02500055000275E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "ZENITE INFORMAÇÃO E CONSULTORIA S/A",
+        "unit": "Assessoria de Compras Governamentais",
+        "fiscal": "Gabriel Moraes Godinho",
+        "ordinance": "Portaria nº 056/2026",
+        "contractNumber": "Contrato nº 09/2025",
+        "addendum": "(1º Termo Aditivo)",
+        "value": "R$ 13.065,76",
+        "start": "2026-04-29",
+        "end": "2027-04-28",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "86.781.069/0001-15",
+          "companyOriginal": "ZENITE INFORMAÇÃO E CONSULTORIA S/A",
+          "companyValidated": "ZÊNITE INFORMACAO E CONSULTORIA S/A",
+          "officialContractNumber": "09/2025",
+          "officialModality": "Dispensa de licitação",
+          "officialSigningDate": "2025-04-28",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Gabriel Moraes Godinho",
+          "devUserKey": "f12",
+          "devUserName": "Gabriel Moraes Godinho",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f12).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": "Gabriel Moraes Godinho",
+          "officialEvidence": "Confirmado na planilha oficial (grafia \"Moraes\")."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02500055000275E14",
+        "normalized": "202500055000275",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº 09/2025",
+        "normalized": "09/2025",
+        "collisionKey": "09/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Dispensa de licitação",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2026-04-29",
+        "end": "2027-04-28",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2025-04-28",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 13.065,76",
+        "normalized": "13065.76",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "D",
+      "overallStatusLabel": "D — INCONSISTÊNCIA ESTRUTURAL"
+    },
+    {
+      "ordem": 26,
+      "fromSource": {
+        "processNumber": "2.02400055000827E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "L.A VIAGENS E TURISMO LTDA",
+        "unit": "Diretoria Comercial",
+        "fiscal": "Denize Morais",
+        "ordinance": "Portaria nº 084/2025",
+        "contractNumber": "Contrato nº 15/2025",
+        "addendum": "NÃO INFORMADO NA FONTE",
+        "value": "R$ 271.750,00",
+        "start": "2025-06-10",
+        "end": "2026-06-09",
+        "observation": "EM ANDAMENTO NOVA CONTRATAÇÃO"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "NÃO LOCALIZADO",
+          "companyOriginal": "L.A VIAGENS E TURISMO LTDA",
+          "companyValidated": "NÃO LOCALIZADO",
+          "officialContractNumber": null,
+          "officialModality": null,
+          "officialSigningDate": null,
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "NENHUMA FONTE CONFIÁVEL LOCALIZOU ESTA EMPRESA",
+          "sourceUrl": null,
+          "confidence": "LOW",
+          "status": "NOT_FOUND",
+          "note": "L.A VIAGENS E TURISMO LTDA não aparece na planilha oficial. Uma busca por \"VIAGENS\" encontrou apenas \"R.R.F GUIMARAES AGENCIA DE VIAGENS LTDA\", empresa diferente — não presumido como a mesma."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Denize Morais",
+          "devUserKey": "f13",
+          "devUserName": "Denize Morais",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f13).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02400055000827E14",
+        "normalized": "202400055000827",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº 15/2025",
+        "normalized": "15/2025",
+        "collisionKey": "15/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": null,
+        "modalityFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "dateValidation": {
+        "start": "2025-06-10",
+        "end": "2026-06-09",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": null,
+        "signingDateFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "valueValidation": {
+        "original": "R$ 271.750,00",
+        "normalized": "271750.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "CNPJ da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Data de assinatura (signingDate)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 27,
+      "fromSource": {
+        "processNumber": "2.02500055000308E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "GÁS E MAIS COMÉRCIO EIRELI",
+        "unit": "Coordenação Administrativa",
+        "fiscal": "Eliety Rodrigues Pereira",
+        "ordinance": "Portaria nº 032/2026",
+        "contractNumber": "Contrato nº 14/2025",
+        "addendum": "NÃO INFORMADO NA FONTE",
+        "value": "R$ 3.061,50",
+        "start": "2025-06-10",
+        "end": "2026-06-09",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "NÃO LOCALIZADO",
+          "companyOriginal": "GÁS E MAIS COMÉRCIO EIRELI",
+          "companyValidated": "NÃO LOCALIZADO",
+          "officialContractNumber": null,
+          "officialModality": null,
+          "officialSigningDate": null,
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "NENHUMA FONTE CONFIÁVEL LOCALIZOU ESTA EMPRESA",
+          "sourceUrl": null,
+          "confidence": "LOW",
+          "status": "NOT_FOUND",
+          "note": "GÁS E MAIS COMÉRCIO EIRELI não aparece na planilha oficial (0 resultados para \"GAS E MAIS\")."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Eliety Rodrigues Pereira",
+          "devUserKey": "f05",
+          "devUserName": "Eliety Rodrigues Pereira",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f05).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02500055000308E14",
+        "normalized": "202500055000308",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº 14/2025",
+        "normalized": "14/2025",
+        "collisionKey": "14/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": null,
+        "modalityFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "dateValidation": {
+        "start": "2025-06-10",
+        "end": "2026-06-09",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": null,
+        "signingDateFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "valueValidation": {
+        "original": "R$ 3.061,50",
+        "normalized": "3061.50",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "CNPJ da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Data de assinatura (signingDate)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 28,
+      "fromSource": {
+        "processNumber": "2.02400055000709E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "BRASILSEG",
+        "unit": "Gerência de Recursos Humanos",
+        "fiscal": "Dalmo Francisco da Costa",
+        "ordinance": "Portaria nº 066/2025",
+        "contractNumber": "Contrato nº 13/2025",
+        "addendum": "NÃO INFORMADO NA FONTE",
+        "value": "R$ 9.900,00",
+        "start": "2025-06-24",
+        "end": "2026-06-23",
+        "observation": "SOLICITADA A PRORROGAÇÃO"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "28.196.889/0001-43",
+          "companyOriginal": "BRASILSEG",
+          "companyValidated": "BRASILSEG COMPANHIA DE SEGUROS",
+          "officialContractNumber": "NÃO LOCALIZADO para o contrato específico da fonte (histórico anterior encontrado)",
+          "officialModality": null,
+          "officialSigningDate": null,
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\") (continuidade cadastral de contrato anterior da mesma empresa)",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "MEDIUM",
+          "status": "FOUND_VIA_CNPJ_CONTINUITY",
+          "note": "BRASILSEG: a planilha oficial tem histórico da mesma empresa sob contrato \"003/2022\" (CNPJ 28.196.889/0001-43) com aditivos até vencimento 2025-04-07 — imediatamente anterior ao início do contrato da fonte original (2025-06-24). O CNPJ é reaproveitável por continuidade cadastral (mesma pessoa jurídica), mas o contrato específico \"13/2025\" da fonte original não foi localizado na planilha."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Dalmo Francisco da Costa",
+          "devUserKey": "f22",
+          "devUserName": "Dalmo Francisco da Costa",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f22).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02400055000709E14",
+        "normalized": "202400055000709",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº 13/2025",
+        "normalized": "13/2025",
+        "collisionKey": "13/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": null,
+        "modalityFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "dateValidation": {
+        "start": "2025-06-24",
+        "end": "2026-06-23",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": null,
+        "signingDateFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "valueValidation": {
+        "original": "R$ 9.900,00",
+        "normalized": "9900.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Data de assinatura (signingDate)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 29,
+      "fromSource": {
+        "processNumber": "2.02500055000328E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "ÔMEGA LOCADORA DE VEÍCULOS LTDA",
+        "unit": "Gerência de Logística",
+        "fiscal": "Weverson de Oliveira",
+        "ordinance": "Portaria nº 100/2025",
+        "contractNumber": "Contrato nº 18/2025",
+        "addendum": "NÃO INFORMADO NA FONTE",
+        "value": "R$ 51.000,00",
+        "start": "2025-07-03",
+        "end": "2026-07-02",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "NÃO LOCALIZADO",
+          "companyOriginal": "ÔMEGA LOCADORA DE VEÍCULOS LTDA",
+          "companyValidated": "NÃO LOCALIZADO",
+          "officialContractNumber": null,
+          "officialModality": null,
+          "officialSigningDate": null,
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "NENHUMA FONTE CONFIÁVEL LOCALIZOU ESTA EMPRESA",
+          "sourceUrl": null,
+          "confidence": "LOW",
+          "status": "NOT_FOUND",
+          "note": "ÔMEGA LOCADORA DE VEÍCULOS LTDA não aparece na planilha oficial (0 resultados para \"OMEGA\")."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Weverson de Oliveira",
+          "devUserKey": "f06",
+          "devUserName": "Weverson de Oliveira",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f06).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02500055000328E14",
+        "normalized": "202500055000328",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº 18/2025",
+        "normalized": "18/2025",
+        "collisionKey": "18/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": null,
+        "modalityFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "dateValidation": {
+        "start": "2025-07-03",
+        "end": "2026-07-02",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": null,
+        "signingDateFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "valueValidation": {
+        "original": "R$ 51.000,00",
+        "normalized": "51000.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "CNPJ da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Data de assinatura (signingDate)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 30,
+      "fromSource": {
+        "processNumber": "2.02500055000026E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "MISTER PRAGAS DEDETIZACAO E DESENTUPIDORA LTDA",
+        "unit": "Gestão de Contratos",
+        "fiscal": "Emerson Ferreira dos Anjos",
+        "ordinance": "Portaria nº 146/2025",
+        "contractNumber": "Contrato 25/2025",
+        "addendum": "NÃO INFORMADO NA FONTE",
+        "value": "R$ 12.000,00",
+        "start": "2025-09-26",
+        "end": "2026-09-25",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "NÃO LOCALIZADO",
+          "companyOriginal": "MISTER PRAGAS DEDETIZACAO E DESENTUPIDORA LTDA",
+          "companyValidated": "NÃO LOCALIZADO",
+          "officialContractNumber": null,
+          "officialModality": null,
+          "officialSigningDate": null,
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "NENHUMA FONTE CONFIÁVEL LOCALIZOU ESTA EMPRESA",
+          "sourceUrl": null,
+          "confidence": "LOW",
+          "status": "NOT_FOUND",
+          "note": "MISTER PRAGAS DEDETIZAÇÃO E DESENTUPIDORA LTDA não aparece na planilha oficial (0 resultados). Contrato iniciado em 2025-09-26, fora da janela de cobertura da planilha (dados concentrados até meados de 2025)."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Emerson Ferreira dos Anjos",
+          "devUserKey": "f21",
+          "devUserName": "Emerson Ferreira dos Anjos",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f21).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02500055000026E14",
+        "normalized": "202500055000026",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 25/2025",
+        "normalized": "25/2025",
+        "collisionKey": "25/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": null,
+        "modalityFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "dateValidation": {
+        "start": "2025-09-26",
+        "end": "2026-09-25",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": null,
+        "signingDateFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "valueValidation": {
+        "original": "R$ 12.000,00",
+        "normalized": "12000.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "CNPJ da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Data de assinatura (signingDate)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 31,
+      "fromSource": {
+        "processNumber": "2.02300055000041E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "NP TECNOLOGIA E GESTÃO DE DADOS LTDA",
+        "unit": "Assessoria de Compras Governamentais",
+        "fiscal": "Gabriel Morais Godinho",
+        "ordinance": "Portaria nº 171/2025",
+        "contractNumber": "Contrato 01/2023",
+        "addendum": "3º Termo Aditivo",
+        "value": "R$ 11.291,06",
+        "start": "2026-01-28",
+        "end": "2027-01-27",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "07.797.967/0001-95",
+          "companyOriginal": "NP TECNOLOGIA E GESTÃO DE DADOS LTDA",
+          "companyValidated": "NP TECNOLOGIA E GESTÃO DE DADOS LTDA",
+          "officialContractNumber": "001/2023",
+          "officialModality": "Inexigibilidade de licitação",
+          "officialSigningDate": "2024-12-13",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Gabriel Morais Godinho",
+          "devUserKey": "f12",
+          "devUserName": "Gabriel Moraes Godinho",
+          "matchDegree": "AMBIGUOUS_HUMAN_REVIEW",
+          "observation": "Grafia \"Morais\" diverge de \"Moraes\" usado no seed.ts e no ord 25 da própria fonte. Pode ser erro de digitação na planilha original ou pessoa diferente — NÃO presumir.",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "A planilha oficial só registra \"Gabriel Moraes Godinho\" (com \"e\") em todas as ocorrências localizadas — indício de que \"Morais\" é erro de digitação na fonte original, mas não confirmado documentalmente."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02300055000041E14",
+        "normalized": "202300055000041",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 01/2023",
+        "normalized": "01/2023",
+        "collisionKey": "01/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Inexigibilidade de licitação",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2026-01-28",
+        "end": "2027-01-27",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-12-13",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 11.291,06",
+        "normalized": "11291.06",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "Confirmação humana da identidade do fiscal",
+        "requesterId do processo (decisão institucional)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "C",
+      "overallStatusLabel": "C — IDENTIDADE/RELAÇÃO AMBÍGUA"
+    },
+    {
+      "ordem": 32,
+      "fromSource": {
+        "processNumber": "2.02500055000519E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "DMS CALIBRAÇÕES E INSPEÇÕES INDUSTRIAL LTDA",
+        "unit": "Gerência de Controle da Qualidade",
+        "fiscal": "Laurindo Damas da Silva Júnior",
+        "ordinance": "Portaria nº 021/2026",
+        "contractNumber": "Contrato 01/2026",
+        "addendum": "NÃO INFORMADO NA FONTE",
+        "value": "R$ 13.947,26",
+        "start": "2026-02-10",
+        "end": "2026-08-09",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "32.001.032/0001-06",
+          "companyOriginal": "DMS CALIBRAÇÕES E INSPEÇÕES INDUSTRIAL LTDA",
+          "companyValidated": "DMS CALIBRAÇÕES E INSPEÇÕES INDUSTRIAL LTDA",
+          "officialContractNumber": "01/2026",
+          "officialModality": "Dispensa de Licitação",
+          "officialSigningDate": "NÃO INFORMADO NA PLANILHA OFICIAL (campo em branco)",
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "VALIDATED_OFFICIAL_SOURCE",
+          "note": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Laurindo Damas da Silva Júnior",
+          "devUserKey": "f20",
+          "devUserName": "Laurindo Damas da Silva Júnior",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f20).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02500055000519E14",
+        "normalized": "202500055000519",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 01/2026",
+        "normalized": "01/2026",
+        "collisionKey": "01/2026",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Dispensa de Licitação",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2026-02-10",
+        "end": "2026-08-09",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": null,
+        "signingDateFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "valueValidation": {
+        "original": "R$ 13.947,26",
+        "normalized": "13947.26",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Data de assinatura (signingDate)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 33,
+      "fromSource": {
+        "processNumber": "2.02500055000168E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "WORK7 AUDITORES INDEPENDENTES LTDA",
+        "unit": "Gerência de Contabilidade",
+        "fiscal": "Vera Lúcia Nunes",
+        "ordinance": "Portaria nº 092/2025",
+        "contractNumber": "Contrato 17/2025",
+        "addendum": "NÃO INFORMADO NA FONTE",
+        "value": "R$ 47.100,00",
+        "start": "2025-06-25",
+        "end": "2026-06-24",
+        "observation": "EM ANDAMENTO NOVA CONTRATAÇÃO"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "11.689.939/0001-21",
+          "companyOriginal": "WORK7 AUDITORES INDEPENDENTES LTDA",
+          "companyValidated": "WORK7 AUDITORES INDEPENDENTES LTDA",
+          "officialContractNumber": "017/2020 (com aditivos anuais; nenhuma linha para um contrato \"17/2025\" foi localizada)",
+          "officialModality": "Pregão Eletrônico nº 003/2020",
+          "officialSigningDate": "2024-05-07 (aditivo mais recente localizado; vencimento 2025-05-08)",
+          "officialInitialValue": "38200 (valor do contrato original 017/2020, em 2021)",
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\") (busca direcionada por nome)",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "MEDIUM",
+          "status": "FOUND_VIA_TARGETED_SEARCH_NUMBER_MISMATCH",
+          "note": "CNPJ confirmado por continuidade cadastral (mesma empresa, mesmo CNPJ ao longo de 2020-2024). O número \"17/2025\" da fonte original NÃO aparece na planilha oficial; o contrato oficial é identificado como \"017/2020\" com aditivos sucessivos. Pode ser que a fonte tenha registrado informalmente o ano do aditivo em vez do número de contrato original — REQUER CONFIRMAÇÃO HUMANA quanto ao número correto."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Vera Lúcia Nunes",
+          "devUserKey": "f19",
+          "devUserName": "Vera Lúcia Nunes",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f19).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": "Vera Lúcia Nunes dos Santos",
+          "officialEvidence": "Planilha oficial acrescenta \"dos Santos\", ausente tanto na fonte original quanto no seed.ts."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02500055000168E14",
+        "normalized": "202500055000168",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 17/2025",
+        "normalized": "17/2025",
+        "collisionKey": "17/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Pregão Eletrônico nº 003/2020",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2025-06-25",
+        "end": "2026-06-24",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": "2024-05-07 (aditivo mais recente localizado; vencimento 2025-05-08)",
+        "signingDateFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO)"
+      },
+      "valueValidation": {
+        "original": "R$ 47.100,00",
+        "normalized": "47100.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": "38200 (valor do contrato original 017/2020, em 2021)",
+        "initialValueFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO, coluna VALOR)"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)"
+      ],
+      "overallStatus": "D",
+      "overallStatusLabel": "D — INCONSISTÊNCIA ESTRUTURAL"
+    },
+    {
+      "ordem": 34,
+      "fromSource": {
+        "processNumber": "2.02500055000383E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "AUDIGESPUB - SERVIÇOS DE AUDITORIA, ASSESSORIA E CONSULTORIA LTDA",
+        "unit": "Gerência de Contabilidade",
+        "fiscal": "Alessandro dos Santos",
+        "ordinance": "Portaria nº 056/2026",
+        "contractNumber": "Contrato 17/2025",
+        "addendum": "NÃO INFORMADO NA FONTE",
+        "value": "R$ 17.700,00",
+        "start": "2025-03-18",
+        "end": "2027-03-18",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "NÃO LOCALIZADO",
+          "companyOriginal": "AUDIGESPUB - SERVIÇOS DE AUDITORIA, ASSESSORIA E CONSULTORIA LTDA",
+          "companyValidated": "NÃO LOCALIZADO",
+          "officialContractNumber": null,
+          "officialModality": null,
+          "officialSigningDate": null,
+          "officialInitialValue": null,
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "NENHUMA FONTE CONFIÁVEL LOCALIZOU ESTA EMPRESA",
+          "sourceUrl": null,
+          "confidence": "LOW",
+          "status": "NOT_FOUND",
+          "note": "AUDIGESPUB - SERVIÇOS DE AUDITORIA, ASSESSORIA E CONSULTORIA LTDA não aparece na planilha oficial (0 resultados para variações do nome)."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Alessandro dos Santos",
+          "devUserKey": "f18",
+          "devUserName": "Alessandro dos Santos",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f18).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02500055000383E14",
+        "normalized": "202500055000383",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 17/2025",
+        "normalized": "17/2025",
+        "collisionKey": "17/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": null,
+        "modalityFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "dateValidation": {
+        "start": "2025-03-18",
+        "end": "2027-03-18",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": null,
+        "signingDateFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "valueValidation": {
+        "original": "R$ 17.700,00",
+        "normalized": "17700.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": null,
+        "initialValueFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "CNPJ da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Data de assinatura (signingDate)",
+        "Valor inicial (initialValue)"
+      ],
+      "overallStatus": "D",
+      "overallStatusLabel": "D — INCONSISTÊNCIA ESTRUTURAL"
+    },
+    {
+      "ordem": 35,
+      "fromSource": {
+        "processNumber": "2.02500055000779E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "INSTITUTO DE PROMOÇÃO HUMANA, APRENDIZAGEM E CULTURA",
+        "unit": "Gerência de Contabilidade",
+        "fiscal": "Vandeir Gonçalves da Silva",
+        "ordinance": "Portaria nº 078/2026",
+        "contractNumber": "Contrato 07/2025",
+        "addendum": "NÃO INFORMADO NA FONTE",
+        "value": "R$ 441.345,84",
+        "start": "2026-04-08",
+        "end": "2028-04-07",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "11.595.331/0001-38",
+          "companyOriginal": "INSTITUTO DE PROMOÇÃO HUMANA, APRENDIZAGEM E CULTURA",
+          "companyValidated": "INSTITUTO DE PROMOÇÃO HUMANA, APRENDIZAGEM E CULTURA",
+          "officialContractNumber": "07/2026",
+          "officialModality": "Pregão Eletrônico nº 002/2026",
+          "officialSigningDate": "NÃO INFORMADO NA PLANILHA OFICIAL (campo em branco)",
+          "officialInitialValue": "441345.84",
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\") (busca direcionada por nome)",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "FOUND_VIA_TARGETED_SEARCH_NUMBER_MISMATCH",
+          "note": "Vencimento oficial (2028-04-07) é IDÊNTICO ao \"end\" da fonte original (2028-04-07) e o valor oficial (R$ 441.345,84) é IDÊNTICO ao \"value\" da fonte original — forte indício de que é o mesmo contrato. Porém a fonte original registra \"07/2025\" e a planilha oficial registra \"07/2026\". REQUER CONFIRMAÇÃO HUMANA sobre qual ano está correto (provável erro de digitação em uma das duas fontes)."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Vandeir Gonçalves da Silva",
+          "devUserKey": "f17",
+          "devUserName": "Vandeir Gonçalves da Silva",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f17).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02500055000779E14",
+        "normalized": "202500055000779",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 07/2025",
+        "normalized": "07/2025",
+        "collisionKey": "07/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Pregão Eletrônico nº 002/2026",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2026-04-08",
+        "end": "2028-04-07",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": null,
+        "signingDateFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "valueValidation": {
+        "original": "R$ 441.345,84",
+        "normalized": "441345.84",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": "441345.84",
+        "initialValueFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO, coluna VALOR)"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Data de assinatura (signingDate)"
+      ],
+      "overallStatus": "B",
+      "overallStatusLabel": "B — CONFIRMAÇÃO DOCUMENTAL NECESSÁRIA"
+    },
+    {
+      "ordem": 36,
+      "fromSource": {
+        "processNumber": "2.02600055000186E14",
+        "relatedProcessNumbers": [],
+        "legalBasis": "NÃO INFORMADO NA FONTE",
+        "company": "BIOCIENTIFIC LABORATORIOS LTDA",
+        "unit": "Gerência de Contabilidade",
+        "fiscal": "Laurindo Damas da Silva Júnior",
+        "ordinance": "Portaria nº 088/2026",
+        "contractNumber": "Contrato 09/2025",
+        "addendum": "NÃO INFORMADO NA FONTE",
+        "value": "R$ 12.000,00",
+        "start": "2026-04-27",
+        "end": "2027-04-26",
+        "observation": "NÃO INFORMADO NA FONTE"
+      },
+      "validatedExternally": {
+        "companyResearch": {
+          "cnpj": "05.153.743/0001-15",
+          "companyOriginal": "BIOCIENTIFIC LABORATORIOS LTDA",
+          "companyValidated": "BIOCIENTIFIC LABORATORIOS LTDA",
+          "officialContractNumber": "09/2026",
+          "officialModality": "Dispensa de Licitação",
+          "officialSigningDate": "NÃO INFORMADO NA PLANILHA OFICIAL (campo em branco)",
+          "officialInitialValue": "12000",
+          "officialAdditiveValue": null,
+          "email": "NÃO LOCALIZADO",
+          "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\") (busca direcionada por nome)",
+          "sourceUrl": "https://goias.gov.br/iquego/wp-content/uploads/sites/16/2026/07/contratos-iquego-20250715.xlsx",
+          "confidence": "HIGH",
+          "status": "FOUND_VIA_TARGETED_SEARCH_NUMBER_MISMATCH",
+          "note": "Valor oficial (R$ 12.000,00) idêntico ao da fonte original. A fonte original registra \"09/2025\" (colidindo com ZENITE); a planilha oficial registra \"09/2026\" para a BIOCIENTIFIC. Forte indício de que o número correto da BIOCIENTIFIC é \"09/2026\" e que a colisão identificada na ETAPA 1 é, na verdade, um erro de digitação de ano na fonte original — mas isso NÃO foi confirmado documentalmente (ex.: publicação em Diário Oficial) e por isso permanece REQUER CONFIRMAÇÃO HUMANA."
+        },
+        "fiscalValidation": {
+          "nameInSource": "Laurindo Damas da Silva Júnior",
+          "devUserKey": "f20",
+          "devUserName": "Laurindo Damas da Silva Júnior",
+          "matchDegree": "EXACT",
+          "observation": "Correspondência exata com seed.ts (f20).",
+          "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD.",
+          "officialFullName": null,
+          "officialEvidence": "Nome não localizado, isoladamente, na planilha oficial da IQUEGO."
+        }
+      },
+      "processNumberValidation": {
+        "original": "2.02600055000186E14",
+        "normalized": "202600055000186",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 09/2025",
+        "normalized": "09/2025",
+        "collisionKey": "09/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida.",
+        "modalityDocumentedOfficially": "Dispensa de Licitação",
+        "modalityFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO) — ainda assim recomendável confirmar contra o Diário Oficial"
+      },
+      "dateValidation": {
+        "start": "2026-04-27",
+        "end": "2027-04-26",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura.",
+        "signingDateDocumented": null,
+        "signingDateFinalStatus": "NÃO INFORMADO NA FONTE"
+      },
+      "valueValidation": {
+        "original": "R$ 12.000,00",
+        "normalized": "12000.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos.",
+        "initialValueDocumented": "12000",
+        "initialValueFinalStatus": "DOCUMENTADA (fonte: planilha oficial IQUEGO, coluna VALOR)"
+      },
+      "stillPending": [
+        "E-mail da contratada",
+        "requesterId do processo (decisão institucional)",
+        "Data de assinatura (signingDate)"
+      ],
+      "overallStatus": "D",
+      "overallStatusLabel": "D — INCONSISTÊNCIA ESTRUTURAL"
+    }
+  ],
+  "companyTable": [
+    {
+      "ordem": 1,
+      "companyOriginal": "SERVIÇO SOCIAL DA INDÚSTRIA - SESI",
+      "companyValidated": "SERVIÇO SOCIAL DA INDÚSTRIA - SESI",
+      "cnpj": "03.786.187/0001-99",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 2,
+      "companyOriginal": "HEALTH SAÚDE E SEGURANÇA DO TRABALHO LTDA",
+      "companyValidated": "NÃO LOCALIZADO",
+      "cnpj": "NÃO LOCALIZADO",
+      "email": "NÃO LOCALIZADO",
+      "source": "NENHUMA FONTE CONFIÁVEL LOCALIZOU ESTA EMPRESA",
+      "confidence": "LOW",
+      "status": "NOT_FOUND",
+      "notes": "HEALTH SAÚDE E SEGURANÇA DO TRABALHO LTDA não aparece em nenhuma linha da planilha oficial (busca por \"HEALTH\" e por \"SEGURANÇA DO TRABALHO\" no objeto/empresa, 0 resultados). Contrato iniciado em 2025-06-16, possivelmente fora da janela coberta pela planilha (que tem apenas 11 linhas de 2025 e 10 de 2026, concentrando-se em 2021-2024)."
+    },
+    {
+      "ordem": 3,
+      "companyOriginal": "REDEMOB CONSÓRCIO",
+      "companyValidated": "REDEMOB CONSÓRCIO",
+      "cnpj": "10.636.142/0001-01",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 4,
+      "companyOriginal": "PLUXEE BENEFÍCIOS BRASIL S.A",
+      "companyValidated": "PLUXEE BENEFÍCIOS BRASIL S.A.",
+      "cnpj": "69.034.668/0001-56",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 5,
+      "companyOriginal": "LE CARD ADMINISTRADORA DE CARTÕES LTDA",
+      "companyValidated": "LE CARD ADMINISTRADORA DE CARTÕES LTDA",
+      "cnpj": "19.207.352/0001-40",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 6,
+      "companyOriginal": "GENESIS PRESTADORA DE SERVIÇOS LTDA",
+      "companyValidated": "GENESIS PRESTADORA DE SERVIÇOS LTDA",
+      "cnpj": "31.549.836/0001-73",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 7,
+      "companyOriginal": "PADA PÃES E SABORES LTDA",
+      "companyValidated": "PADA PÃES E SABORES LTDA",
+      "cnpj": "12.577.632/0003‐63",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 8,
+      "companyOriginal": "FONSECA E MARTINS COMÉRCIO DE GÁS EIRELI",
+      "companyValidated": "FONSECA E MARTINS COMÉRCIO DE GÁS EIRELI",
+      "cnpj": "00.961.053/0001-79",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 9,
+      "companyOriginal": "JVS PARTICIPAÇÕES EIRELI",
+      "companyValidated": "JVS PARTICIPAÇÕES EIRELI",
+      "cnpj": "28.028.063/0001-75",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 10,
+      "companyOriginal": "LS PRODUTOS E SERVIÇOS LTDA",
+      "companyValidated": "LS PRODUTOS E SERVIÇOS LTDA",
+      "cnpj": "08.532.353/0001-44",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 11,
+      "companyOriginal": "ALTERDATA TECNOLOGIA EM INFORMÁTICA LTDA",
+      "companyValidated": "ALTERDATA TECNOLOGIA EM INFORMÁTICA LTDA",
+      "cnpj": "36.462.778/0001-60",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 12,
+      "companyOriginal": "INTEGRA AUTOMAÇÃO E CONTROLE LTDA",
+      "companyValidated": "INTEGRA AUTOMAÇÃO ECONTROLE LTDA",
+      "cnpj": "07.121.081/0001-27",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 13,
+      "companyOriginal": "MPS BRASIL OUTSOURCING DE IMPRESSÃO LTDA",
+      "companyValidated": "MPS BRASIL OUTSOURCING DE IMPRESSÃO EIRELI",
+      "cnpj": "33.091.401/0001-53",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 14,
+      "companyOriginal": "GOIAS TELECOMUNICAÇÕES S/A - GOIASTELECOM",
+      "companyValidated": "GOIÁS TELECOMUNICAÇÕES S.A. – GOIASTELECOM",
+      "cnpj": "10.268.439/0001-53",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 15,
+      "companyOriginal": "GOIAS TELECOMUNICAÇÕES S/A - GOIAS TELECOM",
+      "companyValidated": "GOIÁS TELECOMUNICAÇÕES S.A.-GOIASTELECOM",
+      "cnpj": "10.268.439/0001-53",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 16,
+      "companyOriginal": "SANEAGO",
+      "companyValidated": "Saneamento de Goiás S/A – SANEAGO",
+      "cnpj": "01.616.929/0001-02",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\") (busca direcionada por nome)",
+      "confidence": "HIGH",
+      "status": "FOUND_VIA_TARGETED_SEARCH",
+      "notes": "Busca direta por \"SANEAGO\" na planilha oficial encontrou o contrato \"003/2021\" — consistente com o número truncado \"003/202\" da fonte original (falta apenas o último dígito \"1\"). Forte indício, mas não é confirmação documental definitiva do dígito faltante — REQUER CONFIRMAÇÃO HUMANA."
+    },
+    {
+      "ordem": 17,
+      "companyOriginal": "EQUATORIAL",
+      "companyValidated": "EQUATORIAL GOIÁS DISTRIBUIDORA DE ENERGIA S.A.",
+      "cnpj": "01.543.032/0001-04",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\") (busca direcionada por nome)",
+      "confidence": "HIGH",
+      "status": "FOUND_VIA_WEB_SEARCH_MULTIPLE_SOURCES",
+      "notes": "CNPJ confirmado por convergência de múltiplas fontes independentes (agregadores CNPJ + um contrato público de outro órgão estadual — SEINFRA-GO — citando a razão social idêntica) e pelo fato de ser a concessionária única de distribuição de energia elétrica do Estado de Goiás (risco de confusão com outra empresa é baixo). NÃO localizado, porém, o contrato específico com a IQUEGO na planilha oficial consultada — esta planilha parece não cobrir contratos de concessionárias de utilidade pública."
+    },
+    {
+      "ordem": 18,
+      "companyOriginal": "GENESIS COMÉRCIO E MANUTENÇÕES LTDA",
+      "companyValidated": "GENESIS COMÉRCIO E MANUTENÇÕES LTDA-ME",
+      "cnpj": "17.596.391/0001-51",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 19,
+      "companyOriginal": "PRIME CONSULTORIA E ASSES. EMPRESARIAL LTDA",
+      "companyValidated": "PRIME CONSULTORIA E ASSESSORIA EMPRESARIAL LTDA",
+      "cnpj": "05.340.639/0001-30",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 20,
+      "companyOriginal": "GIBBOR BRASIL PUBLICIDADE E PROPAGANDA LTDA - EPP",
+      "companyValidated": "GIBBOR BRASIL PUBLICIDADE E PROPAGANDA LTDA-EPP",
+      "cnpj": "08.329.433/0001-05",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 21,
+      "companyOriginal": "WEGH ASSESSORIA E LOGÍSTICA INTERNACIONAL",
+      "companyValidated": "WEGH ASSESSORIA E LOGÍSTICA INTERNACIONAL LTDA",
+      "cnpj": "65.494.742/0001-66",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 22,
+      "companyOriginal": "AVISO URGENTE TECNOLOGIA E INFORMAÇÃO LTDA",
+      "companyValidated": "AVISO URGENTE TECNOLOGIA E INFORMAÇÃO LTDA",
+      "cnpj": "14.774.075/0001-34",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 23,
+      "companyOriginal": "DELTA ENGENHARIA E ARQUITETURA LTDA",
+      "companyValidated": "DELTA ENGENHARIA E ARQUITETURA LTDA",
+      "cnpj": "54.001.411.0001-20",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 24,
+      "companyOriginal": "SHIELD SEGURANÇA DA INFORMAÇÃO E CONSULTORIA EMPRESARIAL LTDA",
+      "companyValidated": "SHIELD SEGURANÇA DA INFORMAÇÃO E CONSULTORIA EMPRESARIAL LTDA",
+      "cnpj": "15.809.115/0001-07",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 25,
+      "companyOriginal": "ZENITE INFORMAÇÃO E CONSULTORIA S/A",
+      "companyValidated": "ZÊNITE INFORMACAO E CONSULTORIA S/A",
+      "cnpj": "86.781.069/0001-15",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 26,
+      "companyOriginal": "L.A VIAGENS E TURISMO LTDA",
+      "companyValidated": "NÃO LOCALIZADO",
+      "cnpj": "NÃO LOCALIZADO",
+      "email": "NÃO LOCALIZADO",
+      "source": "NENHUMA FONTE CONFIÁVEL LOCALIZOU ESTA EMPRESA",
+      "confidence": "LOW",
+      "status": "NOT_FOUND",
+      "notes": "L.A VIAGENS E TURISMO LTDA não aparece na planilha oficial. Uma busca por \"VIAGENS\" encontrou apenas \"R.R.F GUIMARAES AGENCIA DE VIAGENS LTDA\", empresa diferente — não presumido como a mesma."
+    },
+    {
+      "ordem": 27,
+      "companyOriginal": "GÁS E MAIS COMÉRCIO EIRELI",
+      "companyValidated": "NÃO LOCALIZADO",
+      "cnpj": "NÃO LOCALIZADO",
+      "email": "NÃO LOCALIZADO",
+      "source": "NENHUMA FONTE CONFIÁVEL LOCALIZOU ESTA EMPRESA",
+      "confidence": "LOW",
+      "status": "NOT_FOUND",
+      "notes": "GÁS E MAIS COMÉRCIO EIRELI não aparece na planilha oficial (0 resultados para \"GAS E MAIS\")."
+    },
+    {
+      "ordem": 28,
+      "companyOriginal": "BRASILSEG",
+      "companyValidated": "BRASILSEG COMPANHIA DE SEGUROS",
+      "cnpj": "28.196.889/0001-43",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\") (continuidade cadastral de contrato anterior da mesma empresa)",
+      "confidence": "MEDIUM",
+      "status": "FOUND_VIA_CNPJ_CONTINUITY",
+      "notes": "BRASILSEG: a planilha oficial tem histórico da mesma empresa sob contrato \"003/2022\" (CNPJ 28.196.889/0001-43) com aditivos até vencimento 2025-04-07 — imediatamente anterior ao início do contrato da fonte original (2025-06-24). O CNPJ é reaproveitável por continuidade cadastral (mesma pessoa jurídica), mas o contrato específico \"13/2025\" da fonte original não foi localizado na planilha."
+    },
+    {
+      "ordem": 29,
+      "companyOriginal": "ÔMEGA LOCADORA DE VEÍCULOS LTDA",
+      "companyValidated": "NÃO LOCALIZADO",
+      "cnpj": "NÃO LOCALIZADO",
+      "email": "NÃO LOCALIZADO",
+      "source": "NENHUMA FONTE CONFIÁVEL LOCALIZOU ESTA EMPRESA",
+      "confidence": "LOW",
+      "status": "NOT_FOUND",
+      "notes": "ÔMEGA LOCADORA DE VEÍCULOS LTDA não aparece na planilha oficial (0 resultados para \"OMEGA\")."
+    },
+    {
+      "ordem": 30,
+      "companyOriginal": "MISTER PRAGAS DEDETIZACAO E DESENTUPIDORA LTDA",
+      "companyValidated": "NÃO LOCALIZADO",
+      "cnpj": "NÃO LOCALIZADO",
+      "email": "NÃO LOCALIZADO",
+      "source": "NENHUMA FONTE CONFIÁVEL LOCALIZOU ESTA EMPRESA",
+      "confidence": "LOW",
+      "status": "NOT_FOUND",
+      "notes": "MISTER PRAGAS DEDETIZAÇÃO E DESENTUPIDORA LTDA não aparece na planilha oficial (0 resultados). Contrato iniciado em 2025-09-26, fora da janela de cobertura da planilha (dados concentrados até meados de 2025)."
+    },
+    {
+      "ordem": 31,
+      "companyOriginal": "NP TECNOLOGIA E GESTÃO DE DADOS LTDA",
+      "companyValidated": "NP TECNOLOGIA E GESTÃO DE DADOS LTDA",
+      "cnpj": "07.797.967/0001-95",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 32,
+      "companyOriginal": "DMS CALIBRAÇÕES E INSPEÇÕES INDUSTRIAL LTDA",
+      "companyValidated": "DMS CALIBRAÇÕES E INSPEÇÕES INDUSTRIAL LTDA",
+      "cnpj": "32.001.032/0001-06",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\")",
+      "confidence": "HIGH",
+      "status": "VALIDATED_OFFICIAL_SOURCE",
+      "notes": "Casamento automático por número de contrato + confirmação por nome da empresa na planilha oficial da IQUEGO."
+    },
+    {
+      "ordem": 33,
+      "companyOriginal": "WORK7 AUDITORES INDEPENDENTES LTDA",
+      "companyValidated": "WORK7 AUDITORES INDEPENDENTES LTDA",
+      "cnpj": "11.689.939/0001-21",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\") (busca direcionada por nome)",
+      "confidence": "MEDIUM",
+      "status": "FOUND_VIA_TARGETED_SEARCH_NUMBER_MISMATCH",
+      "notes": "CNPJ confirmado por continuidade cadastral (mesma empresa, mesmo CNPJ ao longo de 2020-2024). O número \"17/2025\" da fonte original NÃO aparece na planilha oficial; o contrato oficial é identificado como \"017/2020\" com aditivos sucessivos. Pode ser que a fonte tenha registrado informalmente o ano do aditivo em vez do número de contrato original — REQUER CONFIRMAÇÃO HUMANA quanto ao número correto."
+    },
+    {
+      "ordem": 34,
+      "companyOriginal": "AUDIGESPUB - SERVIÇOS DE AUDITORIA, ASSESSORIA E CONSULTORIA LTDA",
+      "companyValidated": "NÃO LOCALIZADO",
+      "cnpj": "NÃO LOCALIZADO",
+      "email": "NÃO LOCALIZADO",
+      "source": "NENHUMA FONTE CONFIÁVEL LOCALIZOU ESTA EMPRESA",
+      "confidence": "LOW",
+      "status": "NOT_FOUND",
+      "notes": "AUDIGESPUB - SERVIÇOS DE AUDITORIA, ASSESSORIA E CONSULTORIA LTDA não aparece na planilha oficial (0 resultados para variações do nome)."
+    },
+    {
+      "ordem": 35,
+      "companyOriginal": "INSTITUTO DE PROMOÇÃO HUMANA, APRENDIZAGEM E CULTURA",
+      "companyValidated": "INSTITUTO DE PROMOÇÃO HUMANA, APRENDIZAGEM E CULTURA",
+      "cnpj": "11.595.331/0001-38",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\") (busca direcionada por nome)",
+      "confidence": "HIGH",
+      "status": "FOUND_VIA_TARGETED_SEARCH_NUMBER_MISMATCH",
+      "notes": "Vencimento oficial (2028-04-07) é IDÊNTICO ao \"end\" da fonte original (2028-04-07) e o valor oficial (R$ 441.345,84) é IDÊNTICO ao \"value\" da fonte original — forte indício de que é o mesmo contrato. Porém a fonte original registra \"07/2025\" e a planilha oficial registra \"07/2026\". REQUER CONFIRMAÇÃO HUMANA sobre qual ano está correto (provável erro de digitação em uma das duas fontes)."
+    },
+    {
+      "ordem": 36,
+      "companyOriginal": "BIOCIENTIFIC LABORATORIOS LTDA",
+      "companyValidated": "BIOCIENTIFIC LABORATORIOS LTDA",
+      "cnpj": "05.153.743/0001-15",
+      "email": "NÃO LOCALIZADO",
+      "source": "Planilha oficial pública da IQUEGO (\"Contratos e Parcerias\") (busca direcionada por nome)",
+      "confidence": "HIGH",
+      "status": "FOUND_VIA_TARGETED_SEARCH_NUMBER_MISMATCH",
+      "notes": "Valor oficial (R$ 12.000,00) idêntico ao da fonte original. A fonte original registra \"09/2025\" (colidindo com ZENITE); a planilha oficial registra \"09/2026\" para a BIOCIENTIFIC. Forte indício de que o número correto da BIOCIENTIFIC é \"09/2026\" e que a colisão identificada na ETAPA 1 é, na verdade, um erro de digitação de ano na fonte original — mas isso NÃO foi confirmado documentalmente (ex.: publicação em Diário Oficial) e por isso permanece REQUER CONFIRMAÇÃO HUMANA."
+    }
+  ],
+  "finalCounts": {
+    "totalContratos": 36,
+    "cnpjConfirmados": 30,
+    "cnpjNaoLocalizados": 6,
+    "emailsLocalizados": 0,
+    "fiscaisComNomeCompletoOuExato": 34,
+    "fiscaisAindaPendentesHumanReview": 2,
+    "processosReconstruidos": 19,
+    "processosAindaSemConfirmacaoDocumental": 19,
+    "statusPorClassificacao": {
+      "A": 12,
+      "B": 17,
+      "C": 2,
+      "D": 5
+    }
+  }
+}

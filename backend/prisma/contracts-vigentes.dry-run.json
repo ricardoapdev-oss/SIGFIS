@@ -1,0 +1,2052 @@
+{
+  "metadata": {
+    "generatedAt": "2026-08-22T21:35:48.719Z",
+    "purpose": "ETAPA 4 — dry-run técnico. NENHUM dado foi inserido/alterado em nenhum banco. Vocabulário de overallStatus restrito a: READY_FOR_IMPORT, BLOCKED_BY_DATA, BLOCKED_BY_SCHEMA, BLOCKED_BY_INSTITUTIONAL_DECISION, HUMAN_REVIEW_REQUIRED.",
+    "prodStateAssumed": {
+      "totalUsers": 1,
+      "usersByRole": {
+        "ADMIN": 1,
+        "GESTOR": 0,
+        "FISCAL": 0,
+        "ALTA_GESTAO": 0
+      },
+      "note": "Premissa baseada no último bootstrap confirmado nesta conversa (não uma consulta ao vivo nesta etapa — nenhuma credencial foi fornecida neste turno)."
+    },
+    "methodologyNote": "contractor/fiscal/process/contract usam status PASS/BLOCKED/HUMAN_REVIEW por entidade (conforme modelo pedido na seção 14); overallStatus usa o vocabulário fechado da seção 15 (o mais severo entre os quatro eixos vence).",
+    "universalBlockersFoundThisEtapa": [
+      "Contractor.email obrigatório, sem dado real para nenhuma das 36 empresas (0/36).",
+      "ProcurementProcess.requesterId obrigatório, sem regra institucional definida (0/36 com decisão tomada).",
+      "Nenhum dos 22 usuários FISCAL existe hoje em PROD (premissa documentada; ver prodStateAssumed) — mesmo os nomes com correspondência EXATA precisariam ser criados antes de qualquer FiscalAssignment."
+    ]
+  },
+  "contracts": [
+    {
+      "ord": 1,
+      "company": "SERVIÇO SOCIAL DA INDÚSTRIA - SESI",
+      "contractor": {
+        "name": "SERVIÇO SOCIAL DA INDÚSTRIA - SESI",
+        "cnpj": "03.786.187/0001-99",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Rogério B. da Silva",
+        "matchDegree": "EXACT",
+        "officialFullName": "Rogério Brasilino da Silva",
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202300055000054",
+        "processNumberValidated": "202300055000054",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Dispensa de licitação",
+        "modalityMapped": "DISPENSA_13303",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 011/2023",
+        "contractNumberCore": "11/2023",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-06-14",
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 11.025,60",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 2,
+      "company": "HEALTH SAÚDE E SEGURANÇA DO TRABALHO LTDA",
+      "contractor": {
+        "name": "HEALTH SAÚDE E SEGURANÇA DO TRABALHO LTDA",
+        "cnpj": null,
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: cnpjCpf",
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Rogério B. da Silva",
+        "matchDegree": "EXACT",
+        "officialFullName": "Rogério Brasilino da Silva",
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02400055000297E14",
+        "processNumberValidated": "202400055000297",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": null,
+        "modalityMapped": null,
+        "modalitySafety": "N/A",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+          "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 016/2025",
+        "contractNumberCore": "16/2025",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": null,
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 49.300,00",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: cnpjCpf",
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)",
+        "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 3,
+      "company": "REDEMOB CONSÓRCIO",
+      "contractor": {
+        "name": "REDEMOB CONSÓRCIO",
+        "cnpj": "10.636.142/0001-01",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Maria do Carmo C. Silva",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202300055000136",
+        "processNumberValidated": "202300055000136",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Inexigibilidade de licitação",
+        "modalityMapped": "INEXIGIBILIDADE",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 025/2023",
+        "contractNumberCore": "25/2023",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-10-04",
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 340.560,00",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 4,
+      "company": "PLUXEE BENEFÍCIOS BRASIL S.A",
+      "contractor": {
+        "name": "PLUXEE BENEFÍCIOS BRASIL S.A",
+        "cnpj": "69.034.668/0001-56",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Maria do Carmo C. Silva",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02300055000104E14",
+        "processNumberValidated": "202300055000104",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": "Pregão Eletrônico nº 006/2023",
+        "modalityMapped": "PREGAO_ELETRONICO",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 019/2023",
+        "contractNumberCore": "19/2023",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-06-21",
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 1.503.836,40",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 5,
+      "company": "LE CARD ADMINISTRADORA DE CARTÕES LTDA",
+      "contractor": {
+        "name": "LE CARD ADMINISTRADORA DE CARTÕES LTDA",
+        "cnpj": "19.207.352/0001-40",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Edilson Martins Garcia",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02300055000401E14",
+        "processNumberValidated": "202300055000401",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": "Pregão Eletrônico nº 009/2023",
+        "modalityMapped": "PREGAO_ELETRONICO",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 030/2023",
+        "contractNumberCore": "30/2023",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-10-09",
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 3.417.810,00",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 6,
+      "company": "GENESIS PRESTADORA DE SERVIÇOS LTDA",
+      "contractor": {
+        "name": "GENESIS PRESTADORA DE SERVIÇOS LTDA",
+        "cnpj": "31.549.836/0001-73",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Eunice Maria C Oliveira",
+        "matchDegree": "MINOR_VARIANT",
+        "officialFullName": "Eunice Maria Chagas Oliveira",
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202300055000119",
+        "processNumberValidated": "202300055000119",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Pregão Eletrônico nº 008/2023",
+        "modalityMapped": "PREGAO_ELETRONICO",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 021/2023",
+        "contractNumberCore": "21/2023",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-06-12",
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 358.716,96",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 7,
+      "company": "PADA PÃES E SABORES LTDA",
+      "contractor": {
+        "name": "PADA PÃES E SABORES LTDA",
+        "cnpj": "12.577.632/0003‐63",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Eunice Maria C Oliveira",
+        "matchDegree": "MINOR_VARIANT",
+        "officialFullName": "Eunice Maria Chagas Oliveira",
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202200055000417",
+        "processNumberValidated": "202200055000417",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Dispensa de licitação",
+        "modalityMapped": "DISPENSA_13303",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 08/2023",
+        "contractNumberCore": "8/2023",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-05-28",
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 34.370,66",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 8,
+      "company": "FONSECA E MARTINS COMÉRCIO DE GÁS EIRELI",
+      "contractor": {
+        "name": "FONSECA E MARTINS COMÉRCIO DE GÁS EIRELI",
+        "cnpj": "00.961.053/0001-79",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Eliety Rodrigues Pereira",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02200055000273E14",
+        "processNumberValidated": "202200055000273",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": "Pregão Eletrônico nº 008/2022",
+        "modalityMapped": "PREGAO_ELETRONICO",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 019/2022",
+        "contractNumberCore": "19/2022",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-09-23",
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 14.279,40",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 9,
+      "company": "JVS PARTICIPAÇÕES EIRELI",
+      "contractor": {
+        "name": "JVS PARTICIPAÇÕES EIRELI",
+        "cnpj": "28.028.063/0001-75",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Weverson de Oliveira",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202300055000247",
+        "processNumberValidated": "202300055000247",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Ata de Registro de Preços nº 01/2022",
+        "modalityMapped": null,
+        "modalitySafety": "CONFLITO",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+          "ENUM_CONFLICT: modalidade \"Ata de Registro de Preços\" sem correspondência segura no enum BiddingModality"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 09/2022",
+        "contractNumberCore": "9/2022",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-06-07",
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 51.766,44",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "ENUM_CONFLICT: modalidade \"Ata de Registro de Preços\" sem correspondência segura no enum BiddingModality",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 10,
+      "company": "LS PRODUTOS E SERVIÇOS LTDA",
+      "contractor": {
+        "name": "LS PRODUTOS E SERVIÇOS LTDA",
+        "cnpj": "08.532.353/0001-44",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Weverson de Oliveira",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202400055000006",
+        "processNumberValidated": "202400055000006",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Ata de Registro de Preços nº 02/2023",
+        "modalityMapped": null,
+        "modalitySafety": "CONFLITO",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+          "ENUM_CONFLICT: modalidade \"Ata de Registro de Preços\" sem correspondência segura no enum BiddingModality"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 29/2023",
+        "contractNumberCore": "29/2023",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-09-26",
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 63.046,80",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "ENUM_CONFLICT: modalidade \"Ata de Registro de Preços\" sem correspondência segura no enum BiddingModality",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 11,
+      "company": "ALTERDATA TECNOLOGIA EM INFORMÁTICA LTDA",
+      "contractor": {
+        "name": "ALTERDATA TECNOLOGIA EM INFORMÁTICA LTDA",
+        "cnpj": "36.462.778/0001-60",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Cleiton de Sá Silva Vieira",
+        "matchDegree": "AMBIGUOUS_HUMAN_REVIEW",
+        "officialFullName": null,
+        "status": "HUMAN_REVIEW",
+        "issues": [
+          "HUMAN_REVIEW_REQUIRED: identidade do fiscal não confirmada documentalmente (ETAPA 2/3)",
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202400055000728",
+        "processNumberValidated": "202400055000728",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Dispensa de licitação",
+        "modalityMapped": "DISPENSA_13303",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 01/2025",
+        "contractNumberCore": "1/2025",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2025-01-13",
+        "initialValue": "61518",
+        "initialValueSource": "Recuperado nesta ETAPA 4 da coluna VALOR da planilha oficial IQUEGO (mesma fonte já citada na ETAPA 2, coluna não persistida em v2)",
+        "currentValue": "R$56.145,96",
+        "status": "PASS",
+        "issues": []
+      },
+      "overallStatus": "HUMAN_REVIEW_REQUIRED",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "HUMAN_REVIEW_REQUIRED: identidade do fiscal não confirmada documentalmente (ETAPA 2/3)",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+      ]
+    },
+    {
+      "ord": 12,
+      "company": "INTEGRA AUTOMAÇÃO E CONTROLE LTDA",
+      "contractor": {
+        "name": "INTEGRA AUTOMAÇÃO E CONTROLE LTDA",
+        "cnpj": "07.121.081/0001-27",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Cleiton de Sá Silva",
+        "matchDegree": "EXACT",
+        "officialFullName": "Cleiton de Sá Silva",
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202000055000104",
+        "processNumberValidated": "202000055000104",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Pregão Eletrônico nº 90012/2024",
+        "modalityMapped": "PREGAO_ELETRONICO",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 006/2025",
+        "contractNumberCore": "6/2025",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2025-02-12",
+        "initialValue": "29629.8",
+        "initialValueSource": "Recuperado nesta ETAPA 4 da coluna VALOR da planilha oficial IQUEGO (mesma fonte já citada na ETAPA 2, coluna não persistida em v2)",
+        "currentValue": "R$ 30.893,40",
+        "status": "PASS",
+        "issues": []
+      },
+      "overallStatus": "BLOCKED_BY_INSTITUTIONAL_DECISION",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+      ]
+    },
+    {
+      "ord": 13,
+      "company": "MPS BRASIL OUTSOURCING DE IMPRESSÃO LTDA",
+      "contractor": {
+        "name": "MPS BRASIL OUTSOURCING DE IMPRESSÃO LTDA",
+        "cnpj": "33.091.401/0001-53",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Robson Policeno de Rezende",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202100055000133",
+        "processNumberValidated": "202100055000133",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Pregão Eletrônico nº 003/2021",
+        "modalityMapped": "PREGAO_ELETRONICO",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 002/2021",
+        "contractNumberCore": "2/2021",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-07-09",
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 31.346,88",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 14,
+      "company": "GOIAS TELECOMUNICAÇÕES S/A - GOIASTELECOM",
+      "contractor": {
+        "name": "GOIAS TELECOMUNICAÇÕES S/A - GOIASTELECOM",
+        "cnpj": "10.268.439/0001-53",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Robson Policeno de Rezende",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202200055000327",
+        "processNumberValidated": "202200055000327",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Dispensa de Licitação",
+        "modalityMapped": "DISPENSA_13303",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 006/2023",
+        "contractNumberCore": "6/2023",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2023-05-11",
+        "initialValue": "67679.28",
+        "initialValueSource": "Recuperado nesta ETAPA 4 da coluna VALOR da planilha oficial IQUEGO (mesma fonte já citada na ETAPA 2, coluna não persistida em v2)",
+        "currentValue": "R$ 47.123,52",
+        "status": "PASS",
+        "issues": []
+      },
+      "overallStatus": "BLOCKED_BY_INSTITUTIONAL_DECISION",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+      ]
+    },
+    {
+      "ord": 15,
+      "company": "GOIAS TELECOMUNICAÇÕES S/A - GOIAS TELECOM",
+      "contractor": {
+        "name": "GOIAS TELECOMUNICAÇÕES S/A - GOIAS TELECOM",
+        "cnpj": "10.268.439/0001-53",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Robson Policeno de Rezende",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202400055000042",
+        "processNumberValidated": "202400055000042",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Dispensa de licitação",
+        "modalityMapped": "DISPENSA_13303",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 005/2024",
+        "contractNumberCore": "5/2024",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-04-10",
+        "initialValue": "136900",
+        "initialValueSource": "Recuperado nesta ETAPA 4 da coluna VALOR da planilha oficial IQUEGO (mesma fonte já citada na ETAPA 2, coluna não persistida em v2)",
+        "currentValue": "R$ 136.900,00",
+        "status": "PASS",
+        "issues": []
+      },
+      "overallStatus": "BLOCKED_BY_INSTITUTIONAL_DECISION",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+      ]
+    },
+    {
+      "ord": 16,
+      "company": "SANEAGO",
+      "contractor": {
+        "name": "SANEAGO",
+        "cnpj": "01.616.929/0001-02",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Pedro Henrique Martins",
+        "matchDegree": "EXACT",
+        "officialFullName": "Pedro Henrique Santos Martins",
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202100055000217",
+        "processNumberValidated": "202100055000217",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Inexigibilidade de Licitação",
+        "modalityMapped": "INEXIGIBILIDADE",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 003/202",
+        "contractNumberCore": "3/202",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2021-09-13",
+        "initialValue": "257821.74",
+        "initialValueSource": "Persistido desde a ETAPA 2/3 (achado manual)",
+        "currentValue": "R$ 67.373,16",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: número de contrato malformado (\"Contrato 003/202\", ano incompleto)"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "DATA_CONFLICT: número de contrato malformado (\"Contrato 003/202\", ano incompleto)"
+      ]
+    },
+    {
+      "ord": 17,
+      "company": "EQUATORIAL",
+      "contractor": {
+        "name": "EQUATORIAL",
+        "cnpj": "01.543.032/0001-04",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Pedro Henrique Martins",
+        "matchDegree": "EXACT",
+        "officialFullName": "Pedro Henrique Santos Martins",
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202300055000551",
+        "processNumberValidated": "202300055000551",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": null,
+        "modalityMapped": null,
+        "modalitySafety": "N/A",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+          "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato nº CCER GOV 325/2019",
+        "contractNumberCore": "325/2019",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": null,
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 264.688,38",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)",
+        "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 18,
+      "company": "GENESIS COMÉRCIO E MANUTENÇÕES LTDA",
+      "contractor": {
+        "name": "GENESIS COMÉRCIO E MANUTENÇÕES LTDA",
+        "cnpj": "17.596.391/0001-51",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Pedro H. S. Martins",
+        "matchDegree": "MINOR_VARIANT",
+        "officialFullName": "Pedro Henrique Santos Martins",
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202300055000690",
+        "processNumberValidated": "202300055000690",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Pregão Eletrônico nº 90001/2024",
+        "modalityMapped": "PREGAO_ELETRONICO",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 011/2024",
+        "contractNumberCore": "11/2024",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-07-25",
+        "initialValue": "84000",
+        "initialValueSource": "Recuperado nesta ETAPA 4 da coluna VALOR da planilha oficial IQUEGO (mesma fonte já citada na ETAPA 2, coluna não persistida em v2)",
+        "currentValue": "R$ 88.471,71",
+        "status": "PASS",
+        "issues": []
+      },
+      "overallStatus": "BLOCKED_BY_INSTITUTIONAL_DECISION",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+      ]
+    },
+    {
+      "ord": 19,
+      "company": "PRIME CONSULTORIA E ASSES. EMPRESARIAL LTDA",
+      "contractor": {
+        "name": "PRIME CONSULTORIA E ASSES. EMPRESARIAL LTDA",
+        "cnpj": "05.340.639/0001-30",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Weverson de Oliveira",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202300055000144",
+        "processNumberValidated": "202300055000144",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Pregão Eletrônico nº 007/2023",
+        "modalityMapped": "PREGAO_ELETRONICO",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 020/2023",
+        "contractNumberCore": "20/2023",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2023-07-19",
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 194.481,20",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 20,
+      "company": "GIBBOR BRASIL PUBLICIDADE E PROPAGANDA LTDA - EPP",
+      "contractor": {
+        "name": "GIBBOR BRASIL PUBLICIDADE E PROPAGANDA LTDA - EPP",
+        "cnpj": "08.329.433/0001-05",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Sabrina Maria Barbosa",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202100055000360",
+        "processNumberValidated": "202100055000360",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Pregão Eletrônico nº 005/2021",
+        "modalityMapped": "PREGAO_ELETRONICO",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 001/2022",
+        "contractNumberCore": "1/2022",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-01-19",
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 42.498,80",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 21,
+      "company": "WEGH ASSESSORIA E LOGÍSTICA INTERNACIONAL",
+      "contractor": {
+        "name": "WEGH ASSESSORIA E LOGÍSTICA INTERNACIONAL",
+        "cnpj": "65.494.742/0001-66",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Wenderson de Souza",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "202300055000052",
+        "processNumberValidated": "202300055000052",
+        "processNumberStatus": "VALIDATED",
+        "modalityDocumented": "Pregão Eletrônico nº 004/2023",
+        "modalityMapped": "PREGAO_ELETRONICO",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 009/2023",
+        "contractNumberCore": "9/2023",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2023-05-08",
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 10.003.600,00",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 22,
+      "company": "AVISO URGENTE TECNOLOGIA E INFORMAÇÃO LTDA",
+      "contractor": {
+        "name": "AVISO URGENTE TECNOLOGIA E INFORMAÇÃO LTDA",
+        "cnpj": "14.774.075/0001-34",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Patrícia Sodré",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02200055000192E14",
+        "processNumberValidated": "202200055000192",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": "Dispensa de licitação",
+        "modalityMapped": "DISPENSA_13303",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 011/2022",
+        "contractNumberCore": "11/2022",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-07-31",
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 477,84",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 23,
+      "company": "DELTA ENGENHARIA E ARQUITETURA LTDA",
+      "contractor": {
+        "name": "DELTA ENGENHARIA E ARQUITETURA LTDA",
+        "cnpj": "54.001.411.0001-20",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Thalita Guaribaldine da Silva Guimaraes",
+        "matchDegree": "MINOR_VARIANT",
+        "officialFullName": "Thalita Guaribaldine da Silva Guimarães",
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02400055000064E14",
+        "processNumberValidated": "202400055000064",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": "Pregão Eletrônico nº 004/2024",
+        "modalityMapped": "PREGAO_ELETRONICO",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato nº 022/2024",
+        "contractNumberCore": "22/2024",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-10-01",
+        "initialValue": "156000",
+        "initialValueSource": "Recuperado nesta ETAPA 4 da coluna VALOR da planilha oficial IQUEGO (mesma fonte já citada na ETAPA 2, coluna não persistida em v2)",
+        "currentValue": "R$156.000,00",
+        "status": "PASS",
+        "issues": []
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+      ]
+    },
+    {
+      "ord": 24,
+      "company": "SHIELD SEGURANÇA DA INFORMAÇÃO E CONSULTORIA EMPRESARIAL LTDA",
+      "contractor": {
+        "name": "SHIELD SEGURANÇA DA INFORMAÇÃO E CONSULTORIA EMPRESARIAL LTDA",
+        "cnpj": "15.809.115/0001-07",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Fábio Gonçalves da Silva",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.0240005500033E14",
+        "processNumberValidated": "202400055000330",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": "Pregão Eletrônico nº 90013/2024",
+        "modalityMapped": "PREGAO_ELETRONICO",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato nº 05/2025",
+        "contractNumberCore": "5/2025",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2025-02-19",
+        "initialValue": "77000",
+        "initialValueSource": "Recuperado nesta ETAPA 4 da coluna VALOR da planilha oficial IQUEGO (mesma fonte já citada na ETAPA 2, coluna não persistida em v2)",
+        "currentValue": "R$ 77.000,00",
+        "status": "PASS",
+        "issues": []
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+      ]
+    },
+    {
+      "ord": 25,
+      "company": "ZENITE INFORMAÇÃO E CONSULTORIA S/A",
+      "contractor": {
+        "name": "ZENITE INFORMAÇÃO E CONSULTORIA S/A",
+        "cnpj": "86.781.069/0001-15",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Gabriel Moraes Godinho",
+        "matchDegree": "EXACT",
+        "officialFullName": "Gabriel Moraes Godinho",
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02500055000275E14",
+        "processNumberValidated": "202500055000275",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": "Dispensa de licitação",
+        "modalityMapped": "DISPENSA_13303",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato nº 09/2025",
+        "contractNumberCore": "9/2025",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2025-04-28",
+        "initialValue": "12546",
+        "initialValueSource": "Recuperado nesta ETAPA 4 da coluna VALOR da planilha oficial IQUEGO (mesma fonte já citada na ETAPA 2, coluna não persistida em v2)",
+        "currentValue": "R$ 13.065,76",
+        "status": "BLOCKED",
+        "issues": [
+          "UNIQUE_CONFLICT: contractNumber \"9/2025\" colide com outro registro da fonte histórica"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "UNIQUE_CONFLICT: contractNumber \"9/2025\" colide com outro registro da fonte histórica"
+      ]
+    },
+    {
+      "ord": 26,
+      "company": "L.A VIAGENS E TURISMO LTDA",
+      "contractor": {
+        "name": "L.A VIAGENS E TURISMO LTDA",
+        "cnpj": null,
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: cnpjCpf",
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Denize Morais",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02400055000827E14",
+        "processNumberValidated": "202400055000827",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": null,
+        "modalityMapped": null,
+        "modalitySafety": "N/A",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+          "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato nº 15/2025",
+        "contractNumberCore": "15/2025",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": null,
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 271.750,00",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: cnpjCpf",
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)",
+        "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 27,
+      "company": "GÁS E MAIS COMÉRCIO EIRELI",
+      "contractor": {
+        "name": "GÁS E MAIS COMÉRCIO EIRELI",
+        "cnpj": null,
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: cnpjCpf",
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Eliety Rodrigues Pereira",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02500055000308E14",
+        "processNumberValidated": "202500055000308",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": null,
+        "modalityMapped": null,
+        "modalitySafety": "N/A",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+          "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato nº 14/2025",
+        "contractNumberCore": "14/2025",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": null,
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 3.061,50",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: cnpjCpf",
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)",
+        "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 28,
+      "company": "BRASILSEG",
+      "contractor": {
+        "name": "BRASILSEG",
+        "cnpj": "28.196.889/0001-43",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Dalmo Francisco da Costa",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02400055000709E14",
+        "processNumberValidated": "202400055000709",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": null,
+        "modalityMapped": null,
+        "modalitySafety": "N/A",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+          "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato nº 13/2025",
+        "contractNumberCore": "13/2025",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": null,
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 9.900,00",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)",
+        "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 29,
+      "company": "ÔMEGA LOCADORA DE VEÍCULOS LTDA",
+      "contractor": {
+        "name": "ÔMEGA LOCADORA DE VEÍCULOS LTDA",
+        "cnpj": null,
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: cnpjCpf",
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Weverson de Oliveira",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02500055000328E14",
+        "processNumberValidated": "202500055000328",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": null,
+        "modalityMapped": null,
+        "modalitySafety": "N/A",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+          "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato nº 18/2025",
+        "contractNumberCore": "18/2025",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": null,
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 51.000,00",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: cnpjCpf",
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)",
+        "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 30,
+      "company": "MISTER PRAGAS DEDETIZACAO E DESENTUPIDORA LTDA",
+      "contractor": {
+        "name": "MISTER PRAGAS DEDETIZACAO E DESENTUPIDORA LTDA",
+        "cnpj": null,
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: cnpjCpf",
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Emerson Ferreira dos Anjos",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02500055000026E14",
+        "processNumberValidated": "202500055000026",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": null,
+        "modalityMapped": null,
+        "modalitySafety": "N/A",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+          "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 25/2025",
+        "contractNumberCore": "25/2025",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": null,
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 12.000,00",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: cnpjCpf",
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)",
+        "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 31,
+      "company": "NP TECNOLOGIA E GESTÃO DE DADOS LTDA",
+      "contractor": {
+        "name": "NP TECNOLOGIA E GESTÃO DE DADOS LTDA",
+        "cnpj": "07.797.967/0001-95",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Gabriel Morais Godinho",
+        "matchDegree": "AMBIGUOUS_HUMAN_REVIEW",
+        "officialFullName": null,
+        "status": "HUMAN_REVIEW",
+        "issues": [
+          "HUMAN_REVIEW_REQUIRED: identidade do fiscal não confirmada documentalmente (ETAPA 2/3)",
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02300055000041E14",
+        "processNumberValidated": "202300055000041",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": "Inexigibilidade de licitação",
+        "modalityMapped": "INEXIGIBILIDADE",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 01/2023",
+        "contractNumberCore": "1/2023",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-12-13",
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 11.291,06",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "HUMAN_REVIEW_REQUIRED",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "HUMAN_REVIEW_REQUIRED: identidade do fiscal não confirmada documentalmente (ETAPA 2/3)",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 32,
+      "company": "DMS CALIBRAÇÕES E INSPEÇÕES INDUSTRIAL LTDA",
+      "contractor": {
+        "name": "DMS CALIBRAÇÕES E INSPEÇÕES INDUSTRIAL LTDA",
+        "cnpj": "32.001.032/0001-06",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Laurindo Damas da Silva Júnior",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02500055000519E14",
+        "processNumberValidated": "202500055000519",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": "Dispensa de Licitação",
+        "modalityMapped": "DISPENSA_13303",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 01/2026",
+        "contractNumberCore": "1/2026",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": null,
+        "initialValue": "R$ 13.947,26",
+        "initialValueSource": "Recuperado nesta ETAPA 4 da coluna VALOR da planilha oficial IQUEGO (mesma fonte já citada na ETAPA 2, coluna não persistida em v2)",
+        "currentValue": "R$ 13.947,26",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)"
+      ]
+    },
+    {
+      "ord": 33,
+      "company": "WORK7 AUDITORES INDEPENDENTES LTDA",
+      "contractor": {
+        "name": "WORK7 AUDITORES INDEPENDENTES LTDA",
+        "cnpj": "11.689.939/0001-21",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Vera Lúcia Nunes",
+        "matchDegree": "EXACT",
+        "officialFullName": "Vera Lúcia Nunes dos Santos",
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02500055000168E14",
+        "processNumberValidated": "202500055000168",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": "Pregão Eletrônico nº 003/2020",
+        "modalityMapped": "PREGAO_ELETRONICO",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 17/2025",
+        "contractNumberCore": "17/2025",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": "2024-05-07 (aditivo mais recente localizado; vencimento 2025-05-08)",
+        "initialValue": "38200 (valor do contrato original 017/2020, em 2021)",
+        "initialValueSource": "Persistido desde a ETAPA 2/3 (achado manual)",
+        "currentValue": "R$ 47.100,00",
+        "status": "BLOCKED",
+        "issues": [
+          "UNIQUE_CONFLICT: contractNumber \"17/2025\" colide com outro registro da fonte histórica"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "UNIQUE_CONFLICT: contractNumber \"17/2025\" colide com outro registro da fonte histórica"
+      ]
+    },
+    {
+      "ord": 34,
+      "company": "AUDIGESPUB - SERVIÇOS DE AUDITORIA, ASSESSORIA E CONSULTORIA LTDA",
+      "contractor": {
+        "name": "AUDIGESPUB - SERVIÇOS DE AUDITORIA, ASSESSORIA E CONSULTORIA LTDA",
+        "cnpj": null,
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: cnpjCpf",
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Alessandro dos Santos",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02500055000383E14",
+        "processNumberValidated": "202500055000383",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": null,
+        "modalityMapped": null,
+        "modalitySafety": "N/A",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+          "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 17/2025",
+        "contractNumberCore": "17/2025",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": null,
+        "initialValue": null,
+        "initialValueSource": null,
+        "currentValue": "R$ 17.700,00",
+        "status": "BLOCKED",
+        "issues": [
+          "UNIQUE_CONFLICT: contractNumber \"17/2025\" colide com outro registro da fonte histórica",
+          "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+          "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: cnpjCpf",
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: modality (não documentada oficialmente; apenas inferência não validada quando há legalBasis)",
+        "UNIQUE_CONFLICT: contractNumber \"17/2025\" colide com outro registro da fonte histórica",
+        "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)",
+        "MISSING_REQUIRED_FIELD: initialValue (Contract.initialValue é obrigatório; a planilha oficial não documenta valor original para este contrato específico — coluna \"VALOR\" veio \"-\")"
+      ]
+    },
+    {
+      "ord": 35,
+      "company": "INSTITUTO DE PROMOÇÃO HUMANA, APRENDIZAGEM E CULTURA",
+      "contractor": {
+        "name": "INSTITUTO DE PROMOÇÃO HUMANA, APRENDIZAGEM E CULTURA",
+        "cnpj": "11.595.331/0001-38",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Vandeir Gonçalves da Silva",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02500055000779E14",
+        "processNumberValidated": "202500055000779",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": "Pregão Eletrônico nº 002/2026",
+        "modalityMapped": "PREGAO_ELETRONICO",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 07/2025",
+        "contractNumberCore": "7/2025",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": null,
+        "initialValue": "441345.84",
+        "initialValueSource": "Persistido desde a ETAPA 2/3 (achado manual)",
+        "currentValue": "R$ 441.345,84",
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)"
+      ]
+    },
+    {
+      "ord": 36,
+      "company": "BIOCIENTIFIC LABORATORIOS LTDA",
+      "contractor": {
+        "name": "BIOCIENTIFIC LABORATORIOS LTDA",
+        "cnpj": "05.153.743/0001-15",
+        "email": null,
+        "status": "BLOCKED",
+        "issues": [
+          "MISSING_REQUIRED_FIELD: email"
+        ]
+      },
+      "fiscal": {
+        "nameInSource": "Laurindo Damas da Silva Júnior",
+        "matchDegree": "EXACT",
+        "officialFullName": null,
+        "status": "BLOCKED",
+        "issues": [
+          "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)"
+        ]
+      },
+      "process": {
+        "processNumberOriginal": "2.02600055000186E14",
+        "processNumberValidated": "202600055000186",
+        "processNumberStatus": "RECONSTRUCTED_PENDING_CONFIRMATION",
+        "modalityDocumented": "Dispensa de Licitação",
+        "modalityMapped": "DISPENSA_13303",
+        "modalitySafety": "SEGURA",
+        "status": "BLOCKED",
+        "issues": [
+          "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+          "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)"
+        ]
+      },
+      "contract": {
+        "contractNumberOriginal": "Contrato 09/2025",
+        "contractNumberCore": "9/2025",
+        "objectDescription": "PRESENTE (recuperado da fonte original)",
+        "signingDate": null,
+        "initialValue": "12000",
+        "initialValueSource": "Persistido desde a ETAPA 2/3 (achado manual)",
+        "currentValue": "R$ 12.000,00",
+        "status": "BLOCKED",
+        "issues": [
+          "UNIQUE_CONFLICT: contractNumber \"9/2025\" colide com outro registro da fonte histórica",
+          "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)"
+        ]
+      },
+      "overallStatus": "BLOCKED_BY_DATA",
+      "issues": [
+        "MISSING_REQUIRED_FIELD: email",
+        "RELATIONSHIP_CONFLICT: usuário FISCAL correspondente não existe em PROD (criação de usuário está fora do escopo desta etapa; além disso, não há e-mail/matrícula institucional real confirmado para os 22 fiscais para criar o registro corretamente)",
+        "DATA_CONFLICT: processNumber reconstruído de notação científica, sem confirmação documental (ETAPA 1-3)",
+        "INSTITUTIONAL_DECISION_REQUIRED: requesterId (nenhuma regra institucional definida; ver 3 cenários no plano de importação)",
+        "UNIQUE_CONFLICT: contractNumber \"9/2025\" colide com outro registro da fonte histórica",
+        "MISSING_REQUIRED_FIELD: signingDate (Contract.signingDate é obrigatório; fonte/validações não documentam esta data para este registro)"
+      ]
+    }
+  ],
+  "counts": {
+    "BLOCKED_BY_DATA": 30,
+    "HUMAN_REVIEW_REQUIRED": 2,
+    "BLOCKED_BY_INSTITUTIONAL_DECISION": 4
+  },
+  "wouldBeOnlyInstitutionallyBlocked": [
+    12,
+    14,
+    15,
+    18
+  ]
+}

@@ -1,0 +1,3661 @@
+{
+  "metadata": {
+    "generatedAt": "2026-08-22T19:23:55.414Z",
+    "sourceFile": "backend/prisma/contracts-vigentes.data.ts",
+    "sourceFileModified": false,
+    "purpose": "ETAPA 1 do plano de migração — estrutura de conferência para validação humana. NÃO é apta para importação automática.",
+    "warning": "Nenhum registro deste arquivo deve ser tratado como pronto para PROD. Ver overallStatus e issues de cada contrato."
+  },
+  "contracts": [
+    {
+      "ordem": 1,
+      "processNumber": "202300055000054",
+      "relatedProcessNumbers": [
+        "202500055000266"
+      ],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "SERVIÇO SOCIAL DA INDÚSTRIA - SESI",
+      "unit": "Segurança do Trabalho",
+      "fiscal": "Rogério B. da Silva",
+      "ordinance": "Portaria nº 059/2025",
+      "contractNumber": "Contrato 011/2023",
+      "addendum": "(2º Termo Aditivo)",
+      "value": "R$ 11.025,60",
+      "start": "2025-06-16",
+      "end": "2026-06-15",
+      "observation": "*INICIADO OS PROCEDIMENTOS PARA A PRORROGAÇÃO",
+      "processNumberValidation": {
+        "original": "202300055000054",
+        "normalized": "202300055000054",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "SERVIÇO SOCIAL DA INDÚSTRIA - SESI",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Rogério B. da Silva",
+        "devUserKey": "f01",
+        "devUserName": "Rogério B. da Silva",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f01).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 011/2023",
+        "normalized": "011/2023",
+        "collisionKey": "011/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-06-16",
+        "end": "2026-06-15",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 11.025,60",
+        "normalized": "11025.60",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "A",
+      "issues": [
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Nenhuma inconsistência estrutural identificada; ainda assim, requer complementação cadastral padrão (CNPJ/e-mail da empresa, identificador estável do fiscal, requesterId do processo, modalidade quando ausente, signingDate, initialValue) antes da carga em PROD.",
+      "overallStatusLabel": "A — DADOS CONSISTENTES, MAS REQUER COMPLEMENTAÇÃO"
+    },
+    {
+      "ordem": 2,
+      "processNumber": "2.02400055000297E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "HEALTH SAÚDE E SEGURANÇA DO TRABALHO LTDA",
+      "unit": "Segurança do Trabalho",
+      "fiscal": "Rogério B. da Silva",
+      "ordinance": "Portaria nº 080/2025",
+      "contractNumber": "Contrato 016/2025",
+      "addendum": "NÃO INFORMADO NA FONTE",
+      "value": "R$ 49.300,00",
+      "start": "2025-06-16",
+      "end": "2026-06-15",
+      "observation": "*INICIADO OS PROCEDIMENTOS PARA A PRORROGAÇÃO",
+      "processNumberValidation": {
+        "original": "2.02400055000297E14",
+        "normalized": "202400055000297",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "HEALTH SAÚDE E SEGURANÇA DO TRABALHO LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Rogério B. da Silva",
+        "devUserKey": "f01",
+        "devUserName": "Rogério B. da Silva",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f01).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 016/2025",
+        "normalized": "016/2025",
+        "collisionKey": "016/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-06-16",
+        "end": "2026-06-15",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 49.300,00",
+        "normalized": "49300.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 3,
+      "processNumber": "202300055000136",
+      "relatedProcessNumbers": [],
+      "legalBasis": "Art. 30, I, Lei 13.303/2016",
+      "company": "REDEMOB CONSÓRCIO",
+      "unit": "Gerência de Gestão de Pessoas",
+      "fiscal": "Maria do Carmo C. Silva",
+      "ordinance": "Portaria nº 099/2023",
+      "contractNumber": "Contrato 025/2023",
+      "addendum": "2º TERMO ADITIVO",
+      "value": "R$ 340.560,00",
+      "start": "2025-10-26",
+      "end": "2026-10-25",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "202300055000136",
+        "normalized": "202300055000136",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "REDEMOB CONSÓRCIO",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Maria do Carmo C. Silva",
+        "devUserKey": "f02",
+        "devUserName": "Maria do Carmo C. Silva",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f02).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 025/2023",
+        "normalized": "025/2023",
+        "collisionKey": "025/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": "Art. 30, I, Lei 13.303/2016",
+        "inferredModality": "INEXIGIBILIDADE",
+        "modalityStatus": "INFERÊNCIA — NÃO VALIDADA",
+        "note": "Inferência baseada apenas na citação do artigo da Lei 13.303/2016; não é um dado explícito de \"modality\" na fonte."
+      },
+      "dateValidation": {
+        "start": "2025-10-26",
+        "end": "2026-10-25",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 340.560,00",
+        "normalized": "340560.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "A",
+      "issues": [
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Nenhuma inconsistência estrutural identificada; ainda assim, requer complementação cadastral padrão (CNPJ/e-mail da empresa, identificador estável do fiscal, requesterId do processo, modalidade quando ausente, signingDate, initialValue) antes da carga em PROD.",
+      "overallStatusLabel": "A — DADOS CONSISTENTES, MAS REQUER COMPLEMENTAÇÃO"
+    },
+    {
+      "ordem": 4,
+      "processNumber": "2.02300055000104E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "PLUXEE BENEFÍCIOS BRASIL S.A",
+      "unit": "Gerência de Gestão de Pessoas",
+      "fiscal": "Maria do Carmo C. Silva",
+      "ordinance": "Portaria nº 064/2023",
+      "contractNumber": "Contrato 019/2023",
+      "addendum": "(2º Termo Aditivo)",
+      "value": "R$ 1.503.836,40",
+      "start": "2025-07-04",
+      "end": "2026-07-03",
+      "observation": "*INICIADO OS PROCEDIMENTOS PARA A PRORROGAÇÃO",
+      "processNumberValidation": {
+        "original": "2.02300055000104E14",
+        "normalized": "202300055000104",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "PLUXEE BENEFÍCIOS BRASIL S.A",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Maria do Carmo C. Silva",
+        "devUserKey": "f02",
+        "devUserName": "Maria do Carmo C. Silva",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f02).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 019/2023",
+        "normalized": "019/2023",
+        "collisionKey": "019/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-07-04",
+        "end": "2026-07-03",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 1.503.836,40",
+        "normalized": "1503836.40",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 5,
+      "processNumber": "2.02300055000401E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "LE CARD ADMINISTRADORA DE CARTÕES LTDA",
+      "unit": "Gerência de Gestão de Pessoas",
+      "fiscal": "Edilson Martins Garcia",
+      "ordinance": "Portaria nº 030/2025",
+      "contractNumber": "Contrato 030/2023",
+      "addendum": "(2º Termo Aditivo)",
+      "value": "R$ 3.417.810,00",
+      "start": "2025-11-08",
+      "end": "2026-11-07",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "2.02300055000401E14",
+        "normalized": "202300055000401",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "LE CARD ADMINISTRADORA DE CARTÕES LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Edilson Martins Garcia",
+        "devUserKey": "f03",
+        "devUserName": "Edilson Martins Garcia",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f03).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 030/2023",
+        "normalized": "030/2023",
+        "collisionKey": "030/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-11-08",
+        "end": "2026-11-07",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 3.417.810,00",
+        "normalized": "3417810.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 6,
+      "processNumber": "202300055000119",
+      "relatedProcessNumbers": [
+        "202400055000337"
+      ],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "GENESIS PRESTADORA DE SERVIÇOS LTDA",
+      "unit": "Coordenação de Serviços Gerais",
+      "fiscal": "Eunice Maria C Oliveira",
+      "ordinance": "Portaria nº 078/2023",
+      "contractNumber": "Contrato 021/2023",
+      "addendum": "5º Termo Aditivo",
+      "value": "R$ 358.716,96",
+      "start": "2025-07-19",
+      "end": "2026-07-18",
+      "observation": "*INICIADO OS PROCEDIMENTOS PARA A PRORROGAÇÃO",
+      "processNumberValidation": {
+        "original": "202300055000119",
+        "normalized": "202300055000119",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "GENESIS PRESTADORA DE SERVIÇOS LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Eunice Maria C Oliveira",
+        "devUserKey": "f04",
+        "devUserName": "Eunice Maria C. Oliveira",
+        "matchDegree": "MINOR_VARIANT",
+        "observation": "Fonte grafa sem ponto (\"C Oliveira\"); seed.ts usa \"C. Oliveira\". Diferença apenas de pontuação.",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 021/2023",
+        "normalized": "021/2023",
+        "collisionKey": "021/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-07-19",
+        "end": "2026-07-18",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 358.716,96",
+        "normalized": "358716.96",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "FISCAL_NAME_MINOR_VARIANT",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 7,
+      "processNumber": "202200055000417",
+      "relatedProcessNumbers": [
+        "202500055000163"
+      ],
+      "legalBasis": "Art. 29, II, Lei 13.303/2016",
+      "company": "PADA PÃES E SABORES LTDA",
+      "unit": "Coordenação de Serviços Gerais",
+      "fiscal": "Eunice Maria C Oliveira",
+      "ordinance": "Portaria nº 028/2023",
+      "contractNumber": "Contrato 08/2023",
+      "addendum": "(4º Termo Aditivo)",
+      "value": "R$ 34.370,66",
+      "start": "2026-04-20",
+      "end": "2027-04-19",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "202200055000417",
+        "normalized": "202200055000417",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "PADA PÃES E SABORES LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Eunice Maria C Oliveira",
+        "devUserKey": "f04",
+        "devUserName": "Eunice Maria C. Oliveira",
+        "matchDegree": "MINOR_VARIANT",
+        "observation": "Fonte grafa sem ponto (\"C Oliveira\"); seed.ts usa \"C. Oliveira\". Diferença apenas de pontuação.",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 08/2023",
+        "normalized": "08/2023",
+        "collisionKey": "08/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": "Art. 29, II, Lei 13.303/2016",
+        "inferredModality": "DISPENSA_13303",
+        "modalityStatus": "INFERÊNCIA — NÃO VALIDADA",
+        "note": "Inferência baseada apenas na citação do artigo da Lei 13.303/2016; não é um dado explícito de \"modality\" na fonte."
+      },
+      "dateValidation": {
+        "start": "2026-04-20",
+        "end": "2027-04-19",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 34.370,66",
+        "normalized": "34370.66",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "FISCAL_NAME_MINOR_VARIANT",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 8,
+      "processNumber": "2.02200055000273E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "FONSECA E MARTINS COMÉRCIO DE GÁS EIRELI",
+      "unit": "Coordenação de Serviços Gerais",
+      "fiscal": "Eliety Rodrigues Pereira",
+      "ordinance": "Portaria nº 031/2026",
+      "contractNumber": "Contrato 019/2022",
+      "addendum": "(3º Termo Aditivo)",
+      "value": "R$ 14.279,40",
+      "start": "2025-10-22",
+      "end": "2026-10-21",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "2.02200055000273E14",
+        "normalized": "202200055000273",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "FONSECA E MARTINS COMÉRCIO DE GÁS EIRELI",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Eliety Rodrigues Pereira",
+        "devUserKey": "f05",
+        "devUserName": "Eliety Rodrigues Pereira",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f05).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 019/2022",
+        "normalized": "019/2022",
+        "collisionKey": "019/2022",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-10-22",
+        "end": "2026-10-21",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 14.279,40",
+        "normalized": "14279.40",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 9,
+      "processNumber": "202300055000247",
+      "relatedProcessNumbers": [
+        "202200055000105"
+      ],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "JVS PARTICIPAÇÕES EIRELI",
+      "unit": "Gerência de Logística",
+      "fiscal": "Weverson de Oliveira",
+      "ordinance": "Portaria nº 47/2025",
+      "contractNumber": "Contrato 09/2022",
+      "addendum": "(4º Termo Aditivo)",
+      "value": "R$ 51.766,44",
+      "start": "2025-11-16",
+      "end": "2026-11-15",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "202300055000247",
+        "normalized": "202300055000247",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "JVS PARTICIPAÇÕES EIRELI",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Weverson de Oliveira",
+        "devUserKey": "f06",
+        "devUserName": "Weverson de Oliveira",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f06).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 09/2022",
+        "normalized": "09/2022",
+        "collisionKey": "09/2022",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-11-16",
+        "end": "2026-11-15",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 51.766,44",
+        "normalized": "51766.44",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "A",
+      "issues": [
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Nenhuma inconsistência estrutural identificada; ainda assim, requer complementação cadastral padrão (CNPJ/e-mail da empresa, identificador estável do fiscal, requesterId do processo, modalidade quando ausente, signingDate, initialValue) antes da carga em PROD.",
+      "overallStatusLabel": "A — DADOS CONSISTENTES, MAS REQUER COMPLEMENTAÇÃO"
+    },
+    {
+      "ordem": 10,
+      "processNumber": "202400055000006",
+      "relatedProcessNumbers": [
+        "202300055000354",
+        "202400055000668"
+      ],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "LS PRODUTOS E SERVIÇOS LTDA",
+      "unit": "Gerência de Logística",
+      "fiscal": "Weverson de Oliveira",
+      "ordinance": "Portaria nº 48/2025",
+      "contractNumber": "Contrato 29/2023",
+      "addendum": "(2º Termo Aditivo)",
+      "value": "R$ 63.046,80",
+      "start": "2025-10-28",
+      "end": "2026-10-27",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "202400055000006",
+        "normalized": "202400055000006",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "LS PRODUTOS E SERVIÇOS LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Weverson de Oliveira",
+        "devUserKey": "f06",
+        "devUserName": "Weverson de Oliveira",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f06).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 29/2023",
+        "normalized": "29/2023",
+        "collisionKey": "29/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-10-28",
+        "end": "2026-10-27",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 63.046,80",
+        "normalized": "63046.80",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "A",
+      "issues": [
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Nenhuma inconsistência estrutural identificada; ainda assim, requer complementação cadastral padrão (CNPJ/e-mail da empresa, identificador estável do fiscal, requesterId do processo, modalidade quando ausente, signingDate, initialValue) antes da carga em PROD.",
+      "overallStatusLabel": "A — DADOS CONSISTENTES, MAS REQUER COMPLEMENTAÇÃO"
+    },
+    {
+      "ordem": 11,
+      "processNumber": "202400055000728",
+      "relatedProcessNumbers": [
+        "202500055000828"
+      ],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "ALTERDATA TECNOLOGIA EM INFORMÁTICA LTDA",
+      "unit": "Tecnologia da Informação e Comunicação - TIC",
+      "fiscal": "Cleiton de Sá Silva Vieira",
+      "ordinance": "Portaria nº 008/2025",
+      "contractNumber": "Contrato 01/2025",
+      "addendum": "(1º Termo Aditivo)",
+      "value": "R$56.145,96",
+      "start": "2026-01-17",
+      "end": "2027-01-16",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "202400055000728",
+        "normalized": "202400055000728",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "ALTERDATA TECNOLOGIA EM INFORMÁTICA LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Cleiton de Sá Silva Vieira",
+        "devUserKey": "f07",
+        "devUserName": "Cleiton de Sá Silva",
+        "matchDegree": "AMBIGUOUS_HUMAN_REVIEW",
+        "observation": "Fonte cita \"Vieira\" apenas neste registro (ord 11); seed.ts e demais registros da própria fonte (ord 12) usam \"Cleiton de Sá Silva\" sem \"Vieira\". NÃO presumir que é a mesma pessoa sem confirmação humana.",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 01/2025",
+        "normalized": "01/2025",
+        "collisionKey": "01/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2026-01-17",
+        "end": "2027-01-16",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$56.145,96",
+        "normalized": "56145.96",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "C",
+      "issues": [
+        "FISCAL_NAME_AMBIGUOUS",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente com a área responsável a identidade exata do fiscal antes de qualquer vínculo com usuário.",
+      "overallStatusLabel": "C — INCONSISTÊNCIA ESTRUTURAL"
+    },
+    {
+      "ordem": 12,
+      "processNumber": "202000055000104",
+      "relatedProcessNumbers": [
+        "202500055000828"
+      ],
+      "legalBasis": "Art. 29, III, Lei 13.303/2016",
+      "company": "INTEGRA AUTOMAÇÃO E CONTROLE LTDA",
+      "unit": "Tecnologia da Informação e Comunicação - TIC",
+      "fiscal": "Cleiton de Sá Silva",
+      "ordinance": "Portaria nº 024/2025",
+      "contractNumber": "Contrato 006/2025",
+      "addendum": "(1º Termo Aditivo)",
+      "value": "R$ 30.893,40",
+      "start": "2026-02-28",
+      "end": "2027-02-27",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "202000055000104",
+        "normalized": "202000055000104",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "INTEGRA AUTOMAÇÃO E CONTROLE LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Cleiton de Sá Silva",
+        "devUserKey": "f07",
+        "devUserName": "Cleiton de Sá Silva",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f07).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 006/2025",
+        "normalized": "006/2025",
+        "collisionKey": "006/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": "Art. 29, III, Lei 13.303/2016",
+        "inferredModality": "DISPENSA_13303",
+        "modalityStatus": "INFERÊNCIA — NÃO VALIDADA",
+        "note": "Inferência baseada apenas na citação do artigo da Lei 13.303/2016; não é um dado explícito de \"modality\" na fonte."
+      },
+      "dateValidation": {
+        "start": "2026-02-28",
+        "end": "2027-02-27",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 30.893,40",
+        "normalized": "30893.40",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "A",
+      "issues": [
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Nenhuma inconsistência estrutural identificada; ainda assim, requer complementação cadastral padrão (CNPJ/e-mail da empresa, identificador estável do fiscal, requesterId do processo, modalidade quando ausente, signingDate, initialValue) antes da carga em PROD.",
+      "overallStatusLabel": "A — DADOS CONSISTENTES, MAS REQUER COMPLEMENTAÇÃO"
+    },
+    {
+      "ordem": 13,
+      "processNumber": "202100055000133",
+      "relatedProcessNumbers": [
+        "202200055000094"
+      ],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "MPS BRASIL OUTSOURCING DE IMPRESSÃO LTDA",
+      "unit": "Tecnologia da Informação e Comunicação - TIC",
+      "fiscal": "Robson Policeno de Rezende",
+      "ordinance": "Portaria nº 35/2026",
+      "contractNumber": "Contrato 002/2021",
+      "addendum": "(4° Termo aditivo)",
+      "value": "R$ 31.346,88",
+      "start": "2025-07-15",
+      "end": "2026-07-14",
+      "observation": "EM ANDAMENTO O PROCESSO DE NOVA CONTRATAÇÃO",
+      "processNumberValidation": {
+        "original": "202100055000133",
+        "normalized": "202100055000133",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "MPS BRASIL OUTSOURCING DE IMPRESSÃO LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Robson Policeno de Rezende",
+        "devUserKey": "f08",
+        "devUserName": "Robson Policeno de Rezende",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f08).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 002/2021",
+        "normalized": "002/2021",
+        "collisionKey": "002/2021",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-07-15",
+        "end": "2026-07-14",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 31.346,88",
+        "normalized": "31346.88",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "A",
+      "issues": [
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Nenhuma inconsistência estrutural identificada; ainda assim, requer complementação cadastral padrão (CNPJ/e-mail da empresa, identificador estável do fiscal, requesterId do processo, modalidade quando ausente, signingDate, initialValue) antes da carga em PROD.",
+      "overallStatusLabel": "A — DADOS CONSISTENTES, MAS REQUER COMPLEMENTAÇÃO"
+    },
+    {
+      "ordem": 14,
+      "processNumber": "202200055000327",
+      "relatedProcessNumbers": [
+        "202600055000123"
+      ],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "GOIAS TELECOMUNICAÇÕES S/A - GOIASTELECOM",
+      "unit": "Tecnologia da Informação e Comunicação - TIC",
+      "fiscal": "Robson Policeno de Rezende",
+      "ordinance": "Portaria nº 200/2024",
+      "contractNumber": "Contrato 006/2023",
+      "addendum": "1º Termo Aditivo",
+      "value": "R$ 47.123,52",
+      "start": "2026-06-02",
+      "end": "2028-06-01",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "202200055000327",
+        "normalized": "202200055000327",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "GOIAS TELECOMUNICAÇÕES S/A - GOIASTELECOM",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Robson Policeno de Rezende",
+        "devUserKey": "f08",
+        "devUserName": "Robson Policeno de Rezende",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f08).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 006/2023",
+        "normalized": "006/2023",
+        "collisionKey": "006/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2026-06-02",
+        "end": "2028-06-01",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 47.123,52",
+        "normalized": "47123.52",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "A",
+      "issues": [
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Nenhuma inconsistência estrutural identificada; ainda assim, requer complementação cadastral padrão (CNPJ/e-mail da empresa, identificador estável do fiscal, requesterId do processo, modalidade quando ausente, signingDate, initialValue) antes da carga em PROD.",
+      "overallStatusLabel": "A — DADOS CONSISTENTES, MAS REQUER COMPLEMENTAÇÃO"
+    },
+    {
+      "ordem": 15,
+      "processNumber": "202400055000042",
+      "relatedProcessNumbers": [],
+      "legalBasis": "Art. 29, XI, Lei 13.303/2016",
+      "company": "GOIAS TELECOMUNICAÇÕES S/A - GOIAS TELECOM",
+      "unit": "Tecnologia da Informação e Comunicação - TIC",
+      "fiscal": "Robson Policeno de Rezende",
+      "ordinance": "Portaria nº 202/2024",
+      "contractNumber": "Contrato 005/2024",
+      "addendum": "NÃO INFORMADO NA FONTE",
+      "value": "R$ 136.900,00",
+      "start": "2024-10-04",
+      "end": "2026-09-04",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "202400055000042",
+        "normalized": "202400055000042",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "GOIAS TELECOMUNICAÇÕES S/A - GOIAS TELECOM",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Robson Policeno de Rezende",
+        "devUserKey": "f08",
+        "devUserName": "Robson Policeno de Rezende",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f08).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 005/2024",
+        "normalized": "005/2024",
+        "collisionKey": "005/2024",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": "Art. 29, XI, Lei 13.303/2016",
+        "inferredModality": "DISPENSA_13303",
+        "modalityStatus": "INFERÊNCIA — NÃO VALIDADA",
+        "note": "Inferência baseada apenas na citação do artigo da Lei 13.303/2016; não é um dado explícito de \"modality\" na fonte."
+      },
+      "dateValidation": {
+        "start": "2024-10-04",
+        "end": "2026-09-04",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 136.900,00",
+        "normalized": "136900.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "A",
+      "issues": [
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Nenhuma inconsistência estrutural identificada; ainda assim, requer complementação cadastral padrão (CNPJ/e-mail da empresa, identificador estável do fiscal, requesterId do processo, modalidade quando ausente, signingDate, initialValue) antes da carga em PROD.",
+      "overallStatusLabel": "A — DADOS CONSISTENTES, MAS REQUER COMPLEMENTAÇÃO"
+    },
+    {
+      "ordem": 16,
+      "processNumber": "202100055000217",
+      "relatedProcessNumbers": [],
+      "legalBasis": "Art. 30, caput, Lei 13.303/2016",
+      "company": "SANEAGO",
+      "unit": "Engenharia",
+      "fiscal": "Pedro Henrique Martins",
+      "ordinance": "Portaria nº 19/2021",
+      "contractNumber": "Contrato 003/202",
+      "addendum": "5º Termo de Apostilamento",
+      "value": "R$ 67.373,16",
+      "start": "2024-09-13",
+      "end": "2025-09-12",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "202100055000217",
+        "normalized": "202100055000217",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "SANEAGO",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Pedro Henrique Martins",
+        "devUserKey": "f09",
+        "devUserName": "Pedro Henrique Martins",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f09).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 003/202",
+        "normalized": "003/202",
+        "collisionKey": "003/202",
+        "status": "MALFORMED_YEAR",
+        "note": "Ano com menos de 4 dígitos (\"202\"). Provável erro de digitação na planilha original (dígito faltante). NÃO corrigido automaticamente."
+      },
+      "legalBasisValidation": {
+        "original": "Art. 30, caput, Lei 13.303/2016",
+        "inferredModality": "INEXIGIBILIDADE",
+        "modalityStatus": "INFERÊNCIA — NÃO VALIDADA",
+        "note": "Inferência baseada apenas na citação do artigo da Lei 13.303/2016; não é um dado explícito de \"modality\" na fonte."
+      },
+      "dateValidation": {
+        "start": "2024-09-13",
+        "end": "2025-09-12",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 67.373,16",
+        "normalized": "67373.16",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "D",
+      "issues": [
+        "CONTRACT_NUMBER_MALFORMED",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Corrigir/confirmar o número de contrato malformado (ano incompleto) antes de qualquer tentativa de carga.",
+      "overallStatusLabel": "D — NÃO APTO PARA MIGRAÇÃO ATÉ CORREÇÃO"
+    },
+    {
+      "ordem": 17,
+      "processNumber": "202300055000551",
+      "relatedProcessNumbers": [],
+      "legalBasis": "Art. 29, X, Lei 13.303/2016",
+      "company": "EQUATORIAL",
+      "unit": "Engenharia",
+      "fiscal": "Pedro Henrique Martins",
+      "ordinance": "Portaria nº 44/2019",
+      "contractNumber": "Contrato nº CCER GOV 325/2019",
+      "addendum": "(5º Termo de Apostilamento)",
+      "value": "R$ 264.688,38",
+      "start": "2025-10-09",
+      "end": "2026-10-08",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "202300055000551",
+        "normalized": "202300055000551",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "EQUATORIAL",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Pedro Henrique Martins",
+        "devUserKey": "f09",
+        "devUserName": "Pedro Henrique Martins",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f09).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº CCER GOV 325/2019",
+        "normalized": "CCER GOV 325/2019",
+        "collisionKey": "325/2019",
+        "status": "NON_STANDARD_FORMAT",
+        "note": "Contém prefixo/sufixo não numérico além do padrão número/ano (\"CCER GOV 325/2019\"). Núcleo numérico identificado: \"325/2019\"."
+      },
+      "legalBasisValidation": {
+        "original": "Art. 29, X, Lei 13.303/2016",
+        "inferredModality": "DISPENSA_13303",
+        "modalityStatus": "INFERÊNCIA — NÃO VALIDADA",
+        "note": "Inferência baseada apenas na citação do artigo da Lei 13.303/2016; não é um dado explícito de \"modality\" na fonte."
+      },
+      "dateValidation": {
+        "start": "2025-10-09",
+        "end": "2026-10-08",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 264.688,38",
+        "normalized": "264688.38",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "CONTRACT_NUMBER_NON_STANDARD_FORMAT",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 18,
+      "processNumber": "202300055000690",
+      "relatedProcessNumbers": [
+        "202500055000417"
+      ],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "GENESIS COMÉRCIO E MANUTENÇÕES LTDA",
+      "unit": "Gerência de Engenharia",
+      "fiscal": "Pedro H. S. Martins",
+      "ordinance": "Portaria nº 106/2024",
+      "contractNumber": "Contrato 011/2024",
+      "addendum": "(1º Termo Aditivo)",
+      "value": "R$ 88.471,71",
+      "start": "2025-07-26",
+      "end": "2026-07-25",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "202300055000690",
+        "normalized": "202300055000690",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "GENESIS COMÉRCIO E MANUTENÇÕES LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Pedro H. S. Martins",
+        "devUserKey": "f09",
+        "devUserName": "Pedro Henrique Martins",
+        "matchDegree": "MINOR_VARIANT",
+        "observation": "Nome abreviado (\"H. S.\"); presumível ser a mesma pessoa do f09, mas não confirmado por identificador estável.",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 011/2024",
+        "normalized": "011/2024",
+        "collisionKey": "011/2024",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-07-26",
+        "end": "2026-07-25",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 88.471,71",
+        "normalized": "88471.71",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "FISCAL_NAME_MINOR_VARIANT",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 19,
+      "processNumber": "202300055000144",
+      "relatedProcessNumbers": [
+        "202400055000415"
+      ],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "PRIME CONSULTORIA E ASSES. EMPRESARIAL LTDA",
+      "unit": "Gerência de Logística",
+      "fiscal": "Weverson de Oliveira",
+      "ordinance": "Portaria nº 070/2023",
+      "contractNumber": "Contrato 020/2023",
+      "addendum": "(2º Termo Aditivo)",
+      "value": "R$ 194.481,20",
+      "start": "2025-07-19",
+      "end": "2026-07-18",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "202300055000144",
+        "normalized": "202300055000144",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "PRIME CONSULTORIA E ASSES. EMPRESARIAL LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Weverson de Oliveira",
+        "devUserKey": "f06",
+        "devUserName": "Weverson de Oliveira",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f06).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 020/2023",
+        "normalized": "020/2023",
+        "collisionKey": "020/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-07-19",
+        "end": "2026-07-18",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 194.481,20",
+        "normalized": "194481.20",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "A",
+      "issues": [
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Nenhuma inconsistência estrutural identificada; ainda assim, requer complementação cadastral padrão (CNPJ/e-mail da empresa, identificador estável do fiscal, requesterId do processo, modalidade quando ausente, signingDate, initialValue) antes da carga em PROD.",
+      "overallStatusLabel": "A — DADOS CONSISTENTES, MAS REQUER COMPLEMENTAÇÃO"
+    },
+    {
+      "ordem": 20,
+      "processNumber": "202100055000360",
+      "relatedProcessNumbers": [
+        "202200055000418",
+        "202500055000798"
+      ],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "GIBBOR BRASIL PUBLICIDADE E PROPAGANDA LTDA - EPP",
+      "unit": "Assessoria de Compras Governamentais",
+      "fiscal": "Sabrina Maria Barbosa",
+      "ordinance": "Portaria nº 053/2026",
+      "contractNumber": "Contrato 001/2022",
+      "addendum": "(5º Termo Aditivo)",
+      "value": "R$ 42.498,80",
+      "start": "2026-01-29",
+      "end": "2027-01-28",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "202100055000360",
+        "normalized": "202100055000360",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "GIBBOR BRASIL PUBLICIDADE E PROPAGANDA LTDA - EPP",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Sabrina Maria Barbosa",
+        "devUserKey": "f14",
+        "devUserName": "Sabrina Maria Barbosa",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f14).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 001/2022",
+        "normalized": "001/2022",
+        "collisionKey": "001/2022",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2026-01-29",
+        "end": "2027-01-28",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 42.498,80",
+        "normalized": "42498.80",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "A",
+      "issues": [
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Nenhuma inconsistência estrutural identificada; ainda assim, requer complementação cadastral padrão (CNPJ/e-mail da empresa, identificador estável do fiscal, requesterId do processo, modalidade quando ausente, signingDate, initialValue) antes da carga em PROD.",
+      "overallStatusLabel": "A — DADOS CONSISTENTES, MAS REQUER COMPLEMENTAÇÃO"
+    },
+    {
+      "ordem": 21,
+      "processNumber": "202300055000052",
+      "relatedProcessNumbers": [
+        "202500055000278",
+        "202600055000058"
+      ],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "WEGH ASSESSORIA E LOGÍSTICA INTERNACIONAL",
+      "unit": "Assessoria Especial da Presidência",
+      "fiscal": "Wenderson de Souza",
+      "ordinance": "Portaria nº 150/2024",
+      "contractNumber": "Contrato 009/2023",
+      "addendum": "(3º Termo Aditivo)",
+      "value": "R$ 10.003.600,00",
+      "start": "2026-05-08",
+      "end": "2027-05-07",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "202300055000052",
+        "normalized": "202300055000052",
+        "wasScientificNotation": false,
+        "reconstructionMethod": null,
+        "status": "OK_FORMAT",
+        "note": "Formato numérico direto, sem notação científica."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "WEGH ASSESSORIA E LOGÍSTICA INTERNACIONAL",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Wenderson de Souza",
+        "devUserKey": "f15",
+        "devUserName": "Wenderson de Souza",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f15).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 009/2023",
+        "normalized": "009/2023",
+        "collisionKey": "009/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2026-05-08",
+        "end": "2027-05-07",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 10.003.600,00",
+        "normalized": "10003600.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "A",
+      "issues": [
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Nenhuma inconsistência estrutural identificada; ainda assim, requer complementação cadastral padrão (CNPJ/e-mail da empresa, identificador estável do fiscal, requesterId do processo, modalidade quando ausente, signingDate, initialValue) antes da carga em PROD.",
+      "overallStatusLabel": "A — DADOS CONSISTENTES, MAS REQUER COMPLEMENTAÇÃO"
+    },
+    {
+      "ordem": 22,
+      "processNumber": "2.02200055000192E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "AVISO URGENTE TECNOLOGIA E INFORMAÇÃO LTDA",
+      "unit": "Gerência Jurídica",
+      "fiscal": "Patrícia Sodré",
+      "ordinance": "Portaria nº 069/2022",
+      "contractNumber": "Contrato 011/2022",
+      "addendum": "(3º Termo Aditivo)",
+      "value": "R$ 477,84",
+      "start": "2025-08-26",
+      "end": "2026-08-25",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "2.02200055000192E14",
+        "normalized": "202200055000192",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "AVISO URGENTE TECNOLOGIA E INFORMAÇÃO LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Patrícia Sodré",
+        "devUserKey": "f16",
+        "devUserName": "Patrícia Sodré",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f16).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 011/2022",
+        "normalized": "011/2022",
+        "collisionKey": "011/2022",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-08-26",
+        "end": "2026-08-25",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 477,84",
+        "normalized": "477.84",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 23,
+      "processNumber": "2.02400055000064E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "DELTA ENGENHARIA E ARQUITETURA LTDA",
+      "unit": "Gerência de Engenharia",
+      "fiscal": "Thalita Guaribaldine da Silva Guimaraes",
+      "ordinance": "Portaria nº 152/2024",
+      "contractNumber": "Contrato nº 022/2024",
+      "addendum": "1º Termo Aditivo",
+      "value": "R$156.000,00",
+      "start": "2024-10-01",
+      "end": "2025-09-30",
+      "observation": "SOLICITADA A PRORROGAÇÃO",
+      "processNumberValidation": {
+        "original": "2.02400055000064E14",
+        "normalized": "202400055000064",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "DELTA ENGENHARIA E ARQUITETURA LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Thalita Guaribaldine da Silva Guimaraes",
+        "devUserKey": "f10",
+        "devUserName": "Thalita Guaribaldine S. Guimaraes",
+        "matchDegree": "MINOR_VARIANT",
+        "observation": "seed.ts abrevia como \"Thalita Guaribaldine S. Guimaraes\" (S. em vez de \"da Silva\").",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº 022/2024",
+        "normalized": "022/2024",
+        "collisionKey": "022/2024",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2024-10-01",
+        "end": "2025-09-30",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$156.000,00",
+        "normalized": "156000.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "FISCAL_NAME_MINOR_VARIANT",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 24,
+      "processNumber": "2.0240005500033E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "SHIELD SEGURANÇA DA INFORMAÇÃO E CONSULTORIA EMPRESARIAL LTDA",
+      "unit": "Assessoria Especial da Presidência",
+      "fiscal": "Fábio Gonçalves da Silva",
+      "ordinance": "Portaria nº 015/2025",
+      "contractNumber": "Contrato nº 05/2025",
+      "addendum": "(1º Termo Aditivo)",
+      "value": "R$ 77.000,00",
+      "start": "2025-02-19",
+      "end": "2026-02-18",
+      "observation": "PRORROGADO POR MAIS 90 DIAS",
+      "processNumberValidation": {
+        "original": "2.0240005500033E14",
+        "normalized": "202400055000330",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "SHIELD SEGURANÇA DA INFORMAÇÃO E CONSULTORIA EMPRESARIAL LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Fábio Gonçalves da Silva",
+        "devUserKey": "f11",
+        "devUserName": "Fábio Gonçalves da Silva",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f11).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº 05/2025",
+        "normalized": "05/2025",
+        "collisionKey": "05/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-02-19",
+        "end": "2026-02-18",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 77.000,00",
+        "normalized": "77000.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 25,
+      "processNumber": "2.02500055000275E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "ZENITE INFORMAÇÃO E CONSULTORIA S/A",
+      "unit": "Assessoria de Compras Governamentais",
+      "fiscal": "Gabriel Moraes Godinho",
+      "ordinance": "Portaria nº 056/2026",
+      "contractNumber": "Contrato nº 09/2025",
+      "addendum": "(1º Termo Aditivo)",
+      "value": "R$ 13.065,76",
+      "start": "2026-04-29",
+      "end": "2027-04-28",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "2.02500055000275E14",
+        "normalized": "202500055000275",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "ZENITE INFORMAÇÃO E CONSULTORIA S/A",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Gabriel Moraes Godinho",
+        "devUserKey": "f12",
+        "devUserName": "Gabriel Moraes Godinho",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f12).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº 09/2025",
+        "normalized": "09/2025",
+        "collisionKey": "09/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2026-04-29",
+        "end": "2027-04-28",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 13.065,76",
+        "normalized": "13065.76",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "D",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Resolver colisão de número de contrato com a empresa citada antes de qualquer tentativa de carga.",
+      "overallStatusLabel": "D — NÃO APTO PARA MIGRAÇÃO ATÉ CORREÇÃO"
+    },
+    {
+      "ordem": 26,
+      "processNumber": "2.02400055000827E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "L.A VIAGENS E TURISMO LTDA",
+      "unit": "Diretoria Comercial",
+      "fiscal": "Denize Morais",
+      "ordinance": "Portaria nº 084/2025",
+      "contractNumber": "Contrato nº 15/2025",
+      "addendum": "NÃO INFORMADO NA FONTE",
+      "value": "R$ 271.750,00",
+      "start": "2025-06-10",
+      "end": "2026-06-09",
+      "observation": "EM ANDAMENTO NOVA CONTRATAÇÃO",
+      "processNumberValidation": {
+        "original": "2.02400055000827E14",
+        "normalized": "202400055000827",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "L.A VIAGENS E TURISMO LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Denize Morais",
+        "devUserKey": "f13",
+        "devUserName": "Denize Morais",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f13).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº 15/2025",
+        "normalized": "15/2025",
+        "collisionKey": "15/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-06-10",
+        "end": "2026-06-09",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 271.750,00",
+        "normalized": "271750.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 27,
+      "processNumber": "2.02500055000308E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "GÁS E MAIS COMÉRCIO EIRELI",
+      "unit": "Coordenação Administrativa",
+      "fiscal": "Eliety Rodrigues Pereira",
+      "ordinance": "Portaria nº 032/2026",
+      "contractNumber": "Contrato nº 14/2025",
+      "addendum": "NÃO INFORMADO NA FONTE",
+      "value": "R$ 3.061,50",
+      "start": "2025-06-10",
+      "end": "2026-06-09",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "2.02500055000308E14",
+        "normalized": "202500055000308",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "GÁS E MAIS COMÉRCIO EIRELI",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Eliety Rodrigues Pereira",
+        "devUserKey": "f05",
+        "devUserName": "Eliety Rodrigues Pereira",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f05).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº 14/2025",
+        "normalized": "14/2025",
+        "collisionKey": "14/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-06-10",
+        "end": "2026-06-09",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 3.061,50",
+        "normalized": "3061.50",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 28,
+      "processNumber": "2.02400055000709E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "BRASILSEG",
+      "unit": "Gerência de Recursos Humanos",
+      "fiscal": "Dalmo Francisco da Costa",
+      "ordinance": "Portaria nº 066/2025",
+      "contractNumber": "Contrato nº 13/2025",
+      "addendum": "NÃO INFORMADO NA FONTE",
+      "value": "R$ 9.900,00",
+      "start": "2025-06-24",
+      "end": "2026-06-23",
+      "observation": "SOLICITADA A PRORROGAÇÃO",
+      "processNumberValidation": {
+        "original": "2.02400055000709E14",
+        "normalized": "202400055000709",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "BRASILSEG",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Dalmo Francisco da Costa",
+        "devUserKey": "f22",
+        "devUserName": "Dalmo Francisco da Costa",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f22).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº 13/2025",
+        "normalized": "13/2025",
+        "collisionKey": "13/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-06-24",
+        "end": "2026-06-23",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 9.900,00",
+        "normalized": "9900.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 29,
+      "processNumber": "2.02500055000328E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "ÔMEGA LOCADORA DE VEÍCULOS LTDA",
+      "unit": "Gerência de Logística",
+      "fiscal": "Weverson de Oliveira",
+      "ordinance": "Portaria nº 100/2025",
+      "contractNumber": "Contrato nº 18/2025",
+      "addendum": "NÃO INFORMADO NA FONTE",
+      "value": "R$ 51.000,00",
+      "start": "2025-07-03",
+      "end": "2026-07-02",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "2.02500055000328E14",
+        "normalized": "202500055000328",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "ÔMEGA LOCADORA DE VEÍCULOS LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Weverson de Oliveira",
+        "devUserKey": "f06",
+        "devUserName": "Weverson de Oliveira",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f06).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato nº 18/2025",
+        "normalized": "18/2025",
+        "collisionKey": "18/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-07-03",
+        "end": "2026-07-02",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 51.000,00",
+        "normalized": "51000.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 30,
+      "processNumber": "2.02500055000026E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "MISTER PRAGAS DEDETIZACAO E DESENTUPIDORA LTDA",
+      "unit": "Gestão de Contratos",
+      "fiscal": "Emerson Ferreira dos Anjos",
+      "ordinance": "Portaria nº 146/2025",
+      "contractNumber": "Contrato 25/2025",
+      "addendum": "NÃO INFORMADO NA FONTE",
+      "value": "R$ 12.000,00",
+      "start": "2025-09-26",
+      "end": "2026-09-25",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "2.02500055000026E14",
+        "normalized": "202500055000026",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "MISTER PRAGAS DEDETIZACAO E DESENTUPIDORA LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Emerson Ferreira dos Anjos",
+        "devUserKey": "f21",
+        "devUserName": "Emerson Ferreira dos Anjos",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f21).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 25/2025",
+        "normalized": "25/2025",
+        "collisionKey": "25/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-09-26",
+        "end": "2026-09-25",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 12.000,00",
+        "normalized": "12000.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 31,
+      "processNumber": "2.02300055000041E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "NP TECNOLOGIA E GESTÃO DE DADOS LTDA",
+      "unit": "Assessoria de Compras Governamentais",
+      "fiscal": "Gabriel Morais Godinho",
+      "ordinance": "Portaria nº 171/2025",
+      "contractNumber": "Contrato 01/2023",
+      "addendum": "3º Termo Aditivo",
+      "value": "R$ 11.291,06",
+      "start": "2026-01-28",
+      "end": "2027-01-27",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "2.02300055000041E14",
+        "normalized": "202300055000041",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "NP TECNOLOGIA E GESTÃO DE DADOS LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Gabriel Morais Godinho",
+        "devUserKey": "f12",
+        "devUserName": "Gabriel Moraes Godinho",
+        "matchDegree": "AMBIGUOUS_HUMAN_REVIEW",
+        "observation": "Grafia \"Morais\" diverge de \"Moraes\" usado no seed.ts e no ord 25 da própria fonte. Pode ser erro de digitação na planilha original ou pessoa diferente — NÃO presumir.",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 01/2023",
+        "normalized": "01/2023",
+        "collisionKey": "01/2023",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2026-01-28",
+        "end": "2027-01-27",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 11.291,06",
+        "normalized": "11291.06",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "C",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "FISCAL_NAME_AMBIGUOUS",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente com a área responsável a identidade exata do fiscal antes de qualquer vínculo com usuário.",
+      "overallStatusLabel": "C — INCONSISTÊNCIA ESTRUTURAL"
+    },
+    {
+      "ordem": 32,
+      "processNumber": "2.02500055000519E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "DMS CALIBRAÇÕES E INSPEÇÕES INDUSTRIAL LTDA",
+      "unit": "Gerência de Controle da Qualidade",
+      "fiscal": "Laurindo Damas da Silva Júnior",
+      "ordinance": "Portaria nº 021/2026",
+      "contractNumber": "Contrato 01/2026",
+      "addendum": "NÃO INFORMADO NA FONTE",
+      "value": "R$ 13.947,26",
+      "start": "2026-02-10",
+      "end": "2026-08-09",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "2.02500055000519E14",
+        "normalized": "202500055000519",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "DMS CALIBRAÇÕES E INSPEÇÕES INDUSTRIAL LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Laurindo Damas da Silva Júnior",
+        "devUserKey": "f20",
+        "devUserName": "Laurindo Damas da Silva Júnior",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f20).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 01/2026",
+        "normalized": "01/2026",
+        "collisionKey": "01/2026",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2026-02-10",
+        "end": "2026-08-09",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 13.947,26",
+        "normalized": "13947.26",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 33,
+      "processNumber": "2.02500055000168E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "WORK7 AUDITORES INDEPENDENTES LTDA",
+      "unit": "Gerência de Contabilidade",
+      "fiscal": "Vera Lúcia Nunes",
+      "ordinance": "Portaria nº 092/2025",
+      "contractNumber": "Contrato 17/2025",
+      "addendum": "NÃO INFORMADO NA FONTE",
+      "value": "R$ 47.100,00",
+      "start": "2025-06-25",
+      "end": "2026-06-24",
+      "observation": "EM ANDAMENTO NOVA CONTRATAÇÃO",
+      "processNumberValidation": {
+        "original": "2.02500055000168E14",
+        "normalized": "202500055000168",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "WORK7 AUDITORES INDEPENDENTES LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Vera Lúcia Nunes",
+        "devUserKey": "f19",
+        "devUserName": "Vera Lúcia Nunes",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f19).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 17/2025",
+        "normalized": "17/2025",
+        "collisionKey": "17/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-06-25",
+        "end": "2026-06-24",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 47.100,00",
+        "normalized": "47100.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "D",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Resolver colisão de número de contrato com a empresa citada antes de qualquer tentativa de carga.",
+      "overallStatusLabel": "D — NÃO APTO PARA MIGRAÇÃO ATÉ CORREÇÃO"
+    },
+    {
+      "ordem": 34,
+      "processNumber": "2.02500055000383E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "AUDIGESPUB - SERVIÇOS DE AUDITORIA, ASSESSORIA E CONSULTORIA LTDA",
+      "unit": "Gerência de Contabilidade",
+      "fiscal": "Alessandro dos Santos",
+      "ordinance": "Portaria nº 056/2026",
+      "contractNumber": "Contrato 17/2025",
+      "addendum": "NÃO INFORMADO NA FONTE",
+      "value": "R$ 17.700,00",
+      "start": "2025-03-18",
+      "end": "2027-03-18",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "2.02500055000383E14",
+        "normalized": "202500055000383",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "AUDIGESPUB - SERVIÇOS DE AUDITORIA, ASSESSORIA E CONSULTORIA LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Alessandro dos Santos",
+        "devUserKey": "f18",
+        "devUserName": "Alessandro dos Santos",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f18).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 17/2025",
+        "normalized": "17/2025",
+        "collisionKey": "17/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2025-03-18",
+        "end": "2027-03-18",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 17.700,00",
+        "normalized": "17700.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "D",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Resolver colisão de número de contrato com a empresa citada antes de qualquer tentativa de carga.",
+      "overallStatusLabel": "D — NÃO APTO PARA MIGRAÇÃO ATÉ CORREÇÃO"
+    },
+    {
+      "ordem": 35,
+      "processNumber": "2.02500055000779E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "INSTITUTO DE PROMOÇÃO HUMANA, APRENDIZAGEM E CULTURA",
+      "unit": "Gerência de Contabilidade",
+      "fiscal": "Vandeir Gonçalves da Silva",
+      "ordinance": "Portaria nº 078/2026",
+      "contractNumber": "Contrato 07/2025",
+      "addendum": "NÃO INFORMADO NA FONTE",
+      "value": "R$ 441.345,84",
+      "start": "2026-04-08",
+      "end": "2028-04-07",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "2.02500055000779E14",
+        "normalized": "202500055000779",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "INSTITUTO DE PROMOÇÃO HUMANA, APRENDIZAGEM E CULTURA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Vandeir Gonçalves da Silva",
+        "devUserKey": "f17",
+        "devUserName": "Vandeir Gonçalves da Silva",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f17).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 07/2025",
+        "normalized": "07/2025",
+        "collisionKey": "07/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2026-04-08",
+        "end": "2028-04-07",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 441.345,84",
+        "normalized": "441345.84",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "B",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Confirmar manualmente processNumber reconstruído e/ou identidade do fiscal antes de considerar o registro validado; realizar complementação cadastral padrão (empresa/fiscal/processo).",
+      "overallStatusLabel": "B — REQUER CONFIRMAÇÃO HUMANA"
+    },
+    {
+      "ordem": 36,
+      "processNumber": "2.02600055000186E14",
+      "relatedProcessNumbers": [],
+      "legalBasis": "NÃO INFORMADO NA FONTE",
+      "company": "BIOCIENTIFIC LABORATORIOS LTDA",
+      "unit": "Gerência de Contabilidade",
+      "fiscal": "Laurindo Damas da Silva Júnior",
+      "ordinance": "Portaria nº 088/2026",
+      "contractNumber": "Contrato 09/2025",
+      "addendum": "NÃO INFORMADO NA FONTE",
+      "value": "R$ 12.000,00",
+      "start": "2026-04-27",
+      "end": "2027-04-26",
+      "observation": "NÃO INFORMADO NA FONTE",
+      "processNumberValidation": {
+        "original": "2.02600055000186E14",
+        "normalized": "202600055000186",
+        "wasScientificNotation": true,
+        "reconstructionMethod": "DIGIT_SHIFT_FROM_STRING_MANTISSA (sem uso de ponto-flutuante)",
+        "status": "REQUIRES_HUMAN_CONFIRMATION",
+        "note": "Notação científica é artefato típico de exportação de planilha Excel/Sheets. Valor reconstruído com precisão de dígitos a partir da própria string, mas NÃO deve ser considerado definitivamente validado até conferência com o processo físico/SEI."
+      },
+      "contractorValidation": {
+        "corporateNameInSource": "BIOCIENTIFIC LABORATORIOS LTDA",
+        "cnpj": "NÃO INFORMADO NA FONTE",
+        "email": "NÃO INFORMADO NA FONTE",
+        "status": "REQUER VALIDAÇÃO CADASTRAL",
+        "note": "CNPJs presentes em backend/prisma/seed.ts são dados fictícios de desenvolvimento e NÃO foram usados aqui como referência."
+      },
+      "fiscalValidation": {
+        "nameInSource": "Laurindo Damas da Silva Júnior",
+        "devUserKey": "f20",
+        "devUserName": "Laurindo Damas da Silva Júnior",
+        "matchDegree": "EXACT",
+        "observation": "Correspondência exata com seed.ts (f20).",
+        "note": "Correspondência determinada exclusivamente por comparação de texto com backend/prisma/seed.ts. Nenhum identificador estável (e-mail/matrícula) existe na fonte. NÃO representa vínculo confirmado nem usuário criado em PROD."
+      },
+      "contractNumberValidation": {
+        "original": "Contrato 09/2025",
+        "normalized": "09/2025",
+        "collisionKey": "09/2025",
+        "status": "STANDARD_FORMAT",
+        "note": "Formato padrão número/ano de 4 dígitos."
+      },
+      "legalBasisValidation": {
+        "original": null,
+        "inferredModality": null,
+        "modalityStatus": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte não traz base legal para este registro; modalidade de contratação não pode ser inferida."
+      },
+      "dateValidation": {
+        "start": "2026-04-27",
+        "end": "2027-04-26",
+        "endAfterStart": true,
+        "signingDate": "NÃO INFORMADO NA FONTE",
+        "note": "Fonte só traz início/fim de vigência. Não presumido como data de assinatura."
+      },
+      "valueValidation": {
+        "original": "R$ 12.000,00",
+        "normalized": "12000.00",
+        "isValid": true,
+        "note": "Convertido de formato monetário BR (R$ X.XXX,XX) para decimal.",
+        "monthlyValue": "NÃO INFORMADO NA FONTE",
+        "outstandingBalance": "NÃO INFORMADO NA FONTE",
+        "initialValue": "NÃO INFORMADO NA FONTE — fonte só apresenta o valor vigente/atual, não o valor inicial pré-aditivos."
+      },
+      "overallStatus": "D",
+      "issues": [
+        "PROCESS_NUMBER_SCIENTIFIC_NOTATION",
+        "MODALITY_MISSING",
+        "CONTRACTOR_CNPJ_EMAIL_MISSING",
+        "FISCAL_NO_STABLE_IDENTIFIER",
+        "REQUESTER_ID_MISSING",
+        "SIGNING_DATE_MISSING",
+        "INITIAL_VALUE_MISSING"
+      ],
+      "requiredAction": "Resolver colisão de número de contrato com a empresa citada antes de qualquer tentativa de carga.",
+      "overallStatusLabel": "D — NÃO APTO PARA MIGRAÇÃO ATÉ CORREÇÃO"
+    }
+  ],
+  "fiscalsSummary": [
+    {
+      "devUserKey": "f01",
+      "devUserName": "Rogério B. da Silva",
+      "namesInSource": [
+        "Rogério B. da Silva"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f01)."
+    },
+    {
+      "devUserKey": "f02",
+      "devUserName": "Maria do Carmo C. Silva",
+      "namesInSource": [
+        "Maria do Carmo C. Silva"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f02)."
+    },
+    {
+      "devUserKey": "f03",
+      "devUserName": "Edilson Martins Garcia",
+      "namesInSource": [
+        "Edilson Martins Garcia"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f03)."
+    },
+    {
+      "devUserKey": "f04",
+      "devUserName": "Eunice Maria C. Oliveira",
+      "namesInSource": [
+        "Eunice Maria C Oliveira"
+      ],
+      "matchDegree": "MINOR_VARIANT",
+      "observation": "Fonte grafa sem ponto (\"C Oliveira\"); seed.ts usa \"C. Oliveira\". Diferença apenas de pontuação."
+    },
+    {
+      "devUserKey": "f05",
+      "devUserName": "Eliety Rodrigues Pereira",
+      "namesInSource": [
+        "Eliety Rodrigues Pereira"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f05)."
+    },
+    {
+      "devUserKey": "f06",
+      "devUserName": "Weverson de Oliveira",
+      "namesInSource": [
+        "Weverson de Oliveira"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f06)."
+    },
+    {
+      "devUserKey": "f07",
+      "devUserName": "Cleiton de Sá Silva",
+      "namesInSource": [
+        "Cleiton de Sá Silva Vieira",
+        "Cleiton de Sá Silva"
+      ],
+      "matchDegree": "MIXED — VER DETALHE POR NOME",
+      "observation": "Fonte cita \"Vieira\" apenas neste registro (ord 11); seed.ts e demais registros da própria fonte (ord 12) usam \"Cleiton de Sá Silva\" sem \"Vieira\". NÃO presumir que é a mesma pessoa sem confirmação humana."
+    },
+    {
+      "devUserKey": "f08",
+      "devUserName": "Robson Policeno de Rezende",
+      "namesInSource": [
+        "Robson Policeno de Rezende"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f08)."
+    },
+    {
+      "devUserKey": "f09",
+      "devUserName": "Pedro Henrique Martins",
+      "namesInSource": [
+        "Pedro Henrique Martins",
+        "Pedro H. S. Martins"
+      ],
+      "matchDegree": "MIXED — VER DETALHE POR NOME",
+      "observation": "Correspondência exata com seed.ts (f09)."
+    },
+    {
+      "devUserKey": "f10",
+      "devUserName": "Thalita Guaribaldine S. Guimaraes",
+      "namesInSource": [
+        "Thalita Guaribaldine da Silva Guimaraes"
+      ],
+      "matchDegree": "MINOR_VARIANT",
+      "observation": "seed.ts abrevia como \"Thalita Guaribaldine S. Guimaraes\" (S. em vez de \"da Silva\")."
+    },
+    {
+      "devUserKey": "f11",
+      "devUserName": "Fábio Gonçalves da Silva",
+      "namesInSource": [
+        "Fábio Gonçalves da Silva"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f11)."
+    },
+    {
+      "devUserKey": "f12",
+      "devUserName": "Gabriel Moraes Godinho",
+      "namesInSource": [
+        "Gabriel Moraes Godinho",
+        "Gabriel Morais Godinho"
+      ],
+      "matchDegree": "MIXED — VER DETALHE POR NOME",
+      "observation": "Correspondência exata com seed.ts (f12)."
+    },
+    {
+      "devUserKey": "f13",
+      "devUserName": "Denize Morais",
+      "namesInSource": [
+        "Denize Morais"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f13)."
+    },
+    {
+      "devUserKey": "f14",
+      "devUserName": "Sabrina Maria Barbosa",
+      "namesInSource": [
+        "Sabrina Maria Barbosa"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f14)."
+    },
+    {
+      "devUserKey": "f15",
+      "devUserName": "Wenderson de Souza",
+      "namesInSource": [
+        "Wenderson de Souza"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f15)."
+    },
+    {
+      "devUserKey": "f16",
+      "devUserName": "Patrícia Sodré",
+      "namesInSource": [
+        "Patrícia Sodré"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f16)."
+    },
+    {
+      "devUserKey": "f17",
+      "devUserName": "Vandeir Gonçalves da Silva",
+      "namesInSource": [
+        "Vandeir Gonçalves da Silva"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f17)."
+    },
+    {
+      "devUserKey": "f18",
+      "devUserName": "Alessandro dos Santos",
+      "namesInSource": [
+        "Alessandro dos Santos"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f18)."
+    },
+    {
+      "devUserKey": "f19",
+      "devUserName": "Vera Lúcia Nunes",
+      "namesInSource": [
+        "Vera Lúcia Nunes"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f19)."
+    },
+    {
+      "devUserKey": "f20",
+      "devUserName": "Laurindo Damas da Silva Júnior",
+      "namesInSource": [
+        "Laurindo Damas da Silva Júnior"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f20)."
+    },
+    {
+      "devUserKey": "f21",
+      "devUserName": "Emerson Ferreira dos Anjos",
+      "namesInSource": [
+        "Emerson Ferreira dos Anjos"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f21)."
+    },
+    {
+      "devUserKey": "f22",
+      "devUserName": "Dalmo Francisco da Costa",
+      "namesInSource": [
+        "Dalmo Francisco da Costa"
+      ],
+      "matchDegree": "EXACT",
+      "observation": "Correspondência exata com seed.ts (f22)."
+    }
+  ],
+  "contractorsSummary": [
+    {
+      "corporateNameInSource": "SERVIÇO SOCIAL DA INDÚSTRIA - SESI",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "HEALTH SAÚDE E SEGURANÇA DO TRABALHO LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "REDEMOB CONSÓRCIO",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "PLUXEE BENEFÍCIOS BRASIL S.A",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "LE CARD ADMINISTRADORA DE CARTÕES LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "GENESIS PRESTADORA DE SERVIÇOS LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "PADA PÃES E SABORES LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "FONSECA E MARTINS COMÉRCIO DE GÁS EIRELI",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "JVS PARTICIPAÇÕES EIRELI",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "LS PRODUTOS E SERVIÇOS LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "ALTERDATA TECNOLOGIA EM INFORMÁTICA LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "INTEGRA AUTOMAÇÃO E CONTROLE LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "MPS BRASIL OUTSOURCING DE IMPRESSÃO LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "GOIAS TELECOMUNICAÇÕES S/A - GOIASTELECOM",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "GOIAS TELECOMUNICAÇÕES S/A - GOIAS TELECOM",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "SANEAGO",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "EQUATORIAL",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "GENESIS COMÉRCIO E MANUTENÇÕES LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "PRIME CONSULTORIA E ASSES. EMPRESARIAL LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "GIBBOR BRASIL PUBLICIDADE E PROPAGANDA LTDA - EPP",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "WEGH ASSESSORIA E LOGÍSTICA INTERNACIONAL",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "AVISO URGENTE TECNOLOGIA E INFORMAÇÃO LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "DELTA ENGENHARIA E ARQUITETURA LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "SHIELD SEGURANÇA DA INFORMAÇÃO E CONSULTORIA EMPRESARIAL LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "ZENITE INFORMAÇÃO E CONSULTORIA S/A",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "L.A VIAGENS E TURISMO LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "GÁS E MAIS COMÉRCIO EIRELI",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "BRASILSEG",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "ÔMEGA LOCADORA DE VEÍCULOS LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "MISTER PRAGAS DEDETIZACAO E DESENTUPIDORA LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "NP TECNOLOGIA E GESTÃO DE DADOS LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "DMS CALIBRAÇÕES E INSPEÇÕES INDUSTRIAL LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "WORK7 AUDITORES INDEPENDENTES LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "AUDIGESPUB - SERVIÇOS DE AUDITORIA, ASSESSORIA E CONSULTORIA LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "INSTITUTO DE PROMOÇÃO HUMANA, APRENDIZAGEM E CULTURA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    },
+    {
+      "corporateNameInSource": "BIOCIENTIFIC LABORATORIOS LTDA",
+      "cnpj": "NÃO INFORMADO NA FONTE",
+      "email": "NÃO INFORMADO NA FONTE",
+      "status": "REQUER VALIDAÇÃO CADASTRAL"
+    }
+  ],
+  "contractNumberCollisions": [
+    {
+      "collisionKey": "09/2025",
+      "ordens": [
+        25,
+        36
+      ],
+      "registros": [
+        {
+          "ordem": 25,
+          "empresa": "ZENITE INFORMAÇÃO E CONSULTORIA S/A",
+          "processo": "2.02500055000275E14",
+          "numeroInformado": "Contrato nº 09/2025"
+        },
+        {
+          "ordem": 36,
+          "empresa": "BIOCIENTIFIC LABORATORIOS LTDA",
+          "processo": "2.02600055000186E14",
+          "numeroInformado": "Contrato 09/2025"
+        }
+      ],
+      "problema": "O identificador \"09/2025\" aparece em mais de um contrato de empresas diferentes. O schema atual define Contract.contractNumber como campo único (@unique) — como está, a carga desses registros violaria essa restrição.",
+      "acaoNecessaria": "Decisão humana: confirmar se é erro de digitação na planilha de origem ou se a numeração de contrato não é, de fato, globalmente única (e precisaria de outro esquema de identificação). NÃO resolvido automaticamente."
+    },
+    {
+      "collisionKey": "17/2025",
+      "ordens": [
+        33,
+        34
+      ],
+      "registros": [
+        {
+          "ordem": 33,
+          "empresa": "WORK7 AUDITORES INDEPENDENTES LTDA",
+          "processo": "2.02500055000168E14",
+          "numeroInformado": "Contrato 17/2025"
+        },
+        {
+          "ordem": 34,
+          "empresa": "AUDIGESPUB - SERVIÇOS DE AUDITORIA, ASSESSORIA E CONSULTORIA LTDA",
+          "processo": "2.02500055000383E14",
+          "numeroInformado": "Contrato 17/2025"
+        }
+      ],
+      "problema": "O identificador \"17/2025\" aparece em mais de um contrato de empresas diferentes. O schema atual define Contract.contractNumber como campo único (@unique) — como está, a carga desses registros violaria essa restrição.",
+      "acaoNecessaria": "Decisão humana: confirmar se é erro de digitação na planilha de origem ou se a numeração de contrato não é, de fato, globalmente única (e precisaria de outro esquema de identificação). NÃO resolvido automaticamente."
+    }
+  ],
+  "contractNumberOtherIssues": [
+    {
+      "ordem": 16,
+      "empresa": "SANEAGO",
+      "processo": "202100055000217",
+      "numeroInformado": "Contrato 003/202",
+      "problema": "Ano com menos de 4 dígitos (\"202\"). Provável erro de digitação na planilha original (dígito faltante). NÃO corrigido automaticamente.",
+      "status": "MALFORMED_YEAR"
+    },
+    {
+      "ordem": 17,
+      "empresa": "EQUATORIAL",
+      "processo": "202300055000551",
+      "numeroInformado": "Contrato nº CCER GOV 325/2019",
+      "problema": "Contém prefixo/sufixo não numérico além do padrão número/ano (\"CCER GOV 325/2019\"). Núcleo numérico identificado: \"325/2019\".",
+      "status": "NON_STANDARD_FORMAT"
+    }
+  ],
+  "processNumberScientificNotation": [
+    {
+      "ordem": 2,
+      "empresa": "HEALTH SAÚDE E SEGURANÇA DO TRABALHO LTDA",
+      "original": "2.02400055000297E14",
+      "reconstructed": "202400055000297",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 4,
+      "empresa": "PLUXEE BENEFÍCIOS BRASIL S.A",
+      "original": "2.02300055000104E14",
+      "reconstructed": "202300055000104",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 5,
+      "empresa": "LE CARD ADMINISTRADORA DE CARTÕES LTDA",
+      "original": "2.02300055000401E14",
+      "reconstructed": "202300055000401",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 8,
+      "empresa": "FONSECA E MARTINS COMÉRCIO DE GÁS EIRELI",
+      "original": "2.02200055000273E14",
+      "reconstructed": "202200055000273",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 22,
+      "empresa": "AVISO URGENTE TECNOLOGIA E INFORMAÇÃO LTDA",
+      "original": "2.02200055000192E14",
+      "reconstructed": "202200055000192",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 23,
+      "empresa": "DELTA ENGENHARIA E ARQUITETURA LTDA",
+      "original": "2.02400055000064E14",
+      "reconstructed": "202400055000064",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 24,
+      "empresa": "SHIELD SEGURANÇA DA INFORMAÇÃO E CONSULTORIA EMPRESARIAL LTDA",
+      "original": "2.0240005500033E14",
+      "reconstructed": "202400055000330",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 25,
+      "empresa": "ZENITE INFORMAÇÃO E CONSULTORIA S/A",
+      "original": "2.02500055000275E14",
+      "reconstructed": "202500055000275",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 26,
+      "empresa": "L.A VIAGENS E TURISMO LTDA",
+      "original": "2.02400055000827E14",
+      "reconstructed": "202400055000827",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 27,
+      "empresa": "GÁS E MAIS COMÉRCIO EIRELI",
+      "original": "2.02500055000308E14",
+      "reconstructed": "202500055000308",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 28,
+      "empresa": "BRASILSEG",
+      "original": "2.02400055000709E14",
+      "reconstructed": "202400055000709",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 29,
+      "empresa": "ÔMEGA LOCADORA DE VEÍCULOS LTDA",
+      "original": "2.02500055000328E14",
+      "reconstructed": "202500055000328",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 30,
+      "empresa": "MISTER PRAGAS DEDETIZACAO E DESENTUPIDORA LTDA",
+      "original": "2.02500055000026E14",
+      "reconstructed": "202500055000026",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 31,
+      "empresa": "NP TECNOLOGIA E GESTÃO DE DADOS LTDA",
+      "original": "2.02300055000041E14",
+      "reconstructed": "202300055000041",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 32,
+      "empresa": "DMS CALIBRAÇÕES E INSPEÇÕES INDUSTRIAL LTDA",
+      "original": "2.02500055000519E14",
+      "reconstructed": "202500055000519",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 33,
+      "empresa": "WORK7 AUDITORES INDEPENDENTES LTDA",
+      "original": "2.02500055000168E14",
+      "reconstructed": "202500055000168",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 34,
+      "empresa": "AUDIGESPUB - SERVIÇOS DE AUDITORIA, ASSESSORIA E CONSULTORIA LTDA",
+      "original": "2.02500055000383E14",
+      "reconstructed": "202500055000383",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 35,
+      "empresa": "INSTITUTO DE PROMOÇÃO HUMANA, APRENDIZAGEM E CULTURA",
+      "original": "2.02500055000779E14",
+      "reconstructed": "202500055000779",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    },
+    {
+      "ordem": 36,
+      "empresa": "BIOCIENTIFIC LABORATORIOS LTDA",
+      "original": "2.02600055000186E14",
+      "reconstructed": "202600055000186",
+      "status": "REQUIRES_HUMAN_CONFIRMATION"
+    }
+  ],
+  "universalBlockers": [
+    {
+      "blocker": "CNPJ das contratadas",
+      "affectedRecords": 36,
+      "note": "Nenhum dos 36 registros possui CNPJ na fonte. Não pode ser inventado — necessário levantamento externo."
+    },
+    {
+      "blocker": "E-mail das contratadas",
+      "affectedRecords": 36,
+      "note": "Campo obrigatório em Contractor.email; ausente em 100% da fonte."
+    },
+    {
+      "blocker": "Identificação real dos fiscais",
+      "affectedRecords": 36,
+      "note": "Correspondência hoje é só por nome em texto livre; nenhum identificador estável (e-mail/matrícula) existe na fonte."
+    },
+    {
+      "blocker": "requesterId do processo",
+      "affectedRecords": 36,
+      "note": "ProcurementProcess.requesterId é obrigatório e não tem correspondente na fonte; requer decisão de política."
+    },
+    {
+      "blocker": "Modalidade de contratação (BiddingModality)",
+      "affectedRecords": 30,
+      "note": "30 dos 36 registros não têm legalBasis, único indício indireto de modalidade; os outros 6 têm apenas inferência não validada."
+    },
+    {
+      "blocker": "signingDate do contrato",
+      "affectedRecords": 36,
+      "note": "Schema exige data de assinatura; fonte só traz início/fim de vigência."
+    },
+    {
+      "blocker": "initialValue do contrato",
+      "affectedRecords": 36,
+      "note": "Schema exige valor inicial; fonte só traz o valor atual/vigente (pós-aditivos, quando houver)."
+    }
+  ],
+  "specificBlockers": [
+    {
+      "blocker": "19 processNumber em notação científica",
+      "affectedOrdens": [
+        2,
+        4,
+        5,
+        8,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "note": "Reconstruídos por deslocamento de dígitos a partir da string original (sem ponto-flutuante), mas exigem confirmação humana contra o processo físico/SEI."
+    },
+    {
+      "blocker": "Número de contrato malformado/não-padrão (ord 16)",
+      "affectedOrdens": [
+        16
+      ],
+      "note": "Ano com menos de 4 dígitos (\"202\"). Provável erro de digitação na planilha original (dígito faltante). NÃO corrigido automaticamente."
+    },
+    {
+      "blocker": "Número de contrato malformado/não-padrão (ord 17)",
+      "affectedOrdens": [
+        17
+      ],
+      "note": "Contém prefixo/sufixo não numérico além do padrão número/ano (\"CCER GOV 325/2019\"). Núcleo numérico identificado: \"325/2019\"."
+    },
+    {
+      "blocker": "Colisão de contractNumber \"09/2025\"",
+      "affectedOrdens": [
+        25,
+        36
+      ],
+      "note": "O identificador \"09/2025\" aparece em mais de um contrato de empresas diferentes. O schema atual define Contract.contractNumber como campo único (@unique) — como está, a carga desses registros violaria essa restrição."
+    },
+    {
+      "blocker": "Colisão de contractNumber \"17/2025\"",
+      "affectedOrdens": [
+        33,
+        34
+      ],
+      "note": "O identificador \"17/2025\" aparece em mais de um contrato de empresas diferentes. O schema atual define Contract.contractNumber como campo único (@unique) — como está, a carga desses registros violaria essa restrição."
+    },
+    {
+      "blocker": "Fiscal \"Cleiton de Sá Silva Vieira\" (ord 11) × \"Cleiton de Sá Silva\" (ord 12 / seed f07)",
+      "affectedOrdens": [
+        11,
+        12
+      ],
+      "note": "Divergência de sobrenome dentro da própria fonte. Marcado HUMAN_REVIEW."
+    },
+    {
+      "blocker": "Fiscal \"Gabriel Moraes Godinho\" (ord 25) × \"Gabriel Morais Godinho\" (ord 31)",
+      "affectedOrdens": [
+        25,
+        31
+      ],
+      "note": "Divergência de grafia dentro da própria fonte. Marcado HUMAN_REVIEW."
+    }
+  ],
+  "finalSummary": {
+    "totalContratos": 36,
+    "totalEmpresas": 36,
+    "totalFiscaisUnicos": 22,
+    "contratosSemBloqueioEstrutural_status_A": 11,
+    "contratosComInconsistencia_status_C": 2,
+    "contratosQuePrecisamDeConfirmacao_status_B": 18,
+    "contratosNaoAptosAteCorrecao_status_D": 5,
+    "informacoesQuePrecisamSerObtidasExternamente": [
+      "CNPJ oficial de cada uma das 36 contratadas",
+      "E-mail/contato oficial de cada uma das 36 contratadas",
+      "Confirmação, junto à área responsável, da identidade real de cada um dos 22 fiscais (matrícula/e-mail institucional)",
+      "Confirmação dos 19 processNumber reconstruídos de notação científica contra o processo físico/SEI",
+      "Esclarecimento sobre as 2 colisões de número de contrato (09/2025 e 17/2025) e o número malformado (003/202)"
+    ],
+    "decisoesQuePrecisamSerTomadasAntesDaImportacao": [
+      "Quem será o requesterId padrão dos 36 processos (ou se cada um exige apuração individual)",
+      "Como atribuir BiddingModality para os 30 registros sem legalBasis",
+      "Se signingDate será aproximado de startDate (e como documentar essa aproximação) ou se será levantado separadamente",
+      "Se initialValue será igualado a currentValue (e como documentar essa aproximação) ou se será levantado separadamente",
+      "Se as duas pessoas com nome ambíguo (Cleiton .../Gabriel ...) são, de fato, uma única identidade cada",
+      "Como resolver, sem inventar prefixo, as duas colisões de contractNumber"
+    ]
+  }
+}
