@@ -1573,7 +1573,7 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
       myContractIds.forEach(cId => { const c = db.contracts.find(c => c.id === cId); if (c) { const d = daysUntil(c.endDate); if (d <= 180 && d > 0) result.items.push({ type: 'CONTRACT_EXPIRY', priority: d <= 30 ? 'CRITICAL' : d <= 90 ? 'HIGH' : 'MEDIUM', title: `Contrato ${c.contractNumber} encerra em ${d} dias`, detail: fmtDate(c.endDate), daysUntil: d, id: c.id, contractId: c.id }); } });
     }
 
-    if (user.role === 'GESTOR') {
+    if (user.role === 'GESTOR' || user.role === 'ADMIN') {
       const pendMsrs = db.measurements.filter(m => m.status === 'PENDING_GESTOR');
       pendMsrs.forEach(m => { const c = db.contracts.find(c => c.id === m.contractId); result.items.push({ type: 'MEASUREMENT', priority: daysSince(m.createdAt) > 10 ? 'HIGH' : 'MEDIUM', title: `Medição pendente: ${fmtCur(Number(m.measurementValue))}`, detail: c?.contractNumber, daysPending: daysSince(m.createdAt), id: m.id, contractId: m.contractId }); });
       const pendAlts = db.alterations.filter(a => a.status === 'PENDING_APPROVAL');
