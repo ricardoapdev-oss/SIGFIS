@@ -31,7 +31,7 @@ export function BackupView({ user }: BackupViewProps) {
       const now = new Date();
       const dateStr = now.toISOString().split('T')[0];
       const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, '-');
-      const filename = `sigfis_backup_${dateStr}_${timeStr}.dump`;
+      const filename = `sigfis_backup_${dateStr}_${timeStr}.json`;
 
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -176,7 +176,7 @@ export function BackupView({ user }: BackupViewProps) {
         </button>
 
         <p className="text-[10px] text-gray-400 text-center mt-3">
-          Formato: PostgreSQL Custom Dump (.dump) · Compatível com pg_restore
+          Formato: JSON gerado via Prisma pelo próprio SIGFIS (sem dependência de pg_dump)
         </p>
       </div>
 
@@ -186,7 +186,7 @@ export function BackupView({ user }: BackupViewProps) {
           <Upload className="h-4 w-4 text-orange-500" /> Restaurar Backup
         </h3>
         <p className="text-xs text-gray-500 mb-5">
-          Selecione um arquivo <code className="bg-gray-100 px-1 rounded text-gray-700">.dump</code> gerado pelo SIGFIS.
+          Selecione um arquivo <code className="bg-gray-100 px-1 rounded text-gray-700">.json</code> gerado pelo SIGFIS.
           Todos os dados atuais serão substituídos.
         </p>
 
@@ -195,7 +195,7 @@ export function BackupView({ user }: BackupViewProps) {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".dump,.sql,.backup"
+            accept=".json,application/json"
             className="hidden"
             onChange={handleFileSelect}
           />
@@ -217,7 +217,7 @@ export function BackupView({ user }: BackupViewProps) {
               <div>
                 <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                 <p className="text-sm font-semibold text-gray-600">Clique para selecionar o arquivo</p>
-                <p className="text-xs text-gray-400 mt-1">Formatos aceitos: .dump</p>
+                <p className="text-xs text-gray-400 mt-1">Formatos aceitos: .json</p>
               </div>
             )}
           </div>
@@ -289,9 +289,9 @@ export function BackupView({ user }: BackupViewProps) {
       <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-2">Informações Técnicas</p>
         <div className="space-y-1 text-[10px] text-gray-500">
-          <p>• O backup utiliza <strong>pg_dump</strong> com formato custom binário comprimido</p>
-          <p>• A restauração utiliza <strong>pg_restore --clean</strong> para substituir os objetos existentes</p>
-          <p>• O sistema detecta automaticamente o PostgreSQL instalado localmente ou via Docker</p>
+          <p>• O backup é um arquivo <strong>JSON</strong> gerado via <strong>Prisma</strong>, sem depender de pg_dump/pg_restore ou de PostgreSQL instalado localmente</p>
+          <p>• A restauração <strong>apaga e recria</strong> todas as tabelas, na ordem correta de dependência entre elas</p>
+          <p>• Funciona igualmente em ambiente serverless (Vercel) e local/Docker</p>
           <p>• Após a restauração, recarregue a página para garantir dados atualizados</p>
         </div>
       </div>
