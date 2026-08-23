@@ -93,8 +93,8 @@ export function Sidebar({ user, activeView, onNavigate, onLogout, onEditProfile,
                   collapsedNow ? 'justify-center px-0 py-2.5' : 'px-3.5 py-2.5 text-left'
                 } ${
                   active
-                    ? 'border-[#2563eb]/70 bg-[#0c1f38]/95 text-white font-semibold shadow-[0_0_16px_rgba(37,99,235,0.28)]'
-                    : 'border-transparent text-slate-300 hover:bg-white/[0.06] hover:text-white'
+                      ? 'border-[#2563eb]/70 border-b-2 border-brand-blue bg-[#e0f7ff] text-black font-semibold shadow-inner'
+                      : 'border-transparent text-slate-300 hover:bg-[#e0f7ff] hover:text-black hover:scale-105 transition-all duration-200'
                 }`}
               >
                 <Icon className={`h-[19px] w-[19px] shrink-0 ${active ? 'text-[#38bdf8]' : 'text-slate-400'}`} />

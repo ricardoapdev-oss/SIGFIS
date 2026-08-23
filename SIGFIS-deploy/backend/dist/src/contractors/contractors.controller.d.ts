@@ -1,0 +1,77 @@
+import { ContractorsService } from './contractors.service';
+export declare class ContractorsController {
+    private readonly contractorsService;
+    constructor(contractorsService: ContractorsService);
+    findAll(): Promise<{
+        id: string;
+        email: string;
+        createdAt: Date;
+        updatedAt: Date;
+        corporateName: string;
+        cnpjCpf: string;
+        phone: string | null;
+        addressCity: string | null;
+        addressState: string | null;
+        tradeName: string | null;
+        postalCode: string | null;
+        addressStreet: string | null;
+        addressNumber: string | null;
+        addressNeighborhood: string | null;
+        stateInscription: string | null;
+        municipalInscription: string | null;
+    }[]>;
+    findOne(id: string): Promise<{
+        id: string;
+        email: string;
+        createdAt: Date;
+        updatedAt: Date;
+        corporateName: string;
+        cnpjCpf: string;
+        phone: string | null;
+        addressCity: string | null;
+        addressState: string | null;
+        tradeName: string | null;
+        postalCode: string | null;
+        addressStreet: string | null;
+        addressNumber: string | null;
+        addressNeighborhood: string | null;
+        stateInscription: string | null;
+        municipalInscription: string | null;
+    }>;
+    create(body: any): Promise<{
+        id: string;
+        email: string;
+        createdAt: Date;
+        updatedAt: Date;
+        corporateName: string;
+        cnpjCpf: string;
+        phone: string | null;
+        addressCity: string | null;
+        addressState: string | null;
+        tradeName: string | null;
+        postalCode: string | null;
+        addressStreet: string | null;
+        addressNumber: string | null;
+        addressNeighborhood: string | null;
+        stateInscription: string | null;
+        municipalInscription: string | null;
+    }>;
+    update(id: string, body: any): Promise<{
+        id: string;
+        email: string;
+        createdAt: Date;
+        updatedAt: Date;
+        corporateName: string;
+        cnpjCpf: string;
+        phone: string | null;
+        addressCity: string | null;
+        addressState: string | null;
+        tradeName: string | null;
+        postalCode: string | null;
+        addressStreet: string | null;
+        addressNumber: string | null;
+        addressNeighborhood: string | null;
+        stateInscription: string | null;
+        municipalInscription: string | null;
+    }>;
+}

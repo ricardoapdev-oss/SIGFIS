@@ -1,0 +1,20 @@
+export type ContractWorkbookRow = {
+    ord: number;
+    processNumber: string;
+    relatedProcessNumbers: string[];
+    legalBasis: string | null;
+    company: string;
+    object: string;
+    unit: string;
+    fiscal: string;
+    ordinance: string;
+    contractNumber: string;
+    addendum: string | null;
+    value: string;
+    monthlyValue: string | null;
+    outstandingBalance: string | null;
+    start: string;
+    end: string;
+    observation: string | null;
+};
+export declare const CONTRACTS_VIGENTES_DATA: ContractWorkbookRow[];
