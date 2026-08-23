@@ -13,7 +13,6 @@ import {
 } from 'recharts';
 import { api, User, GestorDashboard as GestorDashboardType } from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/labels';
-import { StatCard } from '@/components/ui/stat-card';
 import { ChartContainer } from '@/components/ui/chart-container';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,6 +24,46 @@ type View = 'dashboard' | 'contracts' | 'details' | 'processes' | 'communication
 interface Props {
   user: User;
   onNavigate: (view: View, contractId?: string, filter?: string) => void;
+}
+
+// Cartão executivo dos 6 KPIs do topo do Painel Geral — visual próprio (não é
+// o StatCard genérico usado em outras telas), para não afetar mais nada.
+const KPI_TONE: Record<string, string> = {
+  blue: 'bg-brand-blue/10 text-brand-blue',
+  cyan: 'bg-brand-cyan/10 text-teal-600',
+  green: 'bg-brand-green/10 text-emerald-600',
+  purple: 'bg-brand-purple/10 text-violet-600',
+  amber: 'bg-brand-amber/10 text-amber-600',
+  red: 'bg-brand-red/10 text-red-600',
+};
+function ExecutiveKpiCard({
+  icon: Icon, title, value, description, tone = 'blue', onClick,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  value: React.ReactNode;
+  description?: string;
+  tone?: keyof typeof KPI_TONE;
+  onClick?: () => void;
+}) {
+  const Comp = onClick ? 'button' : 'div';
+  return (
+    <Comp
+      onClick={onClick}
+      className={`flex flex-col justify-between rounded-2xl border border-border bg-surface p-4 text-left shadow-card transition-shadow min-w-0 ${onClick ? 'cursor-pointer hover:shadow-card-hover' : ''}`}
+    >
+      <div>
+        <div className="flex items-center gap-2 min-w-0">
+          <span className={`flex size-7 shrink-0 items-center justify-center rounded-full ${KPI_TONE[tone]}`}>
+            <Icon className="size-4" />
+          </span>
+          <p className="text-[12px] font-medium text-muted-foreground truncate" title={title}>{title}</p>
+        </div>
+        <p className="mt-3 font-bold leading-tight text-foreground text-[20px] xl:text-[24px] 2xl:text-[28px] break-all whitespace-normal">{value}</p>
+      </div>
+      {description && <p className="mt-1 text-[10px] text-muted-foreground truncate">{description}</p>}
+    </Comp>
+  );
 }
 
 const RISK_COLORS: Record<string, string> = { critical: '#EF4444', high: '#F59E0B', medium: '#FACC15', low: '#32D583' };
@@ -156,12 +195,12 @@ export function GestorDashboard({ user, onNavigate }: Props) {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-        <StatCard icon={FileSignature} label="Contratos Ativos" value={k?.activeContracts ?? '—'} tone="blue" onClick={() => onNavigate('contracts', undefined, 'active')} />
-        <StatCard icon={CheckCircle} label="Fiscalizações Pendentes" value={k?.pendingFiscalizacoes ?? '—'} tone="cyan" onClick={() => onNavigate('contracts', undefined, 'pending_measurements')} />
-        <StatCard icon={AlertTriangle} label="Alertas Críticos" value={rs?.critical ?? '—'} tone="red" onClick={() => onNavigate('risk')} />
-        <StatCard icon={Clock} label="Contratos a Vencer (90d)" value={k?.expiringIn90 ?? '—'} tone="amber" onClick={() => onNavigate('contracts', undefined, 'expiring90')} />
-        <StatCard icon={DollarSign} label="Valor Total Contratado" value={f ? formatCurrency(f.totalContracted) : '—'} tone="purple" />
-        <StatCard icon={TrendingUp} label="Execução Média" value={f ? `${f.executionPercent}%` : '—'} tone="green" />
+        <ExecutiveKpiCard icon={FileSignature} title="Contratos Ativos" value={k?.activeContracts ?? '—'} tone="blue" onClick={() => onNavigate('contracts', undefined, 'active')} />
+        <ExecutiveKpiCard icon={CheckCircle} title="Fiscalizações Pendentes" value={k?.pendingFiscalizacoes ?? '—'} tone="cyan" onClick={() => onNavigate('contracts', undefined, 'pending_measurements')} />
+        <ExecutiveKpiCard icon={AlertTriangle} title="Alertas Críticos" value={rs?.critical ?? '—'} tone="red" onClick={() => onNavigate('risk')} />
+        <ExecutiveKpiCard icon={Clock} title="Contratos a Vencer" description="Próximos 90 dias" value={k?.expiringIn90 ?? '—'} tone="amber" onClick={() => onNavigate('contracts', undefined, 'expiring90')} />
+        <ExecutiveKpiCard icon={DollarSign} title="Valor Total Contratado" value={f ? formatCurrency(f.totalContracted) : '—'} tone="purple" />
+        <ExecutiveKpiCard icon={TrendingUp} title="Execução Média" value={f ? `${f.executionPercent}%` : '—'} tone="green" />
       </div>
 
       {/* Execução Financeira + Mapa de Riscos */}

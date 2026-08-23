@@ -68,42 +68,42 @@ export function Sidebar({ user, activeView, onNavigate, onLogout, onEditProfile,
 
   const renderContent = (collapsedNow: boolean) => (
     <aside
-      className={`sigfis-sidebar-texture h-full flex flex-col justify-between shrink-0 transition-[width] duration-200 ease-in-out ${collapsedNow ? 'w-[76px]' : 'w-[270px]'}`}
+      className={`sigfis-sidebar-bg h-full flex flex-col justify-between shrink-0 transition-[width] duration-200 ease-in-out ${collapsedNow ? 'w-[76px]' : 'w-[270px]'}`}
     >
       <div className="min-h-0 flex-1 overflow-y-auto sigfis-scrollbar-thin">
         {/* Logo — asset oficial usado tal como fornecido: símbolo + SIGFIS + tagline
             já embutidos na imagem, sem HTML de apoio, sem sombra/filtro extra. */}
-        <div className={`relative flex flex-col items-center border-b border-sidebar-border ${collapsedNow ? 'px-2 py-5' : 'px-6 pt-9 pb-7'}`}>
-          <SigfisLogo className={collapsedNow ? 'h-auto w-10' : 'h-auto w-[160px]'} />
+        <div className={`relative flex flex-col items-center border-b border-white/[0.04] ${collapsedNow ? 'px-2 py-4' : 'px-6 pt-8 pb-6'}`}>
+          <SigfisLogo className={collapsedNow ? 'h-auto w-9' : 'h-auto w-[118px]'} />
           <button onClick={onCloseMobile} className="absolute right-3 top-3 rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white lg:hidden cursor-pointer">
             <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Nav */}
-        <nav className="space-y-1 p-4">
+        <nav className="space-y-1 p-3">
           {items.map(({ view, label, icon: Icon, gapAfter }) => {
             const active = isActive(view);
             const button = (
               <button
                 onClick={() => onNavigate(view)}
-                className={`relative flex w-full cursor-pointer items-center gap-3 rounded-lg text-sm font-medium transition-colors duration-150 ${
-                  collapsedNow ? 'justify-center px-0 py-3' : 'px-3.5 py-3 text-left'
+                className={`relative flex w-full cursor-pointer items-center gap-3 rounded-lg border text-[13px] font-medium transition-colors duration-150 ${
+                  collapsedNow ? 'justify-center px-0 py-2.5' : 'px-3 py-2.5 text-left'
                 } ${
                   active
-                    ? 'bg-brand-blue text-white font-semibold shadow-[0_2px_10px_rgba(0,0,0,0.28)]'
-                    : 'text-slate-300 hover:bg-white/8 hover:text-white'
+                    ? 'border-white/[0.03] bg-[#18222E] text-white font-semibold shadow-[0_2px_6px_rgba(0,0,0,0.15)]'
+                    : 'border-transparent text-slate-400 hover:bg-white/5 hover:text-white'
                 }`}
               >
-                <Icon className={`h-5 w-5 shrink-0 ${active ? 'text-white' : 'text-slate-400'}`} />
+                <Icon className={`h-[18px] w-[18px] shrink-0 ${active ? 'text-sky-400' : 'text-slate-500'}`} />
                 {!collapsedNow && label}
-                {active && <span className="absolute inset-y-1.5 right-0 w-1 rounded-l-full bg-brand-cyan" />}
+                {active && <span className="absolute inset-y-2 right-0 w-[3px] rounded-l-full bg-brand-blue" />}
               </button>
             );
             return (
               <div key={view}>
                 {collapsedNow ? <Tooltip content={label} side="right">{button}</Tooltip> : button}
-                {gapAfter && <div className="h-4" />}
+                {gapAfter && <div className="h-3" />}
               </div>
             );
           })}
@@ -111,10 +111,10 @@ export function Sidebar({ user, activeView, onNavigate, onLogout, onEditProfile,
       </div>
 
       {/* Footer: identidade do usuário + sair do sistema */}
-      <div className={`border-t border-sidebar-border p-4 ${collapsedNow ? 'px-2' : ''}`}>
+      <div className={`border-t border-white/[0.04] p-3 ${collapsedNow ? 'px-2' : ''}`}>
         {collapsedNow ? (
           <Tooltip content={`${user.name} · ${user.role}`} side="right">
-            <button onClick={onEditProfile} className="flex w-full items-center justify-center rounded-xl border border-white/10 bg-white/5 p-2.5 transition-colors hover:border-white/20 hover:bg-white/10 cursor-pointer">
+            <button onClick={onEditProfile} className="flex w-full items-center justify-center rounded-xl border border-white/[0.03] bg-white/[0.02] p-2 transition-colors hover:border-white/10 hover:bg-white/5 cursor-pointer">
               <RoleIcon role={user.role} />
             </button>
           </Tooltip>
@@ -123,18 +123,18 @@ export function Sidebar({ user, activeView, onNavigate, onLogout, onEditProfile,
             side="top"
             align="start"
             className="w-full"
-            panelClassName="w-full"
+            panelClassName="w-full bg-[#151D27] border-white/10"
             trigger={({ open, toggle }) => (
               <button onClick={toggle} title="Menu do usuário" className="group w-full cursor-pointer">
-                <div className={`flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3.5 transition-colors hover:border-white/20 hover:bg-white/10 ${open ? 'border-white/20 bg-white/10' : ''}`}>
+                <div className={`flex items-center gap-3 rounded-xl border border-white/[0.03] bg-[#151D27]/60 p-3 transition-colors hover:border-white/10 hover:bg-white/5 ${open ? 'border-white/10 bg-[#18222E]' : ''}`}>
                   <RoleIcon role={user.role} />
                   <div className="min-w-0 flex-1 text-left">
-                    <p className="line-clamp-1 text-sm font-semibold text-white">{user.name}</p>
-                    <span className={`mt-1 block w-max rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest ${(roleStyle[user.role] ?? roleStyle.FISCAL).badge}`}>
+                    <p className="line-clamp-1 text-xs font-semibold text-white">{user.name}</p>
+                    <span className={`mt-0.5 block w-max rounded border px-1 py-0.2 text-[8px] font-bold uppercase tracking-widest ${(roleStyle[user.role] ?? roleStyle.FISCAL).badge}`}>
                       {user.role}
                     </span>
                   </div>
-                  <ChevronDown className={`h-4 w-4 shrink-0 text-slate-400 transition-transform group-hover:text-white ${open ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform group-hover:text-white ${open ? 'rotate-180' : ''}`} />
                 </div>
               </button>
             )}
@@ -158,7 +158,7 @@ export function Sidebar({ user, activeView, onNavigate, onLogout, onEditProfile,
           <Tooltip content="Sair do Sistema" side="right">
             <button
               onClick={onLogout}
-              className="mt-2 flex w-full cursor-pointer items-center justify-center rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+              className="mt-2 flex w-full cursor-pointer items-center justify-center rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
             >
               <LogOut className="h-4 w-4" />
             </button>
@@ -166,9 +166,9 @@ export function Sidebar({ user, activeView, onNavigate, onLogout, onEditProfile,
         ) : (
           <button
             onClick={onLogout}
-            className="mt-2 flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3.5 py-2.5 text-sm font-medium text-slate-400 transition-colors duration-150 hover:bg-white/8 hover:text-white"
+            className="mt-2 flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-400 transition-colors duration-150 hover:bg-white/5 hover:text-white"
           >
-            <LogOut className="h-4 w-4 shrink-0" />
+            <LogOut className="h-3.5 w-3.5 shrink-0 text-slate-500" />
             Sair do Sistema
           </button>
         )}

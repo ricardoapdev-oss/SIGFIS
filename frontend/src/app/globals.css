@@ -112,14 +112,14 @@
   --chart-5: var(--brand-green);
   --radius: 0.625rem;
 
-  /* Sidebar institucional (navy escuro, sempre neste tom — não segue dark mode) */
-  --sidebar: #0a1128;
-  --sidebar-foreground: #cbd5e1;
+  /* Sidebar institucional (navy escuro/grafite chumbo, sempre neste tom — não segue dark mode) */
+  --sidebar: #111923;
+  --sidebar-foreground: #b2c0d2;
   --sidebar-primary: var(--brand-blue);
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgba(255, 255, 255, 0.06);
+  --sidebar-accent: rgba(255, 255, 255, 0.04);
   --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-border: rgba(255, 255, 255, 0.06);
   --sidebar-ring: var(--brand-blue);
 }
 
@@ -147,6 +147,17 @@
       radial-gradient(circle at 90% 85%, rgba(0, 212, 180, 0.06) 0%, transparent 45%),
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
     background-color: var(--brand-navy);
+  }
+
+  /* Fundo da sidebar (só a sidebar — tela de login mantém .sigfis-sidebar-texture
+     acima, intencionalmente). Navy/cinza-chumbo neutro em vez do azul saturado:
+     tonalidade puxada pro cinza-escuro, com o mesmo ruído extremamente sutil e
+     um traço mínimo de profundidade (sem gradiente chamativo). */
+  .sigfis-sidebar-bg {
+    background-image:
+      radial-gradient(circle at 50% 0%, rgba(21, 29, 39, 0.5) 0%, transparent 75%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.99' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
+    background-color: #111923;
   }
 
   .sigfis-scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }

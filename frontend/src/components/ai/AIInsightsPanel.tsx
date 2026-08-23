@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useQuery } from '@tanstack/react-query';
 import { useState, useMemo, useRef, useEffect } from 'react';
@@ -9,6 +9,7 @@ import {
   Minus, Target, FileText, ChevronRight, Users, Zap, XCircle, Info,
 } from 'lucide-react';
 import { api, User } from '@/lib/api';
+import { formatCurrency } from '@/lib/labels';
 import { Area, ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface Props {
@@ -570,7 +571,7 @@ function DiagnosisSection({ contracts, selectedContractId, setSelectedContractId
                   <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{c.objectDescription}</p>
                   <div className="flex flex-wrap gap-4 mt-3 text-[10px]">
                     <div><p className="text-gray-400">Contratada</p><p className="text-gray-700 font-bold">{c.contractor?.tradeName || c.contractor?.name || '—'}</p></div>
-                    <div><p className="text-gray-400">Valor</p><p className="text-gray-700 font-bold">{(c.currentValue ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p></div>
+                    <div><p className="text-gray-400">Valor</p><p className="text-gray-700 font-bold">{formatCurrency(c.currentValue ?? 0)}</p></div>
                     <div><p className="text-gray-400">Vencimento</p><p className={`font-bold ${daysRemaining <= 30 ? 'text-red-400' : daysRemaining <= 90 ? 'text-amber-400' : 'text-gray-700'}`}>{new Date(c.endDate).toLocaleDateString('pt-BR')} ({daysRemaining}d)</p></div>
                     <div><p className="text-gray-400">Fiscal</p><p className={`font-bold ${fiscal ? 'text-gray-700' : 'text-red-400'}`}>{fiscal?.name ?? 'Sem designação'}</p></div>
                   </div>
