@@ -8,7 +8,6 @@ import {
   getStoredToken,
   setStoredToken,
   api,
-  writeAuditLog,
   User
 } from '@/lib/api';
 import Providers from './providers';
@@ -540,8 +539,7 @@ function ContractsListView({
 
   const createContractMutation = useMutation({
     mutationFn: (data: any) => api.contracts.create(data),
-    onSuccess: (created: any, vars: any) => {
-      if (user) writeAuditLog(user, 'CREATE', 'Contract', created?.id || vars.contractNumber, `Contrato ${vars.contractNumber} cadastrado`);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contracts-list'] });
       setShowNewContractModal(false);
       setNcNumSeq(''); setNcNumYear(new Date().getFullYear().toString()); setNcObject(''); setNcValue(''); setNcSigning(''); setNcStart(''); setNcEnd('');

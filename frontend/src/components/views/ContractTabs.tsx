@@ -8,7 +8,7 @@ import {
   CheckCircle, XCircle, Clock, Shield, ExternalLink, FileSignature,
   Activity, Send, X, Trash2, Pencil, Save, GitBranch,
 } from 'lucide-react';
-import { api, User, Contract, ContractAlert, writeAuditLog } from '@/lib/api';
+import { api, User, Contract, ContractAlert } from '@/lib/api';
 import {
   contractStatusLabel, contractStatusColor, occurrenceSeverityLabel, occurrenceSeverityColor,
   occurrenceStatusLabel, occurrenceStatusColor, measurementStatusLabel, measurementStatusColor,
@@ -466,9 +466,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
 
   const createPaymentMutation = useMutation({
     mutationFn: (data: any) => api.payments.create(data),
-    onSuccess: (_res, vars) => {
-      const cNum = (contract as any)?.contractNumber || contractId;
-      writeAuditLog(user, 'CREATE', 'Contract', contractId, `Pagamento registrado: R$ ${Number(vars.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} em ${vars.paymentDate} — ${cNum}`);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contract', contractId] });
       queryClient.invalidateQueries({ queryKey: ['payments', contractId] });
       setShowPaymentForm(false);
@@ -487,87 +485,63 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
 
   const createMeasurementMutation = useMutation({
     mutationFn: (data: any) => api.measurements.create(data),
-    onSuccess: (_res, vars) => {
-      const cNum = (contract as any)?.contractNumber || contractId;
-      writeAuditLog(user, 'CREATE', 'Contract', contractId, `Medição registrada: ${vars.periodStart}–${vars.periodEnd} | R$ ${Number(vars.measurementValue).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} — ${cNum}`);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contract', contractId] }); setShowMeasurementForm(false); setMsrPeriodStart(''); setMsrPeriodEnd(''); setMsrValue(''); setMsrDesc('');
     },
     onError: (e: any) => alert(`Erro ao registrar medição: ${e.message}`),
   });
   const approveMeasurementMutation = useMutation({
     mutationFn: (id: string) => api.measurements.approve(id),
-    onSuccess: (_res, id) => {
-      const cNum = (contract as any)?.contractNumber || contractId;
-      const msr = (contract as any)?.measurements?.find((m: any) => m.id === id);
-      writeAuditLog(user, 'APPROVE', 'Contract', contractId, `Medição aprovada${msr ? ': R$ ' + Number(msr.measurementValue).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : ''} — ${cNum}`, { status: { from: 'PENDING_GESTOR', to: 'APPROVED' } });
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contract', contractId] });
     },
     onError: (e: any) => alert(`Erro: ${e.message}`),
   });
   const rejectMeasurementMutation = useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) => api.measurements.reject(id, reason),
-    onSuccess: (_res, { id }) => {
-      const cNum = (contract as any)?.contractNumber || contractId;
-      const msr = (contract as any)?.measurements?.find((m: any) => m.id === id);
-      writeAuditLog(user, 'REJECT', 'Contract', contractId, `Medição reprovada${msr ? ': R$ ' + Number(msr.measurementValue).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : ''} — ${cNum}`, { status: { from: 'PENDING_GESTOR', to: 'REJECTED' } });
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contract', contractId] }); setRejectMsrModal(null); setRejectMsrReason('');
     },
     onError: (e: any) => alert(`Erro: ${e.message}`),
   });
   const createOccurrenceMutation = useMutation({
     mutationFn: (data: any) => api.occurrences.create(data),
-    onSuccess: (_res, vars) => {
-      const cNum = (contract as any)?.contractNumber || contractId;
-      writeAuditLog(user, 'CREATE', 'Contract', contractId, `Ocorrência registrada: "${vars.title}" (${vars.severity || 'MEDIUM'}) — ${cNum}`);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contract', contractId] }); setShowOccurrenceForm(false); setOccTitle(''); setOccDesc(''); setOccSeverity('MEDIUM');
     },
     onError: (e: any) => alert(`Erro ao registrar ocorrência: ${e.message}`),
   });
   const resolveOccurrenceMutation = useMutation({
     mutationFn: ({ id, desc }: { id: string; desc: string }) => api.occurrences.resolve(id, desc),
-    onSuccess: (_res, { id }) => {
-      const cNum = (contract as any)?.contractNumber || contractId;
-      const occ = (contract as any)?.occurrences?.find((o: any) => o.id === id);
-      writeAuditLog(user, 'UPDATE', 'Contract', contractId, `Ocorrência resolvida: "${occ?.title || id}" — ${cNum}`, { status: { from: 'OPEN', to: 'RESOLVED' } });
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contract', contractId] }); setResolveOccModal(null); setResolveOccDesc('');
     },
     onError: (e: any) => alert(`Erro: ${e.message}`),
   });
   const createAlterationMutation = useMutation({
     mutationFn: (data: any) => api.alterations.create(data),
-    onSuccess: (_res, vars) => {
-      const cNum = (contract as any)?.contractNumber || contractId;
-      writeAuditLog(user, 'CREATE', 'Contract', contractId, `Aditivo solicitado: ${vars.alterationNumber || vars.type}${vars.valueChange ? ' | R$ ' + Number(vars.valueChange).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : ''} — ${cNum}`);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contract', contractId] }); setShowAlterationForm(false); setAltType('ADDENDUM_VALUE_INCREASE'); setAltJustification(''); setAltValueChange(''); setAltNewEndDate(''); setAltNumber('');
     },
     onError: (e: any) => alert(`Erro ao criar aditivo: ${e.message}`),
   });
   const approveAlterationMutation = useMutation({
     mutationFn: (id: string) => api.alterations.approve(id),
-    onSuccess: (_res, id) => {
-      const cNum = (contract as any)?.contractNumber || contractId;
-      const alt = (contract as any)?.alterations?.find((a: any) => a.id === id);
-      writeAuditLog(user, 'APPROVE', 'Contract', contractId, `Aditivo aprovado: ${alt?.alterationNumber || alt?.type || id}${alt?.valueChange ? ' | R$ ' + Number(alt.valueChange).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : ''} — ${cNum}`, { status: { from: 'PENDING_APPROVAL', to: 'APPROVED' } });
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contract', contractId] });
     },
     onError: (e: any) => alert(`Erro: ${e.message}`),
   });
   const rejectAlterationMutation = useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) => api.alterations.reject(id, reason),
-    onSuccess: (_res, { id }) => {
-      const cNum = (contract as any)?.contractNumber || contractId;
-      const alt = (contract as any)?.alterations?.find((a: any) => a.id === id);
-      writeAuditLog(user, 'REJECT', 'Contract', contractId, `Aditivo reprovado: ${alt?.alterationNumber || alt?.type || id} — ${cNum}`, { status: { from: 'PENDING_APPROVAL', to: 'REJECTED' } });
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contract', contractId] }); setRejectAltModal(null); setRejectAltReason('');
     },
     onError: (e: any) => alert(`Erro: ${e.message}`),
   });
   const assignFiscalMutation = useMutation({
     mutationFn: (data: any) => api.contracts.assignFiscal(contractId, data),
-    onSuccess: (_res, vars) => {
-      const cNum = (contract as any)?.contractNumber || contractId;
-      const roleLabel: Record<string, string> = { TITULAR: 'Titular', SUBSTITUTO: 'Substituto', SUPLENTE: 'Suplente' };
-      writeAuditLog(user, 'UPDATE', 'Contract', contractId, `Fiscal designado (${roleLabel[vars.role] || vars.role}) — ${cNum}`);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contract', contractId] }); setShowAssignModal(false); setAsgFiscalId(''); setAsgRole('TITULAR'); setAsgAct(''); setAsgDate(''); setAsgStart('');
     },
     onError: (e: any) => alert(`Erro ao designar fiscal: ${e.message}`),

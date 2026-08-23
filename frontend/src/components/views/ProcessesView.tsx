@@ -7,7 +7,7 @@ import {
   User as UserIcon, ChevronDown, Trash2, Clock, AlertCircle, CheckCircle2,
   Ban, ArrowRight, FileText, Building2, ChevronLeft,
 } from 'lucide-react';
-import { api, User, ProcessPhase, ChecklistItem, PhaseStatus, writeAuditLog } from '@/lib/api';
+import { api, User, ProcessPhase, ChecklistItem, PhaseStatus } from '@/lib/api';
 import { processStatusLabel, processStatusColor, modalityLabel, formatCurrency, formatDate } from '@/lib/labels';
 import { StatCard } from '@/components/ui/stat-card';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -118,8 +118,7 @@ export function ProcessesView({ user, initialFilter }: ProcessesViewProps) {
 
   const createMutation = useMutation({
     mutationFn: (data: any) => api.processes.create(data),
-    onSuccess: (created: any, vars: any) => {
-      writeAuditLog(user, 'CREATE', 'Process', created?.id || vars.processNumber, `Processo ${vars.processNumber} aberto — ${vars.subject}`);
+    onSuccess: (created: any) => {
       queryClient.invalidateQueries({ queryKey: ['processes'] });
       setIsNewOpen(false);
       resetForm();

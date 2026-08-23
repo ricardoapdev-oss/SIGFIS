@@ -165,18 +165,21 @@
     border-right: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  /* Aba ativa "aço escovado": gradiente metálico + linhas finas de escovado +
-     sombra interna (baixo relevo, como um botão pressionado). Usado só na
+  /* Aba ativa "metal cinza escovado com arranhões": vinheta radial clara
+     deslocada + textura de arranhões finos (ruído fractal em SVG) + sombra
+     interna dupla (baixo relevo, como um botão pressionado). Usado só na
      aba selecionada do menu de Inteligência Contratual. */
-  .sigfis-tab-active-metal {
-    background-color: #e8ebee;
+  .sigfis-tab-active-gray {
+    background-color: #4b4f54;
     background-image:
-      repeating-linear-gradient(100deg, rgba(255, 255, 255, 0.55) 0px, rgba(255, 255, 255, 0.55) 1px, transparent 1px, transparent 3px),
-      linear-gradient(165deg, #f6f7f9 0%, #e3e7eb 42%, #eef1f3 55%, #d7dce1 100%);
+      radial-gradient(ellipse 70% 90% at 38% 35%, rgba(210, 213, 217, 0.55) 0%, rgba(150, 154, 159, 0.25) 45%, transparent 75%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='scratches'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.35' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 5 -3.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23scratches)' opacity='0.35'/%3E%3C/svg%3E"),
+      linear-gradient(165deg, #5c6066 0%, #45484d 45%, #55585d 55%, #3c3f43 100%);
+    background-blend-mode: normal, overlay, normal;
     box-shadow:
-      inset 0 2px 5px rgba(10, 17, 40, 0.20),
-      inset 0 -1px 1px rgba(255, 255, 255, 0.7),
-      inset 0 0 0 1px rgba(10, 17, 40, 0.06);
+      inset 0 2px 5px rgba(0, 0, 0, 0.45),
+      inset 0 -1px 1px rgba(255, 255, 255, 0.12),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.25);
   }
 
   .sigfis-scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }

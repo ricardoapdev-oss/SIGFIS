@@ -25,7 +25,7 @@ export interface Contract {
   department?: string; observations?: string;
   contractor?: Contractor; process?: ProcurementProcess; fiscalAssignments?: FiscalAssignment[];
   occurrences?: Occurrence[]; measurements?: InspectionMeasurement[]; alterations?: ContractAlteration[];
-  documents?: DocumentFile[]; communications?: Communication[];
+  communications?: Communication[];
 }
 export type FiscalRole = 'TITULAR' | 'SUBSTITUTO' | 'TECNICO' | 'ADMINISTRATIVO';
 export interface FiscalAssignment {
@@ -55,20 +55,11 @@ export interface ContractAlteration {
   reviewedById?: string; reviewDate?: string; reviewNotes?: string; createdAt: string;
   requester?: { name: string }; reviewer?: { name: string };
 }
-export interface DocumentFile {
-  id: string; contractId?: string; processId?: string; occurrenceId?: string; measurementId?: string;
-  category: string; title: string; fileKey?: string; fileSize: number; mimeType: string;
-  uploadedById: string; createdAt: string;
-}
 export interface Communication {
   id: string; contractId: string; senderId: string; recipientId?: string; subject: string;
   message: string; parentId?: string; readBy?: string[]; isMandatory?: boolean; createdAt: string;
   sender?: { name: string; role: string }; recipient?: { name: string }; replies?: Communication[];
 }
-export interface SystemAlert {
-  id: string; contractId?: string; type: string; message: string; targetRole: UserRole; isRead: boolean; createdAt: string;
-}
-
 // ── Novos Tipos ────────────────────────────────────────────────────────────────
 
 export type ContractAlertType =
@@ -130,7 +121,7 @@ export interface RiskItem {
 export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'VIEW' | 'APPROVE' | 'REJECT' | 'LOGIN' | 'LOGOUT' | 'STATUS_CHANGE' | 'RESOLVE' | 'ASSIGN_FISCAL' | 'EXPORT' | 'RESTORE' | 'RESTORE_FAILED' | (string & {});
 
 // Trilha de auditoria real, persistida em backend/src/audit (tabela audit_logs).
-// Não depende mais de localStorage/writeAuditLog no navegador.
+// Gravada automaticamente pelo backend — não depende de localStorage.
 export interface AuditLog {
   id: string;
   userId: string | null; userEmail: string | null; userName: string | null; userRole: string | null;
@@ -236,83 +227,6 @@ const SEED_USERS: User[] = [
   { id: 'usr-f22',   name: 'Dalmo Francisco da Costa',            email: 'f22@sigecontratos.com',     role: 'FISCAL', status: 'ACTIVE', registrationNumber: 'IQG-1022' },
 ];
 
-const SEED_CONTRACTORS: Contractor[] = [
-  { id: 'ctr-c01', corporateName: 'SERVIÇO SOCIAL DA INDÚSTRIA — SESI',                                          cnpjCpf: '03.775.235/0001-10', email: 'contato@sesigo.org.br',        phone: '(62) 3200-1100', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c02', corporateName: 'HEALTH SAÚDE E SEGURANÇA DO TRABALHO LTDA',                                   cnpjCpf: '11.222.333/0001-44', email: 'contato@healthsst.com.br',     phone: '(62) 3300-2200', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c03', corporateName: 'REDEMOB CONSÓRCIO',                                                           cnpjCpf: '22.333.444/0001-55', email: 'contato@redemob.com.br',       phone: '(62) 3400-3300', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c04', corporateName: 'PLUXEE BENEFÍCIOS BRASIL S.A.',                                               cnpjCpf: '08.722.911/0001-49', email: 'corporativo@pluxee.com.br',   phone: '(11) 3000-4000', addressCity: 'São Paulo', addressState: 'SP' },
-  { id: 'ctr-c05', corporateName: 'LE CARD ADMINISTRADORA DE CARTÕES LTDA',                                      cnpjCpf: '33.444.555/0001-66', email: 'contato@lecard.com.br',        phone: '(62) 3500-5500', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c06', corporateName: 'GENESIS PRESTADORA DE SERVIÇOS LTDA',                                         cnpjCpf: '44.555.666/0001-77', email: 'contato@genesis-servicos.com.br', phone: '(62) 3600-6600', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c07', corporateName: 'PADA PÃES E SABORES LTDA',                                                    cnpjCpf: '55.666.777/0001-88', email: 'contato@pada.com.br',          phone: '(62) 3700-7700', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c08', corporateName: 'FONSECA E MARTINS COMÉRCIO DE GÁS EIRELI',                                    cnpjCpf: '66.777.888/0001-99', email: 'contato@fonsecagas.com.br',    phone: '(62) 3800-8800', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c09', corporateName: 'JVS PARTICIPAÇÕES EIRELI',                                                    cnpjCpf: '77.888.999/0001-00', email: 'contato@jvspart.com.br',       phone: '(62) 3900-9900', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c10', corporateName: 'LS PRODUTOS E SERVIÇOS LTDA',                                                 cnpjCpf: '88.999.000/0001-11', email: 'contato@lsprodutos.com.br',    phone: '(62) 3100-1010', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c11', corporateName: 'ALTERDATA TECNOLOGIA EM INFORMÁTICA LTDA',                                    cnpjCpf: '00.111.222/0001-33', email: 'comercial@alterdata.com.br',   phone: '(21) 2109-0000', addressCity: 'Rio de Janeiro', addressState: 'RJ' },
-  { id: 'ctr-c12', corporateName: 'INTEGRA AUTOMAÇÃO E CONTROLE LTDA',                                           cnpjCpf: '11.222.333/0002-25', email: 'contato@integraac.com.br',     phone: '(62) 3200-2020', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c13', corporateName: 'MPS BRASIL OUTSOURCING DE IMPRESSÃO LTDA',                                    cnpjCpf: '22.333.444/0002-06', email: 'contato@mpsbrasil.com.br',     phone: '(11) 4000-3030', addressCity: 'São Paulo', addressState: 'SP' },
-  { id: 'ctr-c14', corporateName: 'GOIAS TELECOMUNICAÇÕES S/A — GOIASTELECOM',                                   cnpjCpf: '02.421.421/0001-11', email: 'corporativo@goiastelecom.com.br', phone: '(62) 3600-4040', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c16', corporateName: 'SANEAGO — SANEAMENTO DE GOIÁS S.A.',                                          cnpjCpf: '02.879.655/0001-19', email: 'atendimento@saneago.com.br',   phone: '(62) 3265-0600', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c17', corporateName: 'EQUATORIAL GOIÁS DISTRIBUIDORA DE ENERGIA S.A.',                              cnpjCpf: '02.322.462/0001-00', email: 'atendimento@equatorialgo.com.br', phone: '(62) 3243-2000', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c18', corporateName: 'GENESIS COMÉRCIO E MANUTENÇÕES LTDA',                                         cnpjCpf: '44.555.777/0001-88', email: 'contato@genesis-manutencoes.com.br', phone: '(62) 3600-5050', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c19', corporateName: 'PRIME CONSULTORIA E ASSESSORIA EMPRESARIAL LTDA',                             cnpjCpf: '33.444.666/0001-99', email: 'contato@primeconsultoria.com.br', phone: '(62) 3200-6060', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c20', corporateName: 'GIBBOR BRASIL PUBLICIDADE E PROPAGANDA LTDA',                                 cnpjCpf: '55.666.888/0001-00', email: 'contato@gibbor.com.br',        phone: '(62) 3300-7070', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c21', corporateName: 'WEGH ASSESSORIA E LOGÍSTICA INTERNACIONAL',                                   cnpjCpf: '66.777.999/0001-11', email: 'contato@wegh.com.br',          phone: '(62) 3400-8080', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c22', corporateName: 'AVISO URGENTE TECNOLOGIA E INFORMAÇÃO LTDA',                                  cnpjCpf: '77.888.000/0001-22', email: 'contato@avisourgente.com.br',  phone: '(62) 3500-9090', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c23', corporateName: 'DELTA ENGENHARIA E ARQUITETURA LTDA',                                         cnpjCpf: '88.999.111/0001-33', email: 'contato@deltaeng.com.br',       phone: '(62) 3600-0101', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c24', corporateName: 'SHIELD SEGURANÇA DA INFORMAÇÃO E CONSULTORIA EMPRESARIAL LTDA',               cnpjCpf: '99.000.222/0001-44', email: 'contato@shield.com.br',        phone: '(62) 3700-1212', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c25', corporateName: 'ZENITE INFORMAÇÃO E CONSULTORIA S/A',                                         cnpjCpf: '00.111.333/0001-55', email: 'contato@zenite.com.br',        phone: '(41) 3250-7070', addressCity: 'Curitiba', addressState: 'PR' },
-  { id: 'ctr-c26', corporateName: 'L.A VIAGENS E TURISMO LTDA',                                                  cnpjCpf: '11.222.444/0001-66', email: 'contato@laviagens.com.br',     phone: '(62) 3800-2323', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c27', corporateName: 'GÁS E MAIS COMÉRCIO EIRELI',                                                  cnpjCpf: '22.333.555/0001-77', email: 'contato@gasemais.com.br',      phone: '(62) 3900-3434', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c28', corporateName: 'BRASILSEG CIA DE SEGUROS',                                                    cnpjCpf: '10.520.977/0001-10', email: 'corporativo@brasilseg.com.br', phone: '(11) 3116-9000', addressCity: 'São Paulo', addressState: 'SP' },
-  { id: 'ctr-c29', corporateName: 'ÔMEGA LOCADORA DE VEÍCULOS LTDA',                                             cnpjCpf: '33.444.666/0002-70', email: 'contato@omegalocadora.com.br', phone: '(62) 3100-4545', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c30', corporateName: 'MISTER PRAGAS DEDETIZAÇÃO E DESENTUPIDORA LTDA',                              cnpjCpf: '44.555.777/0002-69', email: 'contato@misterpragas.com.br',  phone: '(62) 3200-5656', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c31', corporateName: 'NP TECNOLOGIA E GESTÃO DE DADOS LTDA',                                        cnpjCpf: '55.666.888/0002-40', email: 'contato@nptecnologia.com.br',  phone: '(62) 3300-6767', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c32', corporateName: 'DMS CALIBRAÇÕES E INSPEÇÕES INDUSTRIAL LTDA',                                 cnpjCpf: '66.777.999/0002-01', email: 'contato@dmscalibra.com.br',    phone: '(62) 3400-7878', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c33', corporateName: 'WORK7 AUDITORES INDEPENDENTES LTDA',                                          cnpjCpf: '77.888.000/0002-82', email: 'contato@work7auditores.com.br', phone: '(62) 3500-8989', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c34', corporateName: 'AUDIGESPUB SERVIÇOS DE AUDITORIA, ASSESSORIA E CONSULTORIA LTDA',             cnpjCpf: '88.999.111/0002-13', email: 'contato@audigespub.com.br',    phone: '(62) 3600-9090', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c35', corporateName: 'INSTITUTO DE PROMOÇÃO HUMANA, APRENDIZAGEM E CULTURA',                        cnpjCpf: '99.000.222/0002-94', email: 'contato@institutophac.org.br', phone: '(62) 3700-0909', addressCity: 'Goiânia', addressState: 'GO' },
-  { id: 'ctr-c36', corporateName: 'BIOCIENTIFIC LABORATORIOS LTDA',                                              cnpjCpf: '00.111.333/0002-36', email: 'contato@biocientific.com.br',  phone: '(62) 3800-1010', addressCity: 'Goiânia', addressState: 'GO' },
-];
-
-const SEED_PROCESSES: ProcurementProcess[] = [
-  { id: 'prc-c01', processNumber: '202300055000054', subject: 'Exames de saúde ocupacional e medicina do trabalho',              status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 387450.00,  requesterDepartment: 'Segurança do Trabalho',              requesterId: 'usr-gestor' },
-  { id: 'prc-c02', processNumber: '202400055000297', subject: 'Serviços em saúde e segurança do trabalho',                      status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 298320.00,  requesterDepartment: 'Segurança do Trabalho',              requesterId: 'usr-gestor' },
-  { id: 'prc-c03', processNumber: '202300055000136', subject: 'Serviços de remoção hospitalar e translado de pacientes',        status: 'CONCLUDED', modality: 'INEXIGIBILIDADE',   estimatedValue: 196800.00,  requesterDepartment: 'Gerência de Gestão de Pessoas',      requesterId: 'usr-gestor' },
-  { id: 'prc-c04', processNumber: '202300055000104', subject: 'Fornecimento de cartão de benefícios (vale alimentação/refeição)',status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 1485000.00, requesterDepartment: 'Gerência de Gestão de Pessoas',      requesterId: 'usr-gestor' },
-  { id: 'prc-c05', processNumber: '202300055000401', subject: 'Fornecimento de cartão de benefícios (vale alimentação)',        status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 798500.00,  requesterDepartment: 'Gerência de Gestão de Pessoas',      requesterId: 'usr-gestor' },
-  { id: 'prc-c06', processNumber: '202300055000119', subject: 'Serviços de portaria, vigilância e limpeza',                    status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 612000.00,  requesterDepartment: 'Coordenação de Serviços Gerais',    requesterId: 'usr-gestor' },
-  { id: 'prc-c07', processNumber: '202200055000417', subject: 'Fornecimento de refeições e lanches para servidores',           status: 'CONCLUDED', modality: 'DISPENSA_13303',    estimatedValue: 117600.00,  requesterDepartment: 'Coordenação de Serviços Gerais',    requesterId: 'usr-gestor' },
-  { id: 'prc-c08', processNumber: '202200055000273', subject: 'Fornecimento de gás liquefeito de petróleo (GLP) em botijões',  status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 173400.00,  requesterDepartment: 'Coordenação de Serviços Gerais',    requesterId: 'usr-gestor' },
-  { id: 'prc-c09', processNumber: '202300055000247', subject: 'Serviços logísticos de transporte e distribuição',              status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 924000.00,  requesterDepartment: 'Gerência de Logística',              requesterId: 'usr-gestor' },
-  { id: 'prc-c10', processNumber: '202400055000006', subject: 'Fornecimento de materiais e produtos de uso geral',             status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 342000.00,  requesterDepartment: 'Gerência de Logística',              requesterId: 'usr-gestor' },
-  { id: 'prc-c11', processNumber: '202400055000728', subject: 'Licença de uso de sistema de gestão integrada (ERP)',           status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 486000.00,  requesterDepartment: 'Tecnologia da Informação e Comunicação', requesterId: 'usr-gestor' },
-  { id: 'prc-c12', processNumber: '202000055000104', subject: 'Sistema de automação e controle predial',                       status: 'CONCLUDED', modality: 'DISPENSA_13303',    estimatedValue: 93500.00,   requesterDepartment: 'Tecnologia da Informação e Comunicação', requesterId: 'usr-gestor' },
-  { id: 'prc-c13', processNumber: '202100055000133', subject: 'Outsourcing de impressão e gestão de documentos',               status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 432000.00,  requesterDepartment: 'Tecnologia da Informação e Comunicação', requesterId: 'usr-gestor' },
-  { id: 'prc-c14', processNumber: '202200055000327', subject: 'Serviços de telecomunicações e telefonia corporativa',          status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 960000.00,  requesterDepartment: 'Tecnologia da Informação e Comunicação', requesterId: 'usr-gestor' },
-  { id: 'prc-c15', processNumber: '202400055000042', subject: 'Manutenção preventiva e corretiva do sistema PABX',             status: 'CONCLUDED', modality: 'DISPENSA_13303',    estimatedValue: 82800.00,   requesterDepartment: 'Tecnologia da Informação e Comunicação', requesterId: 'usr-gestor' },
-  { id: 'prc-c16', processNumber: '202100055000217', subject: 'Fornecimento de água e coleta de esgoto',                       status: 'CONCLUDED', modality: 'INEXIGIBILIDADE',   estimatedValue: 237600.00,  requesterDepartment: 'Gerência de Engenharia',             requesterId: 'usr-gestor' },
-  { id: 'prc-c17', processNumber: '202300055000551', subject: 'Fornecimento de energia elétrica',                              status: 'CONCLUDED', modality: 'DISPENSA_13303',    estimatedValue: 264688.38,  requesterDepartment: 'Gerência de Engenharia',             requesterId: 'usr-gestor' },
-  { id: 'prc-c18', processNumber: '202300055000690', subject: 'Manutenção predial e instalações',                              status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 540000.00,  requesterDepartment: 'Gerência de Engenharia',             requesterId: 'usr-gestor' },
-  { id: 'prc-c19', processNumber: '202300055000144', subject: 'Consultoria e assessoria empresarial',                          status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 372000.00,  requesterDepartment: 'Gerência de Logística',              requesterId: 'usr-gestor' },
-  { id: 'prc-c20', processNumber: '202100055000360', subject: 'Serviços de publicidade, propaganda e marketing institucional', status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 720000.00,  requesterDepartment: 'Assessoria de Compras Governamentais', requesterId: 'usr-gestor' },
-  { id: 'prc-c21', processNumber: '202300055000052', subject: 'Logística internacional e despacho aduaneiro',                  status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 450000.00,  requesterDepartment: 'Assessoria Especial da Presidência', requesterId: 'usr-gestor' },
-  { id: 'prc-c22', processNumber: '202200055000192', subject: 'Sistema de notificações e comunicação digital',                 status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 283200.00,  requesterDepartment: 'Gerência Jurídica',                  requesterId: 'usr-gestor' },
-  { id: 'prc-c23', processNumber: '202400055000064', subject: 'Serviços de engenharia civil e obras na planta industrial',     status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 1176000.00, requesterDepartment: 'Gerência de Engenharia',             requesterId: 'usr-gestor' },
-  { id: 'prc-c24', processNumber: '202400055000330', subject: 'Segurança da informação e consultoria em LGPD',                 status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 156000.00,  requesterDepartment: 'Assessoria Especial da Presidência', requesterId: 'usr-gestor' },
-  { id: 'prc-c25', processNumber: '202500055000275', subject: 'Informação e consultoria em licitações e contratos',            status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 138600.00,  requesterDepartment: 'Assessoria de Compras Governamentais', requesterId: 'usr-gestor' },
-  { id: 'prc-c26', processNumber: '202400055000827', subject: 'Agenciamento de viagens corporativas',                          status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 684000.00,  requesterDepartment: 'Diretoria Comercial',                requesterId: 'usr-gestor' },
-  { id: 'prc-c27', processNumber: '202500055000308', subject: 'Fornecimento de gás liquefeito de petróleo (GLP) a granel',    status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 94560.00,   requesterDepartment: 'Coordenação Administrativa',         requesterId: 'usr-gestor' },
-  { id: 'prc-c28', processNumber: '202400055000709', subject: 'Seguro de vida em grupo para servidores',                       status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 42000.00,   requesterDepartment: 'Gerência de Recursos Humanos',       requesterId: 'usr-gestor' },
-  { id: 'prc-c29', processNumber: '202500055000329', subject: 'Locação de veículos com motorista para uso institucional',      status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 386400.00,  requesterDepartment: 'Gerência de Logística',              requesterId: 'usr-gestor' },
-  { id: 'prc-c30', processNumber: '202500055000026', subject: 'Dedetização, desratização e controle de pragas',                status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 71400.00,   requesterDepartment: 'Gestão de Contratos',                requesterId: 'usr-gestor' },
-  { id: 'prc-c31', processNumber: '202300055000041', subject: 'Gestão e proteção de dados empresariais',                       status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 516000.00,  requesterDepartment: 'Assessoria de Compras Governamentais', requesterId: 'usr-gestor' },
-  { id: 'prc-c32', processNumber: '202500055000519', subject: 'Calibração e inspeção de equipamentos de medição',              status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 38400.00,   requesterDepartment: 'Gerência de Controle da Qualidade', requesterId: 'usr-gestor' },
-  { id: 'prc-c33', processNumber: '202500055000168', subject: 'Auditoria independente das demonstrações contábeis',            status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 204000.00,  requesterDepartment: 'Gerência de Contabilidade',          requesterId: 'usr-gestor' },
-  { id: 'prc-c34', processNumber: '202500055000383', subject: 'Auditoria, assessoria e consultoria em gestão pública',         status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 185400.00,  requesterDepartment: 'Gerência de Contabilidade',          requesterId: 'usr-gestor' },
-  { id: 'prc-c35', processNumber: '202500055000779', subject: 'Capacitação, treinamento e desenvolvimento organizacional',     status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 336000.00,  requesterDepartment: 'Gerência de Contabilidade',          requesterId: 'usr-gestor' },
-  { id: 'prc-c36', processNumber: '202600055000186', subject: 'Serviços laboratoriais de análises clínicas e microbiológicas', status: 'CONCLUDED', modality: 'LICITACAO_13303',   estimatedValue: 124800.00,  requesterDepartment: 'Gerência de Contabilidade',          requesterId: 'usr-gestor' },
-];
-
 const SEED_CONTRACTS: Contract[] = [
   { id: 'cnt-c01', contractNumber: '032/2023', processId: 'prc-c01', contractorId: 'ctr-c01', objectDescription: 'Realização de exames de saúde ocupacional e medicina do trabalho',                              initialValue: 387450.00,  currentValue: 387450.00,  signingDate: '2024-01-02', startDate: '2024-01-02', endDate: '2026-12-31', status: 'ACTIVE', managerId: 'usr-gestor', department: 'Segurança do Trabalho' },
   { id: 'cnt-c02', contractNumber: '021/2024', processId: 'prc-c02', contractorId: 'ctr-c02', objectDescription: 'Prestação de serviços em saúde e segurança do trabalho, incluindo laudos e PPP',               initialValue: 298320.00,  currentValue: 347160.00,  signingDate: '2025-06-16', startDate: '2025-06-16', endDate: '2027-06-15', status: 'ACTIVE', managerId: 'usr-gestor', department: 'Segurança do Trabalho' },
@@ -391,78 +305,14 @@ const SEED_ASSIGNMENTS: FiscalAssignment[] = [
   { id: 'asg-c36', contractId: 'cnt-c36', fiscalId: 'usr-f02', role: 'TITULAR', designationAct: 'Portaria nº 054/2026-DG', designationDate: '2026-05-01', startDate: '2026-05-01', isActive: true },
 ];
 
-const SEED_OCCURRENCES: Occurrence[] = [
-  { id: 'occ-1', contractId: 'cnt-c01', fiscalId: 'usr-f01', title: 'Atraso na entrega do Lote 02 de exames', description: 'O prestador não enviou os laudos do lote 02 dentro do prazo contratual de 5 dias úteis.', severity: 'MEDIUM', status: 'RESOLVED', resolutionDescription: 'A empresa justificou sobrecarga operacional e entregou os laudos com 3 dias de atraso. Aceito.', resolvedById: 'usr-gestor', resolvedAt: '2026-03-15T14:30:00Z', createdAt: '2026-03-10T09:00:00Z' },
-  { id: 'occ-2', contractId: 'cnt-c01', fiscalId: 'usr-f01', title: 'Inconformidade nos exames audiométricos', description: 'Os exames audiométricos de março não foram realizados por profissional habilitado conforme exige a NR-7.', severity: 'HIGH', status: 'OPEN', createdAt: '2026-05-28T10:15:00Z' },
-];
-
-const SEED_MEASUREMENTS: InspectionMeasurement[] = [
-  { id: 'msr-1',  contractId: 'cnt-c01', fiscalId: 'usr-f01', periodStart: '2026-01-02', periodEnd: '2026-02-28', measurementValue: 64575.00,  reportDescription: 'Realização de exames periódicos — 1º bimestre 2026. Todos os laudos recebidos e conferidos.', status: 'APPROVED', approvedById: 'usr-gestor', approvalDate: '2026-03-10T16:00:00Z', createdAt: '2026-03-05T11:00:00Z' },
-  { id: 'msr-2',  contractId: 'cnt-c01', fiscalId: 'usr-f01', periodStart: '2026-03-01', periodEnd: '2026-04-30', measurementValue: 64575.00,  reportDescription: 'Realização de exames periódicos — 2º bimestre 2026. Pendente análise das inconformidades.', status: 'PENDING_GESTOR', createdAt: '2026-05-20T17:30:00Z' },
-  { id: 'msr-3',  contractId: 'cnt-c04', fiscalId: 'usr-f04', periodStart: '2025-12-01', periodEnd: '2026-01-31', measurementValue: 123750.00, reportDescription: 'Fornecimento de benefícios — Jan/2026. Créditos carregados nos cartões conforme relação nominal.', status: 'APPROVED', approvedById: 'usr-gestor', approvalDate: '2026-02-08T10:00:00Z', createdAt: '2026-02-05T09:00:00Z' },
-  { id: 'msr-4',  contractId: 'cnt-c14', fiscalId: 'usr-f14', periodStart: '2026-02-01', periodEnd: '2026-03-31', measurementValue: 80000.00,  reportDescription: 'Serviços de telecomunicações — 1º bimestre 2026. Notas fiscais conferidas e serviços prestados regularmente.', status: 'APPROVED', approvedById: 'usr-gestor', approvalDate: '2026-04-12T14:00:00Z', createdAt: '2026-04-08T11:00:00Z' },
-  { id: 'msr-5',  contractId: 'cnt-c06', fiscalId: 'usr-f05', periodStart: '2026-03-01', periodEnd: '2026-04-30', measurementValue: 51000.00,  reportDescription: 'Serviços de portaria e vigilância — bimestre Mar-Abr/2026. Frequência e relatórios de ronda conferidos.', status: 'APPROVED', approvedById: 'usr-gestor', approvalDate: '2026-05-15T16:00:00Z', createdAt: '2026-05-10T13:00:00Z' },
-  { id: 'msr-6',  contractId: 'cnt-c17', fiscalId: 'usr-f17', periodStart: '2026-04-01', periodEnd: '2026-05-31', measurementValue: 44114.73, reportDescription: 'Fornecimento de energia elétrica — bimestre Abr-Mai/2026. Faturas conferidas e consumo dentro da variação contratual.', status: 'APPROVED', approvedById: 'usr-gestor', approvalDate: '2026-06-10T09:00:00Z', createdAt: '2026-06-05T10:00:00Z' },
-  { id: 'msr-7',  contractId: 'cnt-c03', fiscalId: 'usr-f03', periodStart: '2026-05-01', periodEnd: '2026-06-30', measurementValue: 86400.00,  reportDescription: 'Serviços de remoção hospitalar — bimestre Mai-Jun/2026. Registro de atendimentos conferido com boletins de ocorrência.', status: 'APPROVED', approvedById: 'usr-gestor', approvalDate: '2026-07-08T11:00:00Z', createdAt: '2026-07-03T10:00:00Z' },
-  { id: 'msr-8',  contractId: 'cnt-c09', fiscalId: 'usr-f09', periodStart: '2026-01-01', periodEnd: '2026-01-31', measurementValue: 77000.00,  reportDescription: 'Serviços logísticos de transporte — Jan/2026. Manifesto de cargas e comprovantes de entrega conferidos.', status: 'APPROVED', approvedById: 'usr-gestor', approvalDate: '2026-02-18T15:00:00Z', createdAt: '2026-02-14T10:00:00Z' },
-  { id: 'msr-9',  contractId: 'cnt-c11', fiscalId: 'usr-f11', periodStart: '2026-03-01', periodEnd: '2026-03-31', measurementValue: 40500.00,  reportDescription: 'Licença de uso do sistema ERP — Mar/2026. Disponibilidade do sistema verificada: 99,2%.', status: 'APPROVED', approvedById: 'usr-gestor', approvalDate: '2026-04-20T11:00:00Z', createdAt: '2026-04-16T09:00:00Z' },
-  { id: 'msr-10', contractId: 'cnt-c05', fiscalId: 'usr-f05', periodStart: '2026-04-01', periodEnd: '2026-04-30', measurementValue: 66542.00,  reportDescription: 'Fornecimento de benefícios alimentação — Abr/2026. Créditos efetuados em D+1 conforme contrato.', status: 'APPROVED', approvedById: 'usr-gestor', approvalDate: '2026-05-22T14:00:00Z', createdAt: '2026-05-18T10:00:00Z' },
-  { id: 'msr-11', contractId: 'cnt-c14', fiscalId: 'usr-f14', periodStart: '2026-04-01', periodEnd: '2026-05-31', measurementValue: 80000.00,  reportDescription: 'Serviços de telecomunicações — 2º bimestre 2026. SLA de disponibilidade: 99,7%. Conferido.', status: 'APPROVED', approvedById: 'usr-gestor', approvalDate: '2026-06-18T10:00:00Z', createdAt: '2026-06-14T09:00:00Z' },
-  { id: 'msr-12', contractId: 'cnt-c06', fiscalId: 'usr-f05', periodStart: '2026-05-01', periodEnd: '2026-06-30', measurementValue: 51000.00,  reportDescription: 'Serviços de portaria e limpeza — Mai-Jun/2026. Escala de plantão e relatório de supervisão conferidos.', status: 'PENDING_GESTOR', createdAt: '2026-07-10T10:00:00Z' },
-];
-
-const SEED_ALTERATIONS: ContractAlteration[] = [
-  { id: 'alt-1', contractId: 'cnt-c04', type: 'ADDENDUM_VALUE_INCREASE', alterationNumber: '1º Termo Aditivo', valueChange: 135000.00, justification: 'Acréscimo de beneficiários por incorporação de novos servidores e dependentes no exercício 2025.', status: 'APPROVED', requestedById: 'usr-f04', reviewedById: 'usr-gestor', reviewDate: '2025-06-10T10:00:00Z', reviewNotes: 'Aprovado conforme Parecer Jurídico nº 22/2025.', createdAt: '2025-06-01T14:00:00Z' },
-];
-
-const SEED_ALERTS: SystemAlert[] = [
-  { id: 'al-1', contractId: 'cnt-c01', type: 'OCCURRENCE_CRITICAL', message: 'Ocorrência de alta gravidade: Inconformidade em exames audiométricos no Contrato 032/2023 (SESI).', targetRole: 'GESTOR', isRead: false, createdAt: '2026-05-28T10:15:00Z' },
-  { id: 'al-2', contractId: 'cnt-c01', type: 'MEASUREMENT_PENDING', message: 'Medição pendente de homologação no valor de R$ 64.575,00 para o Contrato 032/2023 (SESI).', targetRole: 'GESTOR', isRead: false, createdAt: '2026-05-20T17:30:00Z' },
-];
-
-const SEED_PROCESS_PHASES: ProcessPhase[] = [
-  // prc-c01 (CONCLUDED) — todas as fases concluídas
-  ...[1,2,3,4,5,6,7,8,9].map((n): ProcessPhase => ({
-    id: `phase-c01-${n}`, processId: 'prc-c01', phaseNumber: n, name: PHASE_NAMES[n-1], status: 'COMPLETED',
-    plannedStart: `2023-0${Math.min(9,5+Math.floor((n-1)/2))}-01`, plannedEnd: `2023-0${Math.min(9,5+Math.floor((n-1)/2))}-28`,
-    actualStart: `2023-0${Math.min(9,5+Math.floor((n-1)/2))}-01`, actualEnd: `2023-0${Math.min(9,5+Math.floor((n-1)/2))}-25`,
-    responsibleId: 'usr-f01', isActive: true, createdAt: '2023-06-01T00:00:00Z', updatedAt: '2023-12-01T00:00:00Z',
-  })),
-  // prc-c13 (nova contratação em andamento) — fase 1 concluída, fase 2 em andamento
-  { id: 'phase-c13-1', processId: 'prc-c13', phaseNumber: 1, name: PHASE_NAMES[0], status: 'COMPLETED', plannedStart: '2026-04-01', plannedEnd: '2026-04-30', actualStart: '2026-04-01', actualEnd: '2026-04-28', responsibleId: 'usr-f11', isActive: true, createdAt: '2026-04-01T00:00:00Z', updatedAt: '2026-04-28T00:00:00Z' },
-  { id: 'phase-c13-2', processId: 'prc-c13', phaseNumber: 2, name: PHASE_NAMES[1], status: 'IN_PROGRESS', plannedStart: '2026-05-01', plannedEnd: '2026-06-15', actualStart: '2026-05-05', responsibleId: 'usr-f11', observations: 'ETP em elaboração. Aguardando cotações de mercado.', isActive: true, createdAt: '2026-04-01T00:00:00Z', updatedAt: '2026-05-05T00:00:00Z' },
-  ...[3,4,5,6,7,8,9].map((n): ProcessPhase => ({
-    id: `phase-c13-${n}`, processId: 'prc-c13', phaseNumber: n, name: PHASE_NAMES[n-1], status: 'PENDING',
-    responsibleId: 'usr-f11', isActive: true, createdAt: '2026-04-01T00:00:00Z', updatedAt: '2026-04-01T00:00:00Z',
-  })),
-];
-
-const SEED_COMMUNICATIONS: Communication[] = [
-  { id: 'comm-1', contractId: 'cnt-c01', senderId: 'usr-gestor', recipientId: 'usr-f01', subject: 'Início da fiscalização — Contrato 032/2023 SESI', message: 'Prezado(a) Rogério B. da Silva, favor iniciar os registros mensais de fiscalização e atentar-se ao cumprimento dos prazos de entrega dos laudos.', isMandatory: false, readBy: ['usr-gestor', 'usr-f01'], createdAt: '2024-01-03T09:00:00Z' },
-  { id: 'comm-2', contractId: 'cnt-c01', senderId: 'usr-gestor', subject: 'URGENTE — Relatório de Fiscalização Semestral 2026', message: 'Todos os fiscais devem submeter o relatório de fiscalização semestral até o dia 30/06/2026. O não cumprimento será registrado no processo administrativo.', isMandatory: true, readBy: ['usr-gestor'], createdAt: '2026-06-01T08:00:00Z' },
-];
-
-// Formato antigo, local-only, usado apenas pelo simulador de fallback abaixo
-// (handleLocalFallback / logAudit) para entidades cujos endpoints já são reais
-// (Contract, Process, Measurement, Occurrence, Alteration, Communication —
-// todos em REAL_CRUD_PREFIXES). Como request() nunca cai no fallback para esses
-// prefixos, todo este bloco é código morto mantido apenas para não quebrar o
-// arquivo; não tem relação com a trilha de auditoria real (AuditLog acima, que
-// é quem alimenta a tela de Auditoria) e não deve ser usado para exibir nada.
-interface LegacyLocalAuditEntry {
-  id: string; userId: string; userName: string; userRole: string;
-  action: string; entity: string; entityId: string; entityLabel: string;
-  createdAt: string; changes?: Record<string, { from: any; to: any }>;
-}
-
-const SEED_AUDIT_LOGS: LegacyLocalAuditEntry[] = [
-  { id: 'aud-1', userId: 'usr-gestor', userName: 'Jairo', userRole: 'GESTOR', action: 'CREATE', entity: 'Contract', entityId: 'cnt-c01', entityLabel: 'Contrato 032/2023 — SESI', createdAt: '2024-01-02T10:00:00Z' },
-  { id: 'aud-2', userId: 'usr-f01',    userName: 'Rogério B. da Silva', userRole: 'FISCAL', action: 'CREATE', entity: 'Occurrence', entityId: 'occ-2', entityLabel: 'Inconformidade em exames audiométricos', createdAt: '2026-05-28T10:15:00Z' },
-  { id: 'aud-3', userId: 'usr-gestor', userName: 'Jairo', userRole: 'GESTOR', action: 'APPROVE', entity: 'Measurement', entityId: 'msr-1', entityLabel: 'Medição Jan-Fev/2026 — R$ 64.575', createdAt: '2026-03-10T16:00:00Z', changes: { status: { from: 'PENDING_GESTOR', to: 'APPROVED' } } },
-  { id: 'aud-4', userId: 'usr-gestor', userName: 'Jairo', userRole: 'GESTOR', action: 'APPROVE', entity: 'Alteration', entityId: 'alt-1', entityLabel: '1º Termo Aditivo — R$ 135.000 (PLUXEE)', createdAt: '2025-06-10T10:00:00Z', changes: { status: { from: 'PENDING_APPROVAL', to: 'APPROVED' } } },
-  { id: 'aud-5', userId: 'usr-f01',    userName: 'Rogério B. da Silva', userRole: 'FISCAL', action: 'CREATE', entity: 'Measurement', entityId: 'msr-2', entityLabel: 'Medição Mar-Abr/2026 — R$ 64.575', createdAt: '2026-05-20T17:30:00Z' },
-  { id: 'aud-6', userId: 'usr-admin',  userName: 'Ricardo Augusto', userRole: 'ADMIN', action: 'LOGIN', entity: 'Session', entityId: 'sess-1', entityLabel: 'Login realizado', createdAt: '2026-06-10T08:00:00Z' },
-];
+// SEED_OCCURRENCES/SEED_MEASUREMENTS/SEED_ALTERATIONS/SEED_PROCESS_PHASES/
+// SEED_COMMUNICATIONS foram removidos: essas entidades são 100% atendidas
+// pelo backend real (REAL_CRUD_PREFIXES) e, no LocalDB abaixo, só existiam
+// para preencher o objeto "em branco" usado em dois cenários — SSR e uma
+// falha total do fetchLiveDB(). Nenhum bloco vivo do fallback os lê mais
+// diretamente, então o objeto em branco agora usa listas vazias em vez de
+// dados fictícios (evita "inventar" contratações/medições/etc. mesmo nesse
+// cenário raro de indisponibilidade total do backend).
 
 const SEED_AI_INSIGHTS: AIInsight[] = [
   { id: 'ai-1', type: 'RISK', severity: 'WARNING', title: 'Contrato próximo do vencimento', description: 'O contrato IQUEGO-CTR-2025/00052 vence em aproximadamente 150 dias. Recomenda-se iniciar processo de prorrogação ou nova contratação.', contractId: 'cnt-52', confidence: 0.94, suggestedAction: 'Abrir processo de renovação com 180 dias de antecedência.', createdAt: '2026-06-10T06:00:00Z' },
@@ -473,26 +323,19 @@ const SEED_AI_INSIGHTS: AIInsight[] = [
 
 // ── LocalDB ────────────────────────────────────────────────────────────────────
 
-const SEED_DOCUMENTS: DocumentFile[] = [
-  { id: 'doc-c01-1', contractId: 'ctr-c01', title: 'Contrato Assinado.pdf',      category: 'CONTRACT_SIGNED', fileSize: 3415020, mimeType: 'application/pdf', uploadedById: 'usr-gestor', createdAt: '2023-03-01T00:00:00Z' },
-  { id: 'doc-c02-1', contractId: 'ctr-c02', title: 'Contrato Assinado.pdf',      category: 'CONTRACT_SIGNED', fileSize: 2980000, mimeType: 'application/pdf', uploadedById: 'usr-gestor', createdAt: '2023-03-01T00:00:00Z' },
-  { id: 'doc-c03-1', contractId: 'ctr-c03', title: 'Contrato Assinado.pdf',      category: 'CONTRACT_SIGNED', fileSize: 1540000, mimeType: 'application/pdf', uploadedById: 'usr-gestor', createdAt: '2022-01-12T00:00:00Z' },
-];
-
 interface LocalDB {
   users: User[]; contractors: Contractor[]; processes: ProcurementProcess[];
   contracts: Contract[]; assignments: FiscalAssignment[]; occurrences: Occurrence[];
   measurements: InspectionMeasurement[]; alterations: ContractAlteration[];
-  alerts: SystemAlert[]; contractAlerts: ContractAlert[];
+  contractAlerts: ContractAlert[];
   processPhases: ProcessPhase[]; communications: Communication[];
-  auditLogs: LegacyLocalAuditEntry[]; aiInsights: AIInsight[];
-  documents: DocumentFile[];
+  aiInsights: AIInsight[];
 }
 
 const DB_VERSION = '3.4';
 
 function getLocalDB(): LocalDB {
-  const blank: LocalDB = { users: SEED_USERS, contractors: SEED_CONTRACTORS, processes: SEED_PROCESSES, contracts: SEED_CONTRACTS, assignments: SEED_ASSIGNMENTS, occurrences: SEED_OCCURRENCES, measurements: SEED_MEASUREMENTS, alterations: SEED_ALTERATIONS, alerts: SEED_ALERTS, contractAlerts: [], processPhases: SEED_PROCESS_PHASES, communications: SEED_COMMUNICATIONS, auditLogs: SEED_AUDIT_LOGS, aiInsights: SEED_AI_INSIGHTS, documents: SEED_DOCUMENTS };
+  const blank: LocalDB = { users: SEED_USERS, contractors: [], processes: [], contracts: SEED_CONTRACTS, assignments: SEED_ASSIGNMENTS, occurrences: [], measurements: [], alterations: [], contractAlerts: [], processPhases: [], communications: [], aiInsights: SEED_AI_INSIGHTS };
   if (typeof window === 'undefined') return blank;
   // Reset localStorage when seed data changes (version bump)
   if (localStorage.getItem('sigecontratos_db_version') !== DB_VERSION) {
@@ -504,9 +347,8 @@ function getLocalDB(): LocalDB {
   if (!raw) { localStorage.setItem('sigecontratos_db', JSON.stringify(blank)); return blank; }
   const db = JSON.parse(raw) as LocalDB;
   if (!db.contractAlerts) db.contractAlerts = [];
-  if (!db.processPhases) db.processPhases = [...SEED_PROCESS_PHASES];
-  if (!db.communications) db.communications = [...SEED_COMMUNICATIONS];
-  if (!db.auditLogs) db.auditLogs = [...SEED_AUDIT_LOGS];
+  if (!db.processPhases) db.processPhases = [];
+  if (!db.communications) db.communications = [];
   if (!db.aiInsights) db.aiInsights = [...SEED_AI_INSIGHTS];
   return db;
 }
@@ -529,26 +371,6 @@ function fmtCur(v: number) { return new Intl.NumberFormat('pt-BR', { style: 'cur
 
 function createDefaultPhases(processId: string): ProcessPhase[] {
   return PHASE_NAMES.map((name, i) => ({ id: `ph-${processId}-${i+1}`, processId, phaseNumber: i+1, name, status: 'PENDING' as PhaseStatus, isActive: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }));
-}
-
-function logAudit(db: any, user: User, action: string, entity: string, entityId: string, entityLabel: string, now: string, changes?: Record<string, { from: any; to: any }>) {
-  if (!db.auditLogs) db.auditLogs = [];
-  db.auditLogs.push({
-    id: `audit-${Date.now()}`, userId: user.id, userName: user.name, userRole: user.role,
-    action, entity, entityId, entityLabel, changes: changes || {}, createdAt: now,
-  });
-}
-
-/**
- * @deprecated A trilha de auditoria institucional agora é gravada
- * automaticamente pelo backend (backend/src/audit — AuditInterceptor +
- * chamadas diretas em serviços sensíveis), de forma real e persistida no
- * banco, independente do navegador. Esta função não escreve mais em
- * localStorage e é mantida apenas como no-op para não quebrar chamadas
- * existentes no restante do frontend enquanto elas são removidas aos poucos.
- */
-export function writeAuditLog(_user: User, _action: string, _entity: string, _entityId: string, _entityLabel: string, _changes?: Record<string, { from: any; to: any }>) {
-  // Intencionalmente vazio — ver comentário acima.
 }
 
 function notifyActiveFiscais(db: LocalDB, contractId: string, title: string, message: string) {
@@ -838,8 +660,7 @@ async function fetchLiveDB(): Promise<LocalDB> {
           processPhases,
           contractAlerts: local.contractAlerts || [],
           communications: normContracts.flatMap((c: any) => c.communications || []),
-          auditLogs: local.auditLogs || [], aiInsights: local.aiInsights || [],
-          alerts: local.alerts || [], documents: local.documents || [],
+          aiInsights: local.aiInsights || [],
         };
       } else {
         result = local;
@@ -860,34 +681,9 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
   const user = getStoredUser();
   const method = options.method || 'GET';
 
-  // Login
-  if (endpoint === '/auth/login' && method === 'POST') {
-    const body = JSON.parse(options.body as string);
-    const found = db.users.find(u => u.email === body.email);
-    if (!found) throw new Error('E-mail ou senha incorretos');
-    const pass = body.password ?? body.passwordHash ?? '';
-    const ok = pass === '123' || ((found as any)._passwordOverride && pass === (found as any)._passwordOverride) || (found.role === 'ADMIN' && pass === 'admin123') || (found.role === 'GESTOR' && pass === 'gestor123') || (found.role === 'FISCAL' && pass === 'fiscal123') || (found.role === 'ALTA_GESTAO' && pass === 'alta123');
-    if (!ok) throw new Error('E-mail ou senha incorretos');
-    return { access_token: 'local-jwt-simulated', user: found };
-  }
-
+  // Login já vai sempre ao backend real ('/auth/' está em REAL_CRUD_PREFIXES);
+  // este fallback só trata os endpoints computados listados abaixo.
   if (!user) throw new Error('Não autorizado');
-
-  const storedToken = getStoredToken();
-  const isRealBackendToken = storedToken && storedToken !== 'local-jwt-simulated';
-
-  if (!isRealBackendToken) {
-    // Modo offline: valida sessão contra seed local
-    const dbUser = db.users.find(u => u.id === user.id);
-    if (!dbUser || dbUser.role !== user.role) {
-      setStoredToken(null); setStoredUser(null);
-      throw new Error('Sessão inválida. Faça login novamente.');
-    }
-    if (dbUser.status !== 'ACTIVE') {
-      setStoredToken(null); setStoredUser(null);
-      throw new Error('Usuário inativo. Contate o administrador.');
-    }
-  }
 
   // ── Alertas ──────────────────────────────────────────────────────────────────
 
@@ -981,394 +777,10 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
     return newAlert;
   }
 
-  // ── Stats ─────────────────────────────────────────────────────────────────────
-
-  if (endpoint === '/contracts/stats' && method === 'GET') {
-    let contracts = db.contracts;
-    if (user.role === 'FISCAL') {
-      const ids = db.assignments.filter(a => a.fiscalId === user.id && a.isActive).map(a => a.contractId);
-      contracts = contracts.filter(c => ids.includes(c.id));
-    }
-    let totalValue = 0, totalMeasured = 0, openOccurrences = 0;
-    contracts.forEach(c => {
-      totalValue += Number(c.currentValue);
-      db.measurements.filter(m => m.contractId === c.id && m.status === 'APPROVED').forEach(m => totalMeasured += Number(m.measurementValue));
-      openOccurrences += db.occurrences.filter(o => o.contractId === c.id && o.status === 'OPEN').length;
-    });
-    const alerts = db.alerts.filter(a => a.targetRole === user.role && !a.isRead).slice(0, 5);
-    const pendingAlerts = (db.contractAlerts || []).filter(a => a.targetUserId === user.id && a.status === 'PENDING').length;
-    return { totalContracts: contracts.length, activeContracts: contracts.filter(c => c.status === 'ACTIVE').length, totalValue, totalMeasured, openOccurrences, alerts, pendingAlerts };
-  }
-
-  // ── Contratos ─────────────────────────────────────────────────────────────────
-
-  // ── Relatório completo (GESTOR/ADMIN) ────────────────────────────────────────
-  if (endpoint === '/contracts/report' && method === 'GET') {
-    if (user.role !== 'GESTOR' && user.role !== 'ADMIN' && user.role !== 'ALTA_GESTAO') throw new Error('Acesso negado');
-    return db.contracts
-      .filter(c => c.status !== 'DRAFT')
-      .sort((a, b) => a.contractNumber.localeCompare(b.contractNumber))
-      .map(c => {
-        const totalMeasured = db.measurements
-          .filter(m => m.contractId === c.id && m.status === 'APPROVED')
-          .reduce((s, m) => s + Number(m.measurementValue), 0);
-        const approvedAlts = db.alterations.filter(a => a.contractId === c.id && a.status === 'APPROVED');
-        const titularAsg = db.assignments.find(a => a.contractId === c.id && a.isActive && a.role === 'TITULAR');
-        const substitutoAsg = db.assignments.find(a => a.contractId === c.id && a.isActive && a.role === 'SUBSTITUTO');
-        const titularUser = titularAsg ? db.users.find(u => u.id === titularAsg.fiscalId) : null;
-        const substitutoUser = substitutoAsg ? db.users.find(u => u.id === substitutoAsg.fiscalId) : null;
-        const process = db.processes.find(p => p.id === c.processId);
-        const contractor = db.contractors.find(ct => ct.id === c.contractorId);
-        const startDate = (c as any).startDate || c.signingDate;
-        const durationMs = startDate && c.endDate
-          ? new Date(c.endDate + 'T12:00:00Z').getTime() - new Date(startDate + 'T12:00:00Z').getTime()
-          : 365 * 86400000;
-        const durationMonths = Math.max(1, Math.round(durationMs / (30.44 * 86400000)));
-        return {
-          ...c,
-          contractor,
-          process,
-          titular: titularUser ? { ...titularUser, designationAct: titularAsg?.designationAct, designationDate: titularAsg?.designationDate } : null,
-          substituto: substitutoUser ? { ...substitutoUser, designationAct: substitutoAsg?.designationAct } : null,
-          totalMeasured,
-          balance: Math.max(0, Number(c.currentValue) - totalMeasured),
-          monthlyValue: Number(c.currentValue) / durationMonths,
-          aditivoCount: approvedAlts.length,
-          lastAditivo: approvedAlts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0] || null,
-          durationMonths,
-        };
-      });
-  }
-
-  if (endpoint === '/contracts' && method === 'GET') {
-    let contracts = db.contracts;
-    if (user.role === 'FISCAL') {
-      const ids = db.assignments.filter(a => a.fiscalId === user.id && a.isActive).map(a => a.contractId);
-      contracts = contracts.filter(c => ids.includes(c.id));
-    }
-    const now = new Date();
-    const overdueProcessIds = new Set((db.processPhases || []).filter(ph => ph.status !== 'COMPLETED' && ph.plannedEnd && new Date(ph.plannedEnd) < now).map(ph => ph.processId));
-    return contracts.map(c => ({ ...c, contractor: db.contractors.find(ct => ct.id === c.contractorId), fiscalAssignments: db.assignments.filter(a => a.contractId === c.id && a.isActive).map(a => ({ ...a, fiscal: db.users.find(u => u.id === a.fiscalId) })), hasPendingMeasurements: db.measurements.some(m => m.contractId === c.id && m.status === 'PENDING_GESTOR'), hasDelayedProcesses: c.processId ? overdueProcessIds.has(c.processId) : false, hasOpenOccurrences: (db.occurrences || []).some((o: any) => o.contractId === c.id && o.status === 'OPEN') }));
-  }
-
-  if (endpoint.match(/^\/contracts\/[^/]+$/) && method === 'GET') {
-    const id = endpoint.split('/')[2];
-    const c = db.contracts.find(c => c.id === id);
-    if (!c) throw new Error('Contrato não encontrado');
-    if (user.role === 'FISCAL' && !db.assignments.some(a => a.contractId === id && a.fiscalId === user.id && a.isActive)) throw new Error('Acesso negado');
-    return {
-      ...c,
-      contractor: db.contractors.find(ct => ct.id === c.contractorId),
-      process: db.processes.find(p => p.id === c.processId),
-      fiscalAssignments: db.assignments.filter(a => a.contractId === id).map(a => ({ ...a, fiscal: db.users.find(u => u.id === a.fiscalId) })),
-      occurrences: db.occurrences.filter(o => o.contractId === id).map(o => ({ ...o, fiscal: db.users.find(u => u.id === o.fiscalId), resolver: o.resolvedById ? db.users.find(u => u.id === o.resolvedById) : null })),
-      measurements: db.measurements.filter(m => m.contractId === id).map(m => ({ ...m, fiscal: db.users.find(u => u.id === m.fiscalId), approver: m.approvedById ? db.users.find(u => u.id === m.approvedById) : null })),
-      alterations: db.alterations.filter(alt => alt.contractId === id).map(alt => ({ ...alt, requester: db.users.find(u => u.id === alt.requestedById), reviewer: alt.reviewedById ? db.users.find(u => u.id === alt.reviewedById) : null })),
-      documents: (db.documents || []).filter(d => d.contractId === id),
-      communications: db.communications.filter(cm => cm.contractId === id).map(cm => ({ ...cm, sender: db.users.find(u => u.id === cm.senderId), recipient: cm.recipientId ? db.users.find(u => u.id === cm.recipientId) : null })),
-    };
-  }
-
-  if (endpoint === '/contracts' && method === 'POST') {
-    if (user.role !== 'GESTOR') throw new Error('Acesso negado');
-    const body = JSON.parse(options.body as string);
-    const nc: Contract = { id: `cnt-${Date.now()}`, contractNumber: body.contractNumber, processId: body.processId || undefined, contractorId: body.contractorId, objectDescription: body.objectDescription, initialValue: Number(body.initialValue), currentValue: Number(body.initialValue), signingDate: body.signingDate, startDate: body.startDate, endDate: body.endDate, status: 'ACTIVE', managerId: user.id };
-    db.contracts.push(nc);
-    const contractor = db.contractors.find(ct => ct.id === body.contractorId);
-    logAudit(db, user, 'CREATE', 'Contract', nc.id, `Contrato ${nc.contractNumber} cadastrado — ${contractor?.corporateName || ''}`, new Date().toISOString());
-    saveLocalDB(db); return nc;
-  }
-
-  if (endpoint.endsWith('/assign-fiscal') && method === 'POST') {
-    if (user.role !== 'GESTOR' && user.role !== 'ADMIN') throw new Error('Acesso negado');
-    const contractId = endpoint.split('/')[2];
-    const body = JSON.parse(options.body as string);
-    const targetFiscal = db.users.find(u => u.id === body.fiscalId);
-    if (!targetFiscal || targetFiscal.role !== 'FISCAL') throw new Error('O usuário informado não é um fiscal válido');
-    db.assignments.forEach(a => { if (a.contractId === contractId && a.role === body.role) a.isActive = false; });
-    const na: FiscalAssignment = { id: `asg-${Date.now()}-${Math.random().toString(36).slice(2)}`, contractId, fiscalId: body.fiscalId, role: body.role, designationAct: body.designationAct, designationDate: body.designationDate, startDate: body.startDate, endDate: body.endDate || undefined, isActive: true };
-    db.assignments.push(na);
-    const ctr = db.contracts.find(c => c.id === contractId);
-    const roleLabel: Record<string, string> = { TITULAR: 'Titular', SUBSTITUTO: 'Substituto', SUPLENTE: 'Suplente' };
-    logAudit(db, user, 'UPDATE', 'Contract', contractId, `Fiscal designado: ${targetFiscal.name} (${roleLabel[body.role] || body.role}) — ${ctr?.contractNumber || ''}`, new Date().toISOString());
-    saveLocalDB(db); return na;
-  }
-
-  // ── Medições ──────────────────────────────────────────────────────────────────
-
-  if (endpoint === '/measurements' && method === 'POST') {
-    if (user.role !== 'FISCAL') throw new Error('Apenas fiscais podem registrar medições');
-    const body = JSON.parse(options.body as string);
-    const hasAssignment = db.assignments.some(a => a.contractId === body.contractId && a.fiscalId === user.id && a.isActive);
-    if (!hasAssignment) throw new Error('Você não possui atribuição ativa neste contrato');
-    const nm: InspectionMeasurement = { id: `msr-${Date.now()}-${Math.random().toString(36).slice(2)}`, contractId: body.contractId, fiscalId: user.id, periodStart: body.periodStart, periodEnd: body.periodEnd, measurementValue: Number(body.measurementValue), reportDescription: body.reportDescription, status: 'PENDING_GESTOR', createdAt: new Date().toISOString() };
-    db.measurements.push(nm);
-    const c = db.contracts.find(c => c.id === body.contractId);
-    db.alerts.push({ id: `al-${Date.now()}`, contractId: body.contractId, type: 'MEASUREMENT_PENDING', message: `Medição pendente de ${fmtCur(Number(body.measurementValue))} para o contrato ${c?.contractNumber}.`, targetRole: 'GESTOR', isRead: false, createdAt: new Date().toISOString() });
-    logAudit(db, user, 'CREATE', 'Contract', body.contractId, `Medição registrada: ${fmtDate(body.periodStart)}–${fmtDate(body.periodEnd)} | ${fmtCur(Number(body.measurementValue))} — ${c?.contractNumber || ''}`, new Date().toISOString());
-    saveLocalDB(db); return nm;
-  }
-
-  if (endpoint.endsWith('/approve') && endpoint.includes('/measurements/') && method === 'POST') {
-    if (user.role !== 'GESTOR') throw new Error('Acesso negado');
-    const id = endpoint.split('/')[2];
-    const m = db.measurements.find(m => m.id === id);
-    if (!m) throw new Error('Medição não encontrada');
-    const cMeas = db.contracts.find(c => c.id === m.contractId);
-    m.status = 'APPROVED'; m.approvedById = user.id; m.approvalDate = new Date().toISOString();
-    db.contractAlerts.filter(a => a.type === 'MEASUREMENT_OVERDUE' && a.metadata?.measurementId === id).forEach(a => { a.status = 'DISMISSED'; a.updatedAt = new Date().toISOString(); });
-    logAudit(db, user, 'APPROVE', 'Contract', m.contractId, `Medição aprovada: ${fmtCur(m.measurementValue)} — ${cMeas?.contractNumber || ''}`, new Date().toISOString(), { status: { from: 'PENDING_GESTOR', to: 'APPROVED' } });
-    saveLocalDB(db); return m;
-  }
-
-  if (endpoint.endsWith('/reject') && endpoint.includes('/measurements/') && method === 'POST') {
-    if (user.role !== 'GESTOR') throw new Error('Acesso negado');
-    const id = endpoint.split('/')[2];
-    const body = JSON.parse(options.body as string);
-    const m = db.measurements.find(m => m.id === id);
-    if (!m) throw new Error('Medição não encontrada');
-    const cMeasR = db.contracts.find(c => c.id === m.contractId);
-    m.status = 'REJECTED'; m.rejectionReason = body.reason;
-    logAudit(db, user, 'REJECT', 'Contract', m.contractId, `Medição reprovada: ${fmtCur(m.measurementValue)} — ${cMeasR?.contractNumber || ''}`, new Date().toISOString(), { status: { from: 'PENDING_GESTOR', to: 'REJECTED' } });
-    saveLocalDB(db); return m;
-  }
-
-  // ── Ocorrências ───────────────────────────────────────────────────────────────
-
-  if (endpoint === '/occurrences' && method === 'POST') {
-    if (user.role !== 'FISCAL') throw new Error('Apenas fiscais podem registrar ocorrências');
-    const body = JSON.parse(options.body as string);
-    const hasAssignment = db.assignments.some(a => a.contractId === body.contractId && a.fiscalId === user.id && a.isActive);
-    if (!hasAssignment) throw new Error('Você não possui atribuição ativa neste contrato');
-    const no: Occurrence = { id: `occ-${Date.now()}-${Math.random().toString(36).slice(2)}`, contractId: body.contractId, fiscalId: user.id, title: body.title, description: body.description, severity: body.severity || 'MEDIUM', status: 'OPEN', createdAt: new Date().toISOString() };
-    db.occurrences.push(no);
-    const cOcc = db.contracts.find(c => c.id === body.contractId);
-    if (body.severity === 'HIGH' || body.severity === 'CRITICAL') {
-      db.alerts.push({ id: `al-${Date.now()}`, contractId: body.contractId, type: 'OCCURRENCE_CRITICAL', message: `Ocorrência ${body.severity} registrada: "${body.title}" — ${cOcc?.contractNumber}.`, targetRole: 'GESTOR', isRead: false, createdAt: new Date().toISOString() });
-    }
-    logAudit(db, user, 'CREATE', 'Contract', body.contractId, `Ocorrência registrada: "${body.title}" (${body.severity || 'MEDIUM'}) — ${cOcc?.contractNumber || ''}`, new Date().toISOString());
-    saveLocalDB(db); return no;
-  }
-
-  if (endpoint.endsWith('/resolve') && endpoint.includes('/occurrences/') && method === 'POST') {
-    if (user.role !== 'GESTOR' && user.role !== 'ADMIN') throw new Error('Apenas o gestor pode resolver ocorrências');
-    const id = endpoint.split('/')[2];
-    const body = JSON.parse(options.body as string);
-    const o = db.occurrences.find(o => o.id === id);
-    if (!o) throw new Error('Ocorrência não encontrada');
-    const cOccR = db.contracts.find(c => c.id === o.contractId);
-    o.status = 'RESOLVED'; o.resolutionDescription = body.resolutionDescription; o.resolvedById = user.id; o.resolvedAt = new Date().toISOString();
-    db.contractAlerts.filter(a => a.type === 'OCCURRENCE_CRITICAL_OPEN' && a.metadata?.occurrenceId === id).forEach(a => { a.status = 'DISMISSED'; a.updatedAt = new Date().toISOString(); });
-    logAudit(db, user, 'UPDATE', 'Contract', o.contractId, `Ocorrência resolvida: "${o.title}" — ${cOccR?.contractNumber || ''}`, new Date().toISOString(), { status: { from: 'OPEN', to: 'RESOLVED' } });
-    saveLocalDB(db); return o;
-  }
-
-  // ── Alterações ────────────────────────────────────────────────────────────────
-
-  if (endpoint === '/alterations' && method === 'POST') {
-    const body = JSON.parse(options.body as string);
-    const contract = db.contracts.find(c => c.id === body.contractId);
-    if (!contract) throw new Error('Contrato não encontrado');
-    const valueChange = Number(body.valueChange || 0);
-    if (body.type === 'ADDENDUM_VALUE_INCREASE') {
-      const isReform = contract.objectDescription.toLowerCase().includes('reforma');
-      const limit = contract.initialValue * (isReform ? 0.50 : 0.25);
-      const current = db.alterations.filter(a => a.contractId === contract.id && a.type === 'ADDENDUM_VALUE_INCREASE' && a.status === 'APPROVED').reduce((s, a) => s + a.valueChange, 0);
-      if (current + valueChange > limit) throw new Error(`Limite de aditivo excedido. Permitido: ${fmtCur(limit)} (${isReform ? '50%' : '25%'})`);
-    }
-    const na: ContractAlteration = { id: `alt-${Date.now()}`, contractId: body.contractId, type: body.type, alterationNumber: body.alterationNumber, valueChange, newEndDate: body.newEndDate, justification: body.justification, status: 'PENDING_APPROVAL', requestedById: user.id, createdAt: new Date().toISOString() };
-    db.alterations.push(na);
-    logAudit(db, user, 'CREATE', 'Contract', body.contractId, `Aditivo solicitado: ${body.alterationNumber || body.type} ${valueChange !== 0 ? '| ' + fmtCur(valueChange) : ''} — ${contract.contractNumber}`, new Date().toISOString());
-    saveLocalDB(db); return na;
-  }
-
-  if (endpoint.endsWith('/approve') && endpoint.includes('/alterations/') && method === 'POST') {
-    if (user.role !== 'GESTOR') throw new Error('Acesso negado');
-    const id = endpoint.split('/')[2];
-    const alt = db.alterations.find(a => a.id === id);
-    if (!alt) throw new Error('Alteração não encontrada');
-    const c = db.contracts.find(c => c.id === alt.contractId);
-    if (!c) throw new Error('Contrato não encontrado');
-    alt.status = 'APPROVED'; alt.reviewedById = user.id; alt.reviewDate = new Date().toISOString();
-    c.currentValue = Number(c.currentValue) + Number(alt.valueChange);
-    if (alt.newEndDate) { c.endDate = alt.newEndDate; db.contractAlerts.filter(a => a.contractId === c.id && (a.type === 'CONTRACT_EXPIRING_90' || a.type === 'CONTRACT_EXPIRING_180') && a.status === 'PENDING').forEach(a => { a.status = 'DISMISSED'; }); }
-    db.contractAlerts.filter(a => a.type === 'ALTERATION_OVERDUE' && a.metadata?.alterationId === id).forEach(a => { a.status = 'DISMISSED'; });
-    logAudit(db, user, 'APPROVE', 'Contract', alt.contractId, `Aditivo aprovado: ${alt.alterationNumber || alt.type} ${alt.valueChange !== 0 ? '| ' + fmtCur(alt.valueChange) : ''} — ${c.contractNumber}`, new Date().toISOString(), { status: { from: 'PENDING_APPROVAL', to: 'APPROVED' } });
-    saveLocalDB(db); return alt;
-  }
-
-  if (endpoint.endsWith('/reject') && endpoint.includes('/alterations/') && method === 'POST') {
-    if (user.role !== 'GESTOR') throw new Error('Acesso negado');
-    const id = endpoint.split('/')[2];
-    const body = JSON.parse(options.body as string);
-    const alt = db.alterations.find(a => a.id === id);
-    if (!alt) throw new Error('Alteração não encontrada');
-    const cAltR = db.contracts.find(c => c.id === alt.contractId);
-    alt.status = 'REJECTED'; alt.reviewedById = user.id; alt.reviewDate = new Date().toISOString(); alt.reviewNotes = body.reason;
-    logAudit(db, user, 'REJECT', 'Contract', alt.contractId, `Aditivo reprovado: ${alt.alterationNumber || alt.type} — ${cAltR?.contractNumber || ''}`, new Date().toISOString(), { status: { from: 'PENDING_APPROVAL', to: 'REJECTED' } });
-    saveLocalDB(db); return alt;
-  }
-
-  // ── Processos ─────────────────────────────────────────────────────────────────
-
-  if (endpoint === '/processes' && method === 'GET') {
-    let procs = db.processes;
-    if (user.role === 'FISCAL') procs = procs.filter(p => p.requesterId === user.id);
-    return procs.map(p => ({ ...p, requester: db.users.find(u => u.id === p.requesterId), contracts: db.contracts.filter(c => c.processId === p.id).map(c => ({ id: c.id, contractNumber: c.contractNumber, status: c.status })), phases: (db.processPhases || []).filter(ph => ph.processId === p.id) }));
-  }
-
-  if (endpoint.match(/^\/processes\/[^/]+$/) && method === 'GET') {
-    const id = endpoint.split('/')[2];
-    const p = db.processes.find(p => p.id === id);
-    if (!p) throw new Error('Processo não encontrado');
-    if (user.role === 'FISCAL' && p.requesterId !== user.id) throw new Error('Acesso negado');
-    return { ...p, requester: db.users.find(u => u.id === p.requesterId), contracts: db.contracts.filter(c => c.processId === id), phases: (db.processPhases || []).filter(ph => ph.processId === id).map(ph => ({ ...ph, responsible: ph.responsibleId ? db.users.find(u => u.id === ph.responsibleId) : null })) };
-  }
-
-  if (endpoint === '/processes' && method === 'POST') {
-    const body = JSON.parse(options.body as string);
-    const newProcId = `prc-${Date.now()}`;
-    const np: ProcurementProcess = { id: newProcId, processNumber: body.processNumber, subject: body.subject, description: body.description, status: 'PLANNING', modality: body.modality, estimatedValue: Number(body.estimatedValue), requesterDepartment: body.requesterDepartment, requesterId: user.id };
-    db.processes.push(np);
-    db.processPhases = [...(db.processPhases || []), ...createDefaultPhases(newProcId)];
-    saveLocalDB(db); return np;
-  }
-
-  if (endpoint.match(/^\/processes\/[^/]+\/status$/) && method === 'PATCH') {
-    const id = endpoint.split('/')[2];
-    const body = JSON.parse(options.body as string);
-    const p = db.processes.find(p => p.id === id);
-    if (!p) throw new Error('Processo não encontrado');
-    p.status = body.status; saveLocalDB(db); return p;
-  }
-
-  // ── Fases do Processo ─────────────────────────────────────────────────────────
-
-  if (endpoint.match(/^\/processes\/[^/]+\/phases$/) && method === 'GET') {
-    const id = endpoint.split('/')[2];
-    return (db.processPhases || []).filter(ph => ph.processId === id).map(ph => ({ ...ph, responsible: ph.responsibleId ? db.users.find(u => u.id === ph.responsibleId) : null }));
-  }
-
-  if (endpoint.match(/^\/processes\/[^/]+\/phases\/[^/]+$/) && method === 'PATCH') {
-    const parts = endpoint.split('/');
-    const phaseId = parts[4];
-    const body = JSON.parse(options.body as string);
-    const ph = (db.processPhases || []).find(p => p.id === phaseId);
-    if (!ph) throw new Error('Fase não encontrada');
-    const phaseAllowedFields = ['status', 'actualStart', 'actualEnd', 'plannedStart', 'plannedEnd', 'observations', 'responsibleId'];
-    const safeBody = Object.fromEntries(Object.entries(body).filter(([k]) => phaseAllowedFields.includes(k)));
-    Object.assign(ph, safeBody, { updatedAt: new Date().toISOString() });
-    // Auto-dismiss overdue alert if phase is marked completed
-    if (body.status === 'COMPLETED') {
-      db.contractAlerts.filter(a => a.type === 'PROCESS_PHASE_OVERDUE' && a.metadata?.phaseId === phaseId && a.status === 'PENDING').forEach(a => { a.status = 'DISMISSED'; });
-    }
-    saveLocalDB(db); return ph;
-  }
-
-  // ── Comunicados ───────────────────────────────────────────────────────────────
-
-  if (endpoint.match(/^\/contracts\/[^/]+\/communications$/) && method === 'GET') {
-    const contractId = endpoint.split('/')[2];
-    return db.communications.filter(c => c.contractId === contractId).map(c => ({ ...c, sender: db.users.find(u => u.id === c.senderId), recipient: c.recipientId ? db.users.find(u => u.id === c.recipientId) : null, replies: db.communications.filter(r => r.parentId === c.id).map(r => ({ ...r, sender: db.users.find(u => u.id === r.senderId) })) }));
-  }
-
-  if (endpoint === '/communications/all' && method === 'GET') {
-    let comms = db.communications;
-    if (user.role === 'FISCAL') {
-      const myContractIds = db.assignments.filter(a => a.fiscalId === user.id && a.isActive).map(a => a.contractId);
-      comms = comms.filter(c => myContractIds.includes(c.contractId) && (!c.parentId) && (!c.recipientId || c.recipientId === user.id || c.senderId === user.id));
-    } else if (user.role === 'GESTOR' || user.role === 'ALTA_GESTAO') {
-      comms = comms.filter(c => !c.parentId);
-    }
-    return comms.map(c => ({ ...c, sender: db.users.find(u => u.id === c.senderId), recipient: c.recipientId ? db.users.find(u => u.id === c.recipientId) : null, contract: db.contracts.find(ct => ct.id === c.contractId), replies: db.communications.filter(r => r.parentId === c.id).map(r => ({ ...r, sender: db.users.find(u => u.id === r.senderId) })) }));
-  }
-
-  if (endpoint === '/communications' && method === 'POST') {
-    if (user.role === 'ADMIN') throw new Error('Perfil administrativo não pode enviar comunicados');
-    const body = JSON.parse(options.body as string);
-    if (user.role === 'FISCAL') {
-      const hasAssignment = db.assignments.some(a => a.contractId === body.contractId && a.fiscalId === user.id && a.isActive);
-      if (!hasAssignment) throw new Error('Você não possui atribuição ativa neste contrato');
-    }
-    if (user.role === 'ALTA_GESTAO' && !body.parentId) {
-      if (!body.recipientId) throw new Error('Alta Gestão deve indicar um Gestor como destinatário');
-      const recipient = db.users.find(u => u.id === body.recipientId);
-      if (!recipient || recipient.role !== 'GESTOR') throw new Error('Alta Gestão só pode enviar comunicados para Gestores');
-    }
-    const now = new Date().toISOString();
-    const newComm: Communication = { id: `comm-${Date.now()}`, contractId: body.contractId, senderId: user.id, recipientId: body.recipientId || undefined, subject: body.subject, message: body.message, parentId: body.parentId || undefined, isMandatory: body.isMandatory || false, readBy: [user.id], createdAt: now };
-    db.communications.push(newComm);
-    // Se obrigatório, criar alertas para destinatários
-    if (body.isMandatory && !body.parentId) {
-      const asgmts = db.assignments.filter(a => a.contractId === body.contractId && a.isActive);
-      const targets = body.recipientId ? [body.recipientId] : asgmts.map(a => a.fiscalId);
-      for (const fiscalId of targets) {
-        db.contractAlerts.push({ id: `cal-comm-${newComm.id}-${fiscalId}`, contractId: body.contractId, targetUserId: fiscalId, type: 'COMMUNICATION_MANDATORY', status: 'PENDING', title: 'Comunicado Obrigatório — Leitura Pendente', message: body.subject, metadata: { communicationId: newComm.id, subject: body.subject, fullMessage: body.message, senderName: user.name }, createdAt: now, updatedAt: now });
-      }
-    }
-    saveLocalDB(db); return newComm;
-  }
-
-  // Concluir/arquivar comunicado
-  if (endpoint.match(/^\/communications\/[^/]+\/complete$/) && method === 'POST') {
-    if (user.role !== 'GESTOR') throw new Error('Apenas o gestor pode concluir comunicados');
-    const id = endpoint.split('/')[2];
-    const comm = db.communications.find(c => c.id === id);
-    if (!comm) throw new Error('Comunicado não encontrado');
-    (comm as any).completedAt = new Date().toISOString();
-    (comm as any).completedById = user.id;
-    (comm as any).isCompleted = true;
-    saveLocalDB(db);
-    const now = new Date().toISOString();
-    logAudit(db, user, 'UPDATE', 'Communication', id, `Comunicado concluído/arquivado: ${comm.subject}`, now);
-    return comm;
-  }
-
-  // Atualizar dados do contrato (fiscal pode editar com registro em auditoria)
-  if (endpoint.match(/^\/contracts\/[^/]+\/update-data$/) && method === 'PATCH') {
-    const contractId = endpoint.split('/')[2];
-    const body = JSON.parse(options.body as string);
-    const c = db.contracts.find(c => c.id === contractId);
-    if (!c) throw new Error('Contrato não encontrado');
-    if (user.role === 'FISCAL') {
-      const hasAccess = db.assignments.some(a => a.contractId === contractId && a.fiscalId === user.id && a.isActive);
-      if (!hasAccess) throw new Error('Acesso negado');
-    }
-    const now = new Date().toISOString();
-    const changes: Record<string, { from: any; to: any }> = {};
-    const allowedFields = ['objectDescription', 'department', 'observations', 'status', 'endDate', 'startDate', 'signingDate', 'initialValue', 'currentValue', 'successionInfo'];
-    for (const field of allowedFields) {
-      if (body[field] !== undefined && (c as any)[field] !== body[field]) {
-        changes[field] = { from: (c as any)[field], to: body[field] };
-        (c as any)[field] = body[field];
-      }
-    }
-    if (Object.keys(changes).length > 0) {
-      logAudit(db, user, 'UPDATE', 'Contract', contractId, `Dados do contrato atualizados: ${c.contractNumber}`, now, changes);
-      notifyActiveFiscais(db, contractId, 'Contrato atualizado pelo Gestor', `O gestor atualizou dados do contrato: ${Object.keys(changes).join(', ')}.`);
-    }
-    saveLocalDB(db);
-    return c;
-  }
-
-  // ── Contratada ───────────────────────────────────────────────────────────────
-
-  if (endpoint.match(/^\/contractors\/[^/]+$/) && method === 'PATCH') {
-    if (user.role !== 'GESTOR') throw new Error('Acesso negado');
-    const id = endpoint.split('/')[2];
-    const ct = db.contractors.find(c => c.id === id);
-    if (!ct) throw new Error('Contratada não encontrada');
-    const body = JSON.parse(options.body as string);
-    const allowedFields = ['corporateName', 'tradeName', 'cnpjCpf', 'email', 'phone', 'postalCode', 'addressStreet', 'addressNumber', 'addressNeighborhood', 'addressCity', 'addressState', 'stateInscription', 'municipalInscription'];
-    for (const field of allowedFields) {
-      if (body[field] !== undefined) (ct as any)[field] = body[field];
-    }
-    saveLocalDB(db);
-    const affectedContract = db.contracts.find(c => c.contractorId === id);
-    if (affectedContract) notifyActiveFiscais(db, affectedContract.id, 'Dados da empresa atualizados', `O gestor atualizou os dados cadastrais da contratada ${ct.corporateName}.`);
-    saveLocalDB(db);
-    return ct;
-  }
+  // Contratos, processos, medições, ocorrências, alterações, comunicados e
+  // contratadas são todos entidades reais (REAL_CRUD_PREFIXES) — o simulador
+  // local que existia aqui para elas foi removido; request() nunca cai neste
+  // fallback para esses endpoints.
 
   // ── Designações ──────────────────────────────────────────────────────────────
 
@@ -1386,177 +798,9 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
     return { ok: true };
   }
 
-  // ── Edição de Aditivo ────────────────────────────────────────────────────────
-
-  if (endpoint.match(/^\/alterations\/[^/]+$/) && method === 'PATCH') {
-    if (user.role !== 'GESTOR') throw new Error('Acesso negado');
-    const id = endpoint.split('/')[2];
-    const alt = db.alterations.find(a => a.id === id);
-    if (!alt) throw new Error('Aditivo não encontrado');
-    const body = JSON.parse(options.body as string);
-    const allowedFields = ['alterationNumber', 'type', 'justification', 'valueChange', 'newEndDate'];
-    for (const field of allowedFields) {
-      if (body[field] !== undefined) (alt as any)[field] = body[field];
-    }
-    notifyActiveFiscais(db, alt.contractId, 'Aditivo alterado pelo Gestor', `O gestor editou o aditivo ${alt.alterationNumber || alt.type}.`);
-    saveLocalDB(db);
-    return alt;
-  }
-
-  // ── Documentos ───────────────────────────────────────────────────────────────
-
-  if (endpoint.match(/^\/contracts\/[^/]+\/documents$/) && method === 'POST') {
-    if (user.role !== 'GESTOR') throw new Error('Acesso negado');
-    const contractId = endpoint.split('/')[2];
-    const body = JSON.parse(options.body as string);
-    const nd: DocumentFile = {
-      id: `doc-${Date.now()}`, contractId,
-      title: body.title || 'Documento', category: body.category || 'OTHER',
-      fileSize: body.fileSize || 0, mimeType: body.mimeType || 'application/pdf',
-      uploadedById: user.id, createdAt: new Date().toISOString(),
-    };
-    if (!db.documents) db.documents = [];
-    db.documents.push(nd);
-    notifyActiveFiscais(db, contractId, 'Documento anexado pelo Gestor', `O gestor anexou o documento "${nd.title}" ao contrato.`);
-    saveLocalDB(db);
-    return nd;
-  }
-
-  if (endpoint.match(/^\/documents\/[^/]+$/) && method === 'DELETE') {
-    if (user.role !== 'GESTOR') throw new Error('Acesso negado');
-    const id = endpoint.split('/')[2];
-    const doc = (db.documents || []).find(d => d.id === id);
-    if (doc?.contractId) notifyActiveFiscais(db, doc.contractId, 'Documento removido pelo Gestor', `O gestor removeu o documento "${doc.title}".`);
-    db.documents = (db.documents || []).filter(d => d.id !== id);
-    saveLocalDB(db);
-    return { ok: true };
-  }
-
-  // Concluir contrato (GESTOR)
-  if (endpoint.match(/^\/contracts\/[^/]+\/conclude$/) && method === 'PATCH') {
-    if (user.role !== 'GESTOR') throw new Error('Acesso negado');
-    const contractId = endpoint.split('/')[2];
-    const c = db.contracts.find(c => c.id === contractId);
-    if (!c) throw new Error('Contrato não encontrado');
-    const prevStatus = c.status;
-    c.status = 'CONCLUDED';
-    const now = new Date().toISOString();
-    logAudit(db, user, 'UPDATE', 'Contract', contractId, `Contrato ${c.contractNumber} concluído pelo gestor`, now, { status: { from: prevStatus, to: 'CONCLUDED' } });
-    notifyActiveFiscais(db, contractId, 'Contrato Concluído', `O gestor encerrou o contrato ${c.contractNumber}. Ele foi movido para contratos encerrados.`);
-    saveLocalDB(db);
-    return c;
-  }
-
-  // Excluir contrato (ADMIN)
-  if (endpoint.match(/^\/contracts\/[^/]+$/) && method === 'DELETE') {
-    if (user.role !== 'ADMIN') throw new Error('Acesso negado');
-    const contractId = endpoint.split('/')[2];
-    const c = db.contracts.find(c => c.id === contractId);
-    if (!c) throw new Error('Contrato não encontrado');
-    db.contracts = db.contracts.filter(ct => ct.id !== contractId);
-    db.assignments = db.assignments.filter(a => a.contractId !== contractId);
-    db.measurements = db.measurements.filter(m => m.contractId !== contractId);
-    db.occurrences = db.occurrences.filter(o => o.contractId !== contractId);
-    db.alterations = db.alterations.filter(a => a.contractId !== contractId);
-    db.documents = (db.documents || []).filter((d: any) => d.contractId !== contractId);
-    db.communications = db.communications.filter(cm => cm.contractId !== contractId);
-    db.contractAlerts = (db.contractAlerts || []).filter((a: any) => a.contractId !== contractId);
-    db.auditLogs = (db.auditLogs || []).filter((l: any) => l.entityId !== contractId);
-    logAudit(db, user, 'DELETE', 'Contract', contractId, `Contrato ${c.contractNumber} excluído pelo administrador`, new Date().toISOString(), {});
-    saveLocalDB(db);
-    return { ok: true };
-  }
-
-  // Excluir processo (ADMIN)
-  if (endpoint.match(/^\/processes\/[^/]+$/) && method === 'DELETE') {
-    if (user.role !== 'ADMIN') throw new Error('Acesso negado');
-    const processId = endpoint.split('/')[2];
-    const p = db.processes.find(p => p.id === processId);
-    if (!p) throw new Error('Processo não encontrado');
-    db.processes = db.processes.filter(pr => pr.id !== processId);
-    db.processPhases = (db.processPhases || []).filter((ph: any) => ph.processId !== processId);
-    logAudit(db, user, 'DELETE', 'Process', processId, `Processo ${p.processNumber} excluído pelo administrador`, new Date().toISOString(), {});
-    saveLocalDB(db);
-    return { ok: true };
-  }
-
-  // Atualizar dados do processo (fiscal pode editar com registro em auditoria)
-  if (endpoint.match(/^\/processes\/[^/]+\/update-data$/) && method === 'PATCH') {
-    const processId = endpoint.split('/')[2];
-    const body = JSON.parse(options.body as string);
-    const p = db.processes.find(p => p.id === processId);
-    if (!p) throw new Error('Processo não encontrado');
-    const now = new Date().toISOString();
-    const changes: Record<string, { from: any; to: any }> = {};
-    const allowedFields = ['processNumber', 'subject', 'description', 'status', 'modality', 'estimatedValue', 'requesterDepartment'];
-    for (const field of allowedFields) {
-      if (body[field] !== undefined && (p as any)[field] !== body[field]) {
-        changes[field] = { from: (p as any)[field], to: body[field] };
-        (p as any)[field] = body[field];
-      }
-    }
-    if (Object.keys(changes).length > 0) {
-      logAudit(db, user, 'UPDATE', 'Process', processId, `Dados do processo atualizados: ${p.processNumber}`, now, changes);
-    }
-    saveLocalDB(db);
-    return p;
-  }
-
-  // ── Usuários ──────────────────────────────────────────────────────────────────
-
-  if (endpoint === '/users/fiscais' && method === 'GET') return db.users.filter(u => u.role === 'FISCAL');
-  if (endpoint === '/users/gestores' && method === 'GET') return db.users.filter(u => u.role === 'GESTOR' && u.status === 'ACTIVE');
-  if (endpoint === '/users' && method === 'GET') return db.users;
-
-  if (endpoint === '/users' && method === 'POST') {
-    const body = JSON.parse(options.body as string);
-    if (user.role === 'ALTA_GESTAO') {
-      if (body.role !== 'GESTOR' && body.role !== 'FISCAL' && body.role !== 'ALTA_GESTAO') throw new Error('Alta Gestão pode cadastrar apenas Gestores, Fiscais e usuários de Alta Gestão');
-    }
-    const nu: User = { id: `usr-${Date.now()}`, name: body.name, email: body.email, role: body.role, status: 'ACTIVE', registrationNumber: body.registrationNumber };
-    db.users.push(nu); saveLocalDB(db); return nu;
-  }
-
-  if (endpoint.match(/^\/users\/[^/]+$/) && method === 'PATCH') {
-    const id = endpoint.split('/')[2];
-    if (user.role !== 'ADMIN' && user.id !== id) throw new Error('Acesso negado');
-    const body = JSON.parse(options.body as string);
-    const u = db.users.find(u => u.id === id);
-    if (!u) throw new Error('Usuário não encontrado');
-    if (body.name) u.name = body.name;
-    if (body.email) u.email = body.email;
-    if (body.registrationNumber !== undefined) u.registrationNumber = body.registrationNumber;
-    if (body.phone !== undefined) (u as any).phone = body.phone;
-    if (body.password) (u as any)._passwordOverride = body.password;
-    saveLocalDB(db);
-    const stored = getStoredUser();
-    if (stored && stored.id === id) { Object.assign(stored, { name: u.name, email: u.email, registrationNumber: u.registrationNumber }); setStoredUser(stored); }
-    return u;
-  }
-
-  if (endpoint.match(/^\/users\/[^/]+\/status$/) && method === 'PATCH') {
-    if (user.role !== 'ADMIN' && user.role !== 'GESTOR') throw new Error('Acesso negado');
-    const id = endpoint.split('/')[2];
-    const target = db.users.find(u => u.id === id);
-    if (!target) throw new Error('Usuário não encontrado');
-    if (target.role === 'ADMIN' && user.role !== 'ADMIN') throw new Error('Apenas o ADMIN pode alterar o status de outro ADMIN');
-    const body = JSON.parse(options.body as string);
-    target.status = body.status; saveLocalDB(db);
-    return target;
-  }
-
-  if (endpoint.match(/^\/users\/[^/]+$/) && method === 'DELETE') {
-    if (user.role !== 'ADMIN' && user.role !== 'ALTA_GESTAO') throw new Error('Acesso negado');
-    const id = endpoint.split('/')[2];
-    const target = db.users.find(u => u.id === id);
-    if (!target) throw new Error('Usuário não encontrado');
-    if (target.role === 'ADMIN' && user.role !== 'ADMIN') throw new Error('Apenas o ADMIN pode excluir outro ADMIN');
-    db.users = db.users.filter(u => u.id !== id);
-    saveLocalDB(db);
-    return { ok: true };
-  }
-
-  if (endpoint === '/contractors' && method === 'GET') return db.contractors;
+  // Edição de aditivo, documentos, conclusão/exclusão de contrato, exclusão de
+  // processo e todo o módulo de Usuários também são reais (REAL_CRUD_PREFIXES)
+  // — o simulador local correspondente foi removido daqui pelo mesmo motivo.
 
   // ── Central de Pendências ─────────────────────────────────────────────────────
 
@@ -1770,34 +1014,8 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
     return { items, summary: { red: items.filter(i => i.riskLevel === 'RED').length, yellow: items.filter(i => i.riskLevel === 'YELLOW').length, green: items.filter(i => i.riskLevel === 'GREEN').length } };
   }
 
-  if (endpoint.match(/^\/measurements\/[^/]+$/) && method === 'DELETE') {
-    if (user.role !== 'GESTOR') throw new Error('Acesso negado');
-    const id = endpoint.split('/')[2];
-    db.measurements = (db.measurements || []).filter(m => m.id !== id);
-    saveLocalDB(db);
-    return { ok: true };
-  }
-
-  if (endpoint.match(/^\/occurrences\/[^/]+$/) && method === 'DELETE') {
-    if (user.role !== 'GESTOR') throw new Error('Acesso negado');
-    const id = endpoint.split('/')[2];
-    db.occurrences = (db.occurrences || []).filter(o => o.id !== id);
-    saveLocalDB(db);
-    return { ok: true };
-  }
-
-  if (endpoint.match(/^\/alterations\/[^/]+$/) && method === 'DELETE') {
-    if (user.role !== 'GESTOR') throw new Error('Acesso negado');
-    const id = endpoint.split('/')[2];
-    db.alterations = (db.alterations || []).filter(a => a.id !== id);
-    saveLocalDB(db);
-    return { ok: true };
-  }
-
-  // ── Auditoria ────────────────────────────────────────────────────────────────
-  // Removido: '/audit-logs' agora está em REAL_CRUD_PREFIXES e vai direto ao
-  // backend (backend/src/audit), que é a única fonte real e persistida da
-  // trilha de auditoria. Este fallback local nunca é mais alcançado.
+  // Exclusão de medições/ocorrências/aditivos e a trilha de auditoria
+  // ('/audit-logs') também são reais — o simulador local foi removido.
 
   if (endpoint.match(/^\/alerts\/[^/]+$/) && method === 'DELETE') {
     if (user.role !== 'ADMIN') throw new Error('Acesso negado');
@@ -1878,10 +1096,6 @@ export const api = {
   },
   assignments: {
     remove: (id: string) => request(`/assignments/${id}`, { method: 'DELETE' }),
-  },
-  documents: {
-    attach: (contractId: string, data: any) => request(`/contracts/${contractId}/documents`, { method: 'POST', body: JSON.stringify(data) }),
-    delete: (id: string) => request(`/documents/${id}`, { method: 'DELETE' }),
   },
   payments: {
     create: (data: any) => request('/payments', { method: 'POST', body: JSON.stringify(data) }),
