@@ -89,12 +89,12 @@ export function Sidebar({ user, activeView, onNavigate, onLogout, onEditProfile,
             const button = (
               <button
                 onClick={() => onNavigate(view)}
-                className={`relative flex w-full cursor-pointer items-center gap-3 rounded-xl border text-[13.5px] font-medium transition-all duration-150 ${
+                className={`relative flex w-full cursor-pointer items-center gap-3 rounded-xl border text-[13.5px] font-medium transition-colors duration-150 ${
                   collapsedNow ? 'justify-center px-0 py-2.5' : 'px-3.5 py-2.5 text-left'
                 } ${
                   active
-                      ? 'border-[#2563eb]/70 border-b-2 border-brand-blue bg-[#e0f7ff] text-black font-semibold shadow-inner'
-                      : 'border-transparent text-slate-300 hover:bg-[#e0f7ff] hover:text-black hover:scale-105 transition-all duration-200'
+                    ? 'border-white/10 bg-white/[0.06] text-white font-semibold shadow-inner'
+                    : 'border-transparent text-slate-300 hover:bg-white/8 hover:text-white'
                 }`}
               >
                 <Icon className={`h-[19px] w-[19px] shrink-0 ${active ? 'text-[#38bdf8]' : 'text-slate-400'}`} />
