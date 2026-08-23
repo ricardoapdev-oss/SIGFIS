@@ -214,10 +214,10 @@ export function AuditView({ user }: Props) {
 
       {/* Indicadores */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard icon={CalendarRange} label="Eventos hoje" value={summary?.eventsToday ?? '—'} tone="blue" />
-        <StatCard icon={Activity} label="Últimos 7 dias" value={summary?.eventsLast7Days ?? '—'} tone="cyan" />
-        <StatCard icon={UsersIcon} label="Usuários ativos" value={summary?.activeUsers ?? '—'} tone="green" />
-        <StatCard icon={AlertOctagon} label="Ações críticas" value={summary?.criticalActions ?? '—'} tone="red" />
+        <StatCard icon={CalendarRange} label="Eventos hoje" value={summary?.eventsToday ?? '—'} tone="blue" align="center" />
+        <StatCard icon={Activity} label="Últimos 7 dias" value={summary?.eventsLast7Days ?? '—'} tone="cyan" align="center" />
+        <StatCard icon={UsersIcon} label="Usuários ativos" value={summary?.activeUsers ?? '—'} tone="green" align="center" />
+        <StatCard icon={AlertOctagon} label="Ações críticas" value={summary?.criticalActions ?? '—'} tone="red" align="center" />
       </div>
 
       {/* Filtros */}

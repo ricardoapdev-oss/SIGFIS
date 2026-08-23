@@ -28,7 +28,7 @@ function StatCard({
   tone?: keyof typeof toneStyles
   onClick?: () => void
   className?: string
-  /** "center" põe o ícone ao lado do título (como no Painel Geral) e centraliza o valor. Padrão "left" preserva o layout original. */
+  /** "center" põe ícone + título lado a lado à esquerda (como no Painel Geral) e centraliza só o valor. Padrão "left" preserva o layout original (ícone sozinho em cima). */
   align?: "left" | "center"
 }) {
   const Comp = onClick ? "button" : "div"
@@ -37,21 +37,20 @@ function StatCard({
     <Comp
       onClick={onClick}
       className={cn(
-        "flex flex-col rounded-2xl border border-border bg-surface p-5 shadow-card transition-all",
-        centered ? "text-center" : "text-left",
+        "flex flex-col rounded-2xl border border-border bg-surface p-5 shadow-card transition-all text-left",
         onClick && "cursor-pointer hover:shadow-card-hover hover:-translate-y-0.5",
         className
       )}
     >
       {centered ? (
         <>
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
             <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-lg", toneStyles[tone])}>
               <Icon className="size-4" />
             </span>
-            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+            <p className="truncate text-[11px] font-medium uppercase tracking-wide text-muted-foreground" title={label}>{label}</p>
           </div>
-          <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>
+          <p className="mt-2.5 text-center text-2xl font-bold text-foreground">{value}</p>
         </>
       ) : (
         <>

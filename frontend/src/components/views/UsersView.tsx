@@ -123,10 +123,10 @@ export function UsersView({ user }: UsersViewProps) {
 
       {/* Indicadores */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard icon={UsersIcon} label="Total de usuários" value={kpi.total} tone="blue" />
-        <StatCard icon={ShieldCheck} label="Ativos" value={kpi.active} tone="green" />
-        <StatCard icon={ShieldOff} label="Inativos" value={kpi.inactive} tone="red" />
-        <StatCard icon={UsersIcon} label="Admin / Alta Gestão" value={kpi.admins} tone="purple" />
+        <StatCard icon={UsersIcon} label="Total de usuários" value={kpi.total} tone="blue" align="center" />
+        <StatCard icon={ShieldCheck} label="Ativos" value={kpi.active} tone="green" align="center" />
+        <StatCard icon={ShieldOff} label="Inativos" value={kpi.inactive} tone="red" align="center" />
+        <StatCard icon={UsersIcon} label="Admin / Alta Gestão" value={kpi.admins} tone="purple" align="center" />
       </div>
 
       {/* Filtros */}
