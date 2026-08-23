@@ -373,25 +373,6 @@ function createDefaultPhases(processId: string): ProcessPhase[] {
   return PHASE_NAMES.map((name, i) => ({ id: `ph-${processId}-${i+1}`, processId, phaseNumber: i+1, name, status: 'PENDING' as PhaseStatus, isActive: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }));
 }
 
-function notifyActiveFiscais(db: LocalDB, contractId: string, title: string, message: string) {
-  if (!db.contractAlerts) db.contractAlerts = [];
-  const now = new Date().toISOString();
-  const activeFiscais = (db.assignments || []).filter((a: any) => a.contractId === contractId && a.isActive);
-  for (const asg of activeFiscais) {
-    db.contractAlerts.push({
-      id: `notif-${Date.now()}-${asg.fiscalId}-${Math.random().toString(36).slice(2)}`,
-      contractId,
-      targetUserId: asg.fiscalId,
-      type: 'GESTOR_CONTRACT_UPDATE' as any,
-      status: 'PENDING',
-      title,
-      message,
-      createdAt: now,
-      updatedAt: now,
-    });
-  }
-}
-
 // ── Motor de Alertas ───────────────────────────────────────────────────────────
 
 function runAlertEngine(db: LocalDB): ContractAlert[] {
@@ -782,25 +763,11 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
   // local que existia aqui para elas foi removido; request() nunca cai neste
   // fallback para esses endpoints.
 
-  // ── Designações ──────────────────────────────────────────────────────────────
-
-  if (endpoint.match(/^\/assignments\/[^/]+$/) && method === 'DELETE') {
-    if (user.role !== 'GESTOR') throw new Error('Acesso negado');
-    const id = endpoint.split('/')[2];
-    const asg = db.assignments.find(a => a.id === id);
-    if (!asg) throw new Error('Designação não encontrada');
-    const activeCount = db.assignments.filter(a => a.contractId === asg.contractId && a.isActive).length;
-    if (activeCount <= 1) throw new Error('Não é possível remover o último fiscal ativo do contrato.');
-    db.assignments = db.assignments.filter(a => a.id !== id);
-    const fiscal = db.users.find(u => u.id === asg.fiscalId);
-    notifyActiveFiscais(db, asg.contractId, 'Fiscal removido pelo Gestor', `O fiscal ${fiscal?.name || asg.fiscalId} foi removido da comissão de fiscalização.`);
-    saveLocalDB(db);
-    return { ok: true };
-  }
-
-  // Edição de aditivo, documentos, conclusão/exclusão de contrato, exclusão de
-  // processo e todo o módulo de Usuários também são reais (REAL_CRUD_PREFIXES)
-  // — o simulador local correspondente foi removido daqui pelo mesmo motivo.
+  // Designações de fiscal (criação, desativação e agora também a exclusão
+  // definitiva) — assim como edição de aditivo, documentos, conclusão/
+  // exclusão de contrato, exclusão de processo e todo o módulo de Usuários —
+  // são todas reais (REAL_CRUD_PREFIXES); o simulador local que existia aqui
+  // foi removido.
 
   // ── Central de Pendências ─────────────────────────────────────────────────────
 
@@ -1094,9 +1061,6 @@ export const api = {
     create: (data: any) => request('/contractors', { method: 'POST', body: JSON.stringify(data) }),
     update: (id: string, data: any) => request(`/contractors/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   },
-  assignments: {
-    remove: (id: string) => request(`/assignments/${id}`, { method: 'DELETE' }),
-  },
   payments: {
     create: (data: any) => request('/payments', { method: 'POST', body: JSON.stringify(data) }),
     listByContract: (contractId: string) => request(`/payments/contract/${contractId}`),
@@ -1114,6 +1078,10 @@ export const api = {
     delete: (id: string) => request(`/contracts/${id}`, { method: 'DELETE' }),
     deactivateAssignment: (contractId: string, assignmentId: string) =>
       request(`/contracts/${contractId}/assignments/${assignmentId}/deactivate`, { method: 'PATCH' }),
+    // Exclusão real (não soft-delete) de uma designação da comissão de
+    // fiscalização — diferente de deactivateAssignment.
+    removeAssignment: (contractId: string, assignmentId: string) =>
+      request(`/contracts/${contractId}/assignments/${assignmentId}`, { method: 'DELETE' }),
   },
   processes: {
     list: () => request('/processes'),

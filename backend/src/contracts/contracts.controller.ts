@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { ContractsService } from './contracts.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -56,5 +56,12 @@ export class ContractsController {
   @Audit({ module: 'Fiscalização', action: 'UPDATE', entity: 'FiscalAssignment' })
   deactivateAssignment(@Param('id') id: string, @Param('assignmentId') assignmentId: string) {
     return this.contractsService.deactivateAssignment(id, assignmentId);
+  }
+
+  @Delete(':id/assignments/:assignmentId')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  @Audit({ module: 'Fiscalização', action: 'DELETE', entity: 'FiscalAssignment' })
+  removeAssignment(@Param('id') id: string, @Param('assignmentId') assignmentId: string) {
+    return this.contractsService.removeAssignment(id, assignmentId);
   }
 }

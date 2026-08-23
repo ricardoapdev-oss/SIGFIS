@@ -453,7 +453,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
   });
 
   const removeAssignmentMutation = useMutation({
-    mutationFn: (id: string) => api.assignments.remove(id),
+    mutationFn: (id: string) => api.contracts.removeAssignment(contractId, id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contract', contractId] }),
     onError: (e: any) => alert(`Erro: ${e.message}`),
   });
@@ -959,15 +959,22 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
         )}
 
         {/* ── FISCAL ── */}
-        {activeTab === 'fiscal' && (
+        {activeTab === 'fiscal' && (() => {
+          // Só designações ativas aparecem na comissão — designações removidas
+          // pelo gestor são excluídas definitivamente (ver removeAssignmentMutation)
+          // e as substituídas automaticamente ao designar um novo fiscal para o
+          // mesmo papel (isActive: false, preservado só como histórico no banco)
+          // não são exibidas nesta tela.
+          const activeAssignments = (c.fiscalAssignments || []).filter((a: any) => a.isActive);
+          return (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-xs font-semibold text-gray-700">Comissão de Fiscalização</h4>
               <div className="flex items-center gap-2">
-                {isGestor && (c.fiscalAssignments || []).length > 0 && (
+                {isGestor && activeAssignments.length > 0 && (
                   <button
                     onClick={() => {
-                      const asg = (c.fiscalAssignments || []).find((a: any) => a.isActive);
+                      const asg = activeAssignments[0];
                       if (asg?.fiscal) setGestorAlertFiscal({ id: asg.fiscal.id, name: asg.fiscal.name });
                     }}
                     className="flex items-center gap-1.5 text-[11px] bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 px-3 py-1.5 rounded-lg text-blue-400 transition-colors cursor-pointer">
@@ -982,9 +989,9 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                 )}
               </div>
             </div>
-            {(c.fiscalAssignments || []).length > 0 ? (
+            {activeAssignments.length > 0 ? (
               <div className="space-y-3">
-                {(c.fiscalAssignments || []).map((asg: any) => (
+                {activeAssignments.map((asg: any) => (
                   <div key={asg.id} className="bg-blue-50/60 border border-gray-200 p-4 rounded-xl">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-3">
@@ -997,7 +1004,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        {isGestor && asg.isActive && asg.fiscal && (
+                        {isGestor && asg.fiscal && (
                           <button
                             onClick={() => setGestorAlertFiscal({ id: asg.fiscal.id, name: asg.fiscal.name })}
                             title="Enviar alerta a este fiscal"
@@ -1005,15 +1012,14 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                             <Send className="h-3.5 w-3.5" />
                           </button>
                         )}
-                        {isGestor && asg.isActive && (
+                        {isGestor && (
                           <button
                             onClick={() => {
-                              const activeCount = (c.fiscalAssignments || []).filter((a: any) => a.isActive).length;
-                              if (activeCount <= 1) { alert('Não é possível remover o último fiscal ativo do contrato.'); return; }
-                              if (confirm(`Remover ${asg.fiscal?.name} da comissão de fiscalização?`)) removeAssignmentMutation.mutate(asg.id);
+                              if (activeAssignments.length <= 1) { alert('Não é possível remover o último fiscal ativo do contrato.'); return; }
+                              if (confirm(`Remover ${asg.fiscal?.name} definitivamente da comissão de fiscalização?`)) removeAssignmentMutation.mutate(asg.id);
                             }}
                             disabled={removeAssignmentMutation.isPending}
-                            title="Remover fiscal"
+                            title="Remover fiscal definitivamente"
                             className="p-1.5 text-red-500/50 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer disabled:opacity-40">
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
@@ -1021,9 +1027,6 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                         <div className="text-right text-[10px] text-gray-500">
                           <p>Portaria: <strong className="text-gray-500">{asg.designationAct}</strong></p>
                           <p>Desde {formatDate(asg.startDate)}</p>
-                          <span className={`mt-1 inline-block px-2 py-0.5 rounded border font-semibold text-[9px] ${asg.isActive ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-gray-100 border-gray-300 text-gray-500'}`}>
-                            {asg.isActive ? 'Ativo' : 'Inativo'}
-                          </span>
                         </div>
                       </div>
                     </div>
@@ -1032,7 +1035,8 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
               </div>
             ) : <p className="text-xs text-gray-500">Nenhum fiscal designado.</p>}
           </div>
-        )}
+          );
+        })()}
 
         {/* ── GESTOR ── */}
         {activeTab === 'gestor' && (

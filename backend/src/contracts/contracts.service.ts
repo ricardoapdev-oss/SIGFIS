@@ -191,6 +191,30 @@ export class ContractsService {
     });
   }
 
+  /**
+   * Remove definitivamente uma designação da comissão de fiscalização
+   * (exclusão real, não soft-delete). Usado pela tela de Contratos quando o
+   * gestor remove um fiscal — diferente de deactivateAssignment (que apenas
+   * marca isActive: false e é usado internamente quando um novo fiscal
+   * substitui outro no mesmo papel, preservando o histórico).
+   */
+  async removeAssignment(contractId: string, assignmentId: string) {
+    const assignment = await this.prisma.fiscalAssignment.findUnique({ where: { id: assignmentId } });
+    if (!assignment || assignment.contractId !== contractId) {
+      throw new NotFoundException('Designação não encontrada neste contrato.');
+    }
+    if (assignment.isActive) {
+      const activeCount = await this.prisma.fiscalAssignment.count({
+        where: { contractId, isActive: true },
+      });
+      if (activeCount <= 1) {
+        throw new BadRequestException('Não é possível remover o último fiscal ativo do contrato.');
+      }
+    }
+    await this.prisma.fiscalAssignment.delete({ where: { id: assignmentId } });
+    return { ok: true };
+  }
+
   async assignFiscal(contractId: string, data: any) {
     // Verificar se contrato existe
     const contract = await this.prisma.contract.findUnique({ where: { id: contractId } });
