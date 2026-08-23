@@ -911,7 +911,11 @@ export function AIInsightsPanel({ user, onNavigate }: Props) {
           const Icon = s.icon;
           return (
             <button key={s.id} onClick={() => setActiveSection(s.id)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors cursor-pointer flex-1 justify-center whitespace-nowrap ${activeSection === s.id ? 'bg-gray-100 text-white' : 'text-gray-500 hover:text-gray-700'}`}>
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-widest transition-all duration-200 cursor-pointer flex-1 justify-center whitespace-nowrap ${
+                activeSection === s.id
+                  ? 'bg-white text-gray-900 border-gray-200 shadow-[inset_0_1px_4px_rgba(0,0,0,0.10)]'
+                  : 'border-transparent text-gray-500 hover:bg-white/70 hover:text-gray-800 hover:shadow-[0_1px_3px_rgba(0,0,0,0.08)]'
+              }`}>
               <Icon className="h-3 w-3 shrink-0" />
               <span className="hidden lg:inline">{s.label}</span>
             </button>

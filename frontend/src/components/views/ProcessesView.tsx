@@ -194,10 +194,10 @@ export function ProcessesView({ user, initialFilter }: ProcessesViewProps) {
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard icon={FolderOpen} label="Ativos" value={kpi.active} tone="blue" />
-        <StatCard icon={AlertTriangle} label="Atrasados" value={kpi.delayed} tone="red" />
-        <StatCard icon={Clock} label="Pendentes" value={kpi.pending} tone="amber" />
-        <StatCard icon={CheckCircle2} label="Concluídos" value={kpi.concluded} tone="green" />
+        <StatCard icon={FolderOpen} label="Ativos" value={kpi.active} tone="blue" align="center" />
+        <StatCard icon={AlertTriangle} label="Atrasados" value={kpi.delayed} tone="red" align="center" />
+        <StatCard icon={Clock} label="Pendentes" value={kpi.pending} tone="amber" align="center" />
+        <StatCard icon={CheckCircle2} label="Concluídos" value={kpi.concluded} tone="green" align="center" />
       </div>
 
       {initialFilter && initialFilter !== 'ALL' && (

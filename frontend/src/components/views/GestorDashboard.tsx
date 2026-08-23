@@ -67,7 +67,7 @@ function ExecutiveKpiCard({
             {title}
           </p>
         </div>
-        <div className="mt-2.5 flex items-baseline overflow-hidden">
+        <div className="mt-2.5 flex items-baseline justify-center overflow-hidden">
           <p className={`font-bold leading-none text-foreground whitespace-nowrap tracking-tight ${
             isLong
               ? 'text-[13px] sm:text-[14px] xl:text-[15.5px] 2xl:text-[17px]'
@@ -79,7 +79,7 @@ function ExecutiveKpiCard({
           </p>
         </div>
       </div>
-      {description && <p className="mt-2 text-[10px] text-muted-foreground whitespace-nowrap">{description}</p>}
+      {description && <p className="mt-2 text-center text-[10px] text-muted-foreground whitespace-nowrap">{description}</p>}
     </Comp>
   );
 }
@@ -453,10 +453,12 @@ export function GestorDashboard({ user, onNavigate }: Props) {
             { label: 'Comun. s/ Resposta', value: k?.communicationsPendingReply, nav: () => onNavigate('communications') },
             { label: 'Fiscais c/ Contratos', value: fw.length, nav: undefined },
           ].map(({ label, value, nav }) => (
-            <button key={label} onClick={nav} disabled={!nav} className={`rounded-xl border border-border p-3 text-left transition-colors ${nav ? 'cursor-pointer hover:bg-muted' : ''}`}>
+            <button key={label} onClick={nav} disabled={!nav} className={`rounded-xl border border-border p-3 text-center transition-colors ${nav ? 'cursor-pointer hover:bg-muted' : ''}`}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
               <p className="mt-1 text-xl font-bold text-foreground">{value ?? '—'}</p>
-              {nav && <ChevronRight className="mt-1 size-3 text-muted-foreground" />}
+              <div className="mt-1 flex h-3 items-center justify-center">
+                {nav && <ChevronRight className="size-3 text-muted-foreground" />}
+              </div>
             </button>
           ))}
         </div>

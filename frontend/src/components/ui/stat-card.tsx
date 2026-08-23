@@ -19,6 +19,7 @@ function StatCard({
   tone = "blue",
   onClick,
   className,
+  align = "left",
 }: {
   icon: React.ComponentType<{ className?: string }>
   label: string
@@ -27,28 +28,46 @@ function StatCard({
   tone?: keyof typeof toneStyles
   onClick?: () => void
   className?: string
+  /** "center" põe o ícone ao lado do título (como no Painel Geral) e centraliza o valor. Padrão "left" preserva o layout original. */
+  align?: "left" | "center"
 }) {
   const Comp = onClick ? "button" : "div"
+  const centered = align === "center"
   return (
     <Comp
       onClick={onClick}
       className={cn(
-        "flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5 text-left shadow-card transition-all",
+        "flex flex-col rounded-2xl border border-border bg-surface p-5 shadow-card transition-all",
+        centered ? "text-center" : "text-left",
         onClick && "cursor-pointer hover:shadow-card-hover hover:-translate-y-0.5",
         className
       )}
     >
-      <div className="flex items-center justify-between">
-        <span className={cn("flex size-9 items-center justify-center rounded-xl", toneStyles[tone])}>
-          <Icon className="size-4.5" />
-        </span>
-      </div>
-      <div>
-        <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
-        <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-      </div>
+      {centered ? (
+        <>
+          <div className="flex items-center justify-center gap-2">
+            <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-lg", toneStyles[tone])}>
+              <Icon className="size-4" />
+            </span>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+          </div>
+          <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>
+        </>
+      ) : (
+        <>
+          <div className="flex items-center justify-between">
+            <span className={cn("flex size-9 items-center justify-center rounded-xl", toneStyles[tone])}>
+              <Icon className="size-4.5" />
+            </span>
+          </div>
+          <div className="mt-3">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
+          </div>
+        </>
+      )}
       {trend && (
-        <div className={cn("flex items-center gap-1 text-[11px] font-semibold", trend.positive === false ? "text-brand-red" : "text-brand-green")}>
+        <div className={cn("mt-3 flex items-center gap-1 text-[11px] font-semibold", centered && "justify-center", trend.positive === false ? "text-brand-red" : "text-brand-green")}>
           {trend.direction === "up" ? <ArrowUp className="size-3" /> : <ArrowDown className="size-3" />}
           {trend.value}
         </div>

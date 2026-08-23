@@ -744,19 +744,19 @@ function ContractsListView({
 
       {/* Indicadores do portfólio (independentes do filtro ativo) */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <button onClick={() => { setQuickFilter('active'); setPage(1); }} className={`rounded-xl border p-3.5 text-left transition-colors cursor-pointer ${quickFilter === 'active' ? 'border-brand-blue bg-brand-blue/5' : 'border-gray-200 bg-white hover:bg-gray-50'}`}>
+        <button onClick={() => { setQuickFilter('active'); setPage(1); }} className={`rounded-xl border p-3.5 text-center transition-colors cursor-pointer ${quickFilter === 'active' ? 'border-brand-blue bg-brand-blue/5' : 'border-gray-200 bg-white hover:bg-gray-50'}`}>
           <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">Ativos</p>
           <p className="mt-1 text-xl font-bold text-gray-900">{portfolioIndicators.active}</p>
         </button>
-        <button onClick={() => { setQuickFilter('expiring90'); setPage(1); }} className={`rounded-xl border p-3.5 text-left transition-colors cursor-pointer ${quickFilter === 'expiring90' ? 'border-brand-amber bg-brand-amber/5' : 'border-gray-200 bg-white hover:bg-gray-50'}`}>
+        <button onClick={() => { setQuickFilter('expiring90'); setPage(1); }} className={`rounded-xl border p-3.5 text-center transition-colors cursor-pointer ${quickFilter === 'expiring90' ? 'border-brand-amber bg-brand-amber/5' : 'border-gray-200 bg-white hover:bg-gray-50'}`}>
           <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">A vencer (90d)</p>
           <p className="mt-1 text-xl font-bold text-amber-600">{portfolioIndicators.expiring90}</p>
         </button>
-        <button onClick={() => { setQuickFilter('expired'); setPage(1); }} className={`rounded-xl border p-3.5 text-left transition-colors cursor-pointer ${quickFilter === 'expired' ? 'border-brand-red bg-brand-red/5' : 'border-gray-200 bg-white hover:bg-gray-50'}`}>
+        <button onClick={() => { setQuickFilter('expired'); setPage(1); }} className={`rounded-xl border p-3.5 text-center transition-colors cursor-pointer ${quickFilter === 'expired' ? 'border-brand-red bg-brand-red/5' : 'border-gray-200 bg-white hover:bg-gray-50'}`}>
           <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">Vencidos</p>
           <p className="mt-1 text-xl font-bold text-red-600">{portfolioIndicators.expired}</p>
         </button>
-        <button onClick={() => { setQuickFilter('suspended'); setPage(1); }} className={`rounded-xl border p-3.5 text-left transition-colors cursor-pointer ${quickFilter === 'suspended' ? 'border-gray-400 bg-gray-100' : 'border-gray-200 bg-white hover:bg-gray-50'}`}>
+        <button onClick={() => { setQuickFilter('suspended'); setPage(1); }} className={`rounded-xl border p-3.5 text-center transition-colors cursor-pointer ${quickFilter === 'suspended' ? 'border-gray-400 bg-gray-100' : 'border-gray-200 bg-white hover:bg-gray-50'}`}>
           <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">Suspensos</p>
           <p className="mt-1 text-xl font-bold text-gray-700">{portfolioIndicators.suspended}</p>
         </button>
