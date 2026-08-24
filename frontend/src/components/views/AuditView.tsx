@@ -5,7 +5,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Shield, Search, X, Eye, Clock, CalendarRange, Users as UsersIcon, AlertOctagon,
   LogIn, LogOut, PlusCircle, Pencil, Trash2, CheckCircle2, XCircle, UserCog,
-  Download, RotateCcw, ShieldAlert, Activity, Globe, Monitor,
+  Download, RotateCcw, ShieldAlert, Activity, Globe, Monitor, Archive, ArchiveRestore,
+  FileClock, Bell, ClipboardList,
 } from 'lucide-react';
 import { api, User, AuditLog } from '@/lib/api';
 import { formatDateTime } from '@/lib/labels';
@@ -33,6 +34,12 @@ const ACTION_META: Record<string, { label: string; color: string; icon: React.Re
   EXPORT:          { label: 'Exportação',        color: 'text-cyan-600 bg-cyan-500/10 border-cyan-500/20',          icon: <Download className="h-3 w-3" /> },
   RESTORE:         { label: 'Restauração',       color: 'text-amber-600 bg-amber-500/10 border-amber-500/20',       icon: <RotateCcw className="h-3 w-3" /> },
   RESTORE_FAILED:  { label: 'Restauração Falhou', color: 'text-red-600 bg-red-500/10 border-red-500/20',            icon: <ShieldAlert className="h-3 w-3" /> },
+  CONTRATO_ARQUIVADO:                { label: 'Contrato Arquivado',           color: 'text-gray-600 bg-gray-100 border-gray-300',                 icon: <Archive className="h-3 w-3" /> },
+  CONTRATO_RESTAURADO:               { label: 'Contrato Restaurado',          color: 'text-emerald-600 bg-emerald-500/10 border-emerald-500/20',  icon: <ArchiveRestore className="h-3 w-3" /> },
+  CONTRATO_EXCLUIDO_DEFINITIVAMENTE: { label: 'Contrato Excluído (definitivo)', color: 'text-red-600 bg-red-500/10 border-red-500/20',            icon: <AlertOctagon className="h-3 w-3" /> },
+  HISTORICO_EXCLUIDO:                { label: 'Histórico Excluído',           color: 'text-red-600 bg-red-500/10 border-red-500/20',             icon: <FileClock className="h-3 w-3" /> },
+  ALERTAS_EXCLUIDOS:                 { label: 'Alertas Excluídos',            color: 'text-red-600 bg-red-500/10 border-red-500/20',             icon: <Bell className="h-3 w-3" /> },
+  OCORRENCIAS_EXCLUIDAS:             { label: 'Ocorrências Excluídas',        color: 'text-red-600 bg-red-500/10 border-red-500/20',             icon: <ClipboardList className="h-3 w-3" /> },
 };
 const DEFAULT_ACTION_META = { label: '', color: 'text-gray-600 bg-gray-100 border-gray-300', icon: <Activity className="h-3 w-3" /> };
 
@@ -45,7 +52,10 @@ const ENTITY_LABEL: Record<string, string> = {
 
 // Ações consideradas críticas para fins de exibição (mesma regra usada no backend
 // em AuditService.getSummary — mantida em sincronia, não é um dado inventado).
-const CRITICAL_ACTIONS = new Set(['DELETE', 'STATUS_CHANGE']);
+const CRITICAL_ACTIONS = new Set([
+  'DELETE', 'STATUS_CHANGE',
+  'CONTRATO_EXCLUIDO_DEFINITIVAMENTE', 'HISTORICO_EXCLUIDO', 'ALERTAS_EXCLUIDOS', 'OCORRENCIAS_EXCLUIDAS',
+]);
 
 function actionMeta(action: string) {
   return ACTION_META[action] || { ...DEFAULT_ACTION_META, label: action };

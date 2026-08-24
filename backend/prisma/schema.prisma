@@ -33,6 +33,8 @@ model User {
   reviewedAlterations    ContractAlteration[]    @relation("AlterationReviewer")
   registeredPayments     ContractPayment[]       @relation("PaymentRegisteredBy")
   managedContracts       Contract[]              @relation("ContractManager")
+  archivedContracts      Contract[]              @relation("ContractArchivedBy")
+  restoredContracts      Contract[]              @relation("ContractRestoredBy")
   documents              Document[]
   fiscalAssignments      FiscalAssignment[]
   approvedMeasurements   InspectionMeasurement[] @relation("MeasurementApprover")
@@ -124,12 +126,26 @@ model Contract {
   observations      String?
   createdAt         DateTime                @default(now()) @db.Timestamptz(6)
   updatedAt         DateTime                @updatedAt @db.Timestamptz(6)
+  // Arquivamento (soft delete) — independente da "situação" contratual
+  // (status). Um contrato pode estar Encerrado e não-arquivado (raro) ou
+  // Ativo e arquivado (também raro, ex.: arquivado manualmente pelo
+  // usuário); o caso comum é Encerrado + arquivado, ou Ativo + não-arquivado.
+  // Preserva-se sempre o registro e os metadados do último arquivamento/
+  // restauração, mesmo após uma restauração, para fins de histórico.
+  archived          Boolean                 @default(false)
+  archivedAt        DateTime?               @db.Timestamptz(6)
+  archivedById      String?                 @db.Uuid
+  archiveReason     String?                 @db.VarChar(255)
+  restoredAt        DateTime?               @db.Timestamptz(6)
+  restoredById      String?                 @db.Uuid
   communications    Communication[]
   alterations       ContractAlteration[]
   payments          ContractPayment[]
   contractor        Contractor              @relation(fields: [contractorId], references: [id])
   manager           User?                   @relation("ContractManager", fields: [managerId], references: [id])
   process           ProcurementProcess?     @relation(fields: [processId], references: [id])
+  archivedBy        User?                   @relation("ContractArchivedBy", fields: [archivedById], references: [id])
+  restoredBy        User?                   @relation("ContractRestoredBy", fields: [restoredById], references: [id])
   documents         Document[]
   fiscalAssignments FiscalAssignment[]
   measurements      InspectionMeasurement[]
@@ -138,6 +154,7 @@ model Contract {
 
   @@index([managerId], map: "idx_contracts_manager")
   @@index([contractorId], map: "idx_contracts_contractor")
+  @@index([archived], map: "idx_contracts_archived")
   @@map("contracts")
 }
 

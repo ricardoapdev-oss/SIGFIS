@@ -24,16 +24,19 @@ import { UsersView } from '@/components/views/UsersView';
 import { AuditView } from '@/components/views/AuditView';
 import { AIInsightsPanel } from '@/components/ai/AIInsightsPanel';
 import { BackupView } from '@/components/views/BackupView';
+import { ArchivedContractsView } from '@/components/views/ArchivedContractsView';
 import { formatCurrency, formatDate } from '@/lib/labels';
 import {
   Mail, Lock, LogIn, Search, Filter, Plus,
   FileText, ArrowRight, X, Save, Eye, EyeOff, User2, Shield,
-  Clock, AlertTriangle, Download, ArrowUpDown,
+  Clock, AlertTriangle, Download, ArrowUpDown, Archive,
+  MoreVertical, PauseCircle, PlayCircle, Ban,
 } from 'lucide-react';
 import { Pagination } from '@/components/ui/pagination';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Dropdown, DropdownItem } from '@/components/ui/dropdown';
 
-type View = 'dashboard' | 'contracts' | 'details' | 'processes' | 'communications' | 'users' | 'pending' | 'risk' | 'audit' | 'ai' | 'backup';
+type View = 'dashboard' | 'contracts' | 'archived-contracts' | 'details' | 'processes' | 'communications' | 'users' | 'pending' | 'risk' | 'audit' | 'ai' | 'backup';
 type ContractFilter = 'ALL' | 'active' | 'expiring180' | 'expiring90' | 'expiring60' | 'expiring30' | 'pending_measurements' | 'delayed_processes' | (string & {});
 
 // -- SIGFIS Logo ---------------------------------------------------------------
@@ -88,12 +91,12 @@ function UserProfileModal({ user, onClose, onSaved }: { user: User; onClose: () 
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-300">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center font-bold text-emerald-400">
+            <div className="h-10 w-10 rounded-full bg-brand-blue-dark/10 border border-brand-blue-dark/20 flex items-center justify-center font-bold text-brand-blue-dark">
               {user.name.charAt(0)}
             </div>
             <div>
               <h2 className="text-sm font-bold text-gray-900">Meu Perfil</h2>
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">{user.role}</span>
+              <span className="text-xs font-bold text-brand-blue-dark uppercase tracking-widest bg-brand-blue-dark/10 px-1.5 py-0.5 rounded border border-brand-blue-dark/20">{user.role}</span>
             </div>
           </div>
           <button onClick={onClose} className="p-1.5 hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-lg transition-colors cursor-pointer">
@@ -108,7 +111,7 @@ function UserProfileModal({ user, onClose, onSaved }: { user: User; onClose: () 
             <div className="relative">
               <User2 className="absolute left-3 top-2.5 h-4 w-4 text-gray-700" />
               <input value={name} onChange={e => setName(e.target.value)} required
-                className="w-full bg-blue-50 border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500/50" />
+                className="w-full bg-blue-50 border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-brand-blue-dark/50" />
             </div>
           </div>
 
@@ -117,7 +120,7 @@ function UserProfileModal({ user, onClose, onSaved }: { user: User; onClose: () 
             <div className="relative">
               <Mail className="absolute left-3 top-2.5 h-4 w-4 text-gray-700" />
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
-                className="w-full bg-blue-50 border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500/50" />
+                className="w-full bg-blue-50 border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-brand-blue-dark/50" />
             </div>
           </div>
 
@@ -126,7 +129,7 @@ function UserProfileModal({ user, onClose, onSaved }: { user: User; onClose: () 
             <div className="relative">
               <Shield className="absolute left-3 top-2.5 h-4 w-4 text-gray-700" />
               <input value={regNum} onChange={e => setRegNum(e.target.value)}
-                className="w-full bg-blue-50 border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500/50" />
+                className="w-full bg-blue-50 border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-brand-blue-dark/50" />
             </div>
           </div>
 
@@ -136,7 +139,7 @@ function UserProfileModal({ user, onClose, onSaved }: { user: User; onClose: () 
               <div className="relative">
                 <Lock className="absolute left-3 top-2.5 h-4 w-4 text-gray-700" />
                 <input type={showPwd ? 'text' : 'password'} placeholder="Nova senha" value={password} onChange={e => setPassword(e.target.value)}
-                  className="w-full bg-blue-50 border border-gray-300 rounded-xl pl-10 pr-10 py-2.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500/50" />
+                  className="w-full bg-blue-50 border border-gray-300 rounded-xl pl-10 pr-10 py-2.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-brand-blue-dark/50" />
                 <button type="button" onClick={() => setShowPwd(v => !v)} className="absolute right-3 top-2.5 text-gray-700 hover:text-gray-700">
                   {showPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -144,13 +147,13 @@ function UserProfileModal({ user, onClose, onSaved }: { user: User; onClose: () 
               <div className="relative">
                 <Lock className="absolute left-3 top-2.5 h-4 w-4 text-gray-700" />
                 <input type={showPwd ? 'text' : 'password'} placeholder="Confirmar nova senha" value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)}
-                  className="w-full bg-blue-50 border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500/50" />
+                  className="w-full bg-blue-50 border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-brand-blue-dark/50" />
               </div>
             </div>
           </div>
 
           {error && <p className="text-[11px] text-red-400 bg-red-500/5 border border-red-500/10 rounded-lg p-2 text-center">{error}</p>}
-          {success && <p className="text-[11px] text-emerald-400 bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-2 text-center">{success}</p>}
+          {success && <p className="text-[11px] text-brand-blue-dark bg-brand-blue-dark/5 border border-brand-blue-dark/10 rounded-lg p-2 text-center">{success}</p>}
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose}
@@ -158,7 +161,7 @@ function UserProfileModal({ user, onClose, onSaved }: { user: User; onClose: () 
               Cancelar
             </button>
             <button type="submit" disabled={mutation.isPending}
-              className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl py-2.5 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50">
+              className="flex-1 bg-brand-blue-dark hover:bg-brand-blue text-white rounded-xl py-2.5 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50">
               <Save className="h-3.5 w-3.5" /> {mutation.isPending ? 'Salvando...' : 'Salvar'}
             </button>
           </div>
@@ -424,10 +427,13 @@ function MainAppShell() {
             <ContractsListView
               key={contractFilter}
               onSelectContract={(id) => handleNavigate('details', id)}
+              onOpenArchived={() => handleNavigate('archived-contracts')}
               user={user}
               initialFilter={contractFilter}
             />
           )}
+
+          {activeView === 'archived-contracts' && <ArchivedContractsView user={user} onBack={() => handleNavigate('contracts')} />}
 
           {activeView === 'details' && selectedContractId && (
             <ContractTabs
@@ -472,10 +478,12 @@ function SortableHeader({ label, col, sortBy, sortDir, onClick }: {
 // -- CONTRACTS LIST VIEW ------------------------------------------------------
 function ContractsListView({
   onSelectContract,
+  onOpenArchived,
   user,
   initialFilter = 'ALL',
 }: {
   onSelectContract: (id: string) => void;
+  onOpenArchived: () => void;
   user: User;
   initialFilter?: ContractFilter;
 }) {
@@ -486,8 +494,44 @@ function ContractsListView({
     staleTime: 300_000,
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.contracts.delete(id),
+  const canSeeArchived = user.role === 'ADMIN' || user.role === 'GESTOR' || user.role === 'ALTA_GESTAO';
+  const canArchive = user.role === 'ADMIN' || user.role === 'GESTOR';
+  const canHardDelete = user.role === 'ADMIN';
+
+  // Arquivar (soft delete) — ação "Excluir" para usuários autorizados.
+  // Retira o contrato da listagem operacional, mas preserva todo o histórico
+  // em Contratos Arquivados.
+  const archiveMutation = useMutation({
+    mutationFn: (id: string) => api.contracts.archive(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contracts-list'] }),
+    onError: (e: any) => alert(`Erro: ${e.message}`),
+  });
+
+  // Exclusão definitiva — exclusiva do ADMIN, diferente de arquivar.
+  const hardDeleteMutation = useMutation({
+    mutationFn: (id: string) => api.contracts.hardDelete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contracts-list'] }),
+    onError: (e: any) => alert(`Erro: ${e.message}`),
+  });
+
+  // Suspender/Reativar — mudança de situação apenas; o contrato permanece
+  // na listagem principal (diferente de arquivar/rescindir).
+  const suspendMutation = useMutation({
+    mutationFn: (id: string) => api.contracts.updateData(id, { status: 'SUSPENDED' }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contracts-list'] }),
+    onError: (e: any) => alert(`Erro: ${e.message}`),
+  });
+  const reactivateMutation = useMutation({
+    mutationFn: (id: string) => api.contracts.updateData(id, { status: 'ACTIVE' }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contracts-list'] }),
+    onError: (e: any) => alert(`Erro: ${e.message}`),
+  });
+
+  // Rescindir — muda a situação para Rescindido e arquiva automaticamente
+  // (sai da listagem principal, com destaque em Contratos Arquivados).
+  const rescindMutation = useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
+      api.contracts.updateData(id, { status: 'RESCINDED', archiveReason: reason }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contracts-list'] }),
     onError: (e: any) => alert(`Erro: ${e.message}`),
   });
@@ -724,6 +768,14 @@ function ContractsListView({
           <p className="text-xs text-gray-700 mt-0.5">Central de gestão dos contratos administrativos da IQUEGO</p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          {canSeeArchived && (
+            <button
+              onClick={onOpenArchived}
+              className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50 cursor-pointer"
+            >
+              <Archive className="h-3.5 w-3.5" /> Contratos Arquivados
+            </button>
+          )}
           <button
             onClick={exportCsv}
             disabled={filtered.length === 0}
@@ -998,11 +1050,83 @@ function ContractsListView({
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1.5">
-                          {user.role === 'ADMIN' && (
-                            <button onClick={(e) => { e.stopPropagation(); if (confirm(`Excluir contrato ${c.contractNumber} permanentemente?`)) deleteMutation.mutate(c.id); }}
-                              disabled={deleteMutation.isPending}
+                          {canArchive && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (confirm(`Arquivar contrato ${c.contractNumber}?\n\nO contrato será retirado da listagem principal, mas seus dados históricos serão preservados em Contratos Arquivados.`)) {
+                                  archiveMutation.mutate(c.id);
+                                }
+                              }}
+                              disabled={archiveMutation.isPending}
+                              className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-amber-50 hover:text-amber-600 disabled:opacity-40 cursor-pointer"
+                              title="Arquivar contrato">
+                              <Archive className="h-3.5 w-3.5" />
+                            </button>
+                          )}
+                          {canArchive && (c.status === 'ACTIVE' || c.status === 'SUSPENDED') && (
+                            <div onClick={(e) => e.stopPropagation()}>
+                              <Dropdown
+                                trigger={({ toggle }) => (
+                                  <button
+                                    onClick={toggle}
+                                    className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 cursor-pointer"
+                                    title="Mais ações">
+                                    <MoreVertical className="h-3.5 w-3.5" />
+                                  </button>
+                                )}
+                              >
+                                {c.status === 'ACTIVE' && (
+                                  <DropdownItem
+                                    icon={PauseCircle}
+                                    onClick={() => {
+                                      if (confirm(`Suspender o contrato ${c.contractNumber}?\n\nEle permanecerá na listagem principal, com status Suspenso.`)) {
+                                        suspendMutation.mutate(c.id);
+                                      }
+                                    }}
+                                  >
+                                    Suspender Contrato
+                                  </DropdownItem>
+                                )}
+                                {c.status === 'SUSPENDED' && (
+                                  <DropdownItem
+                                    icon={PlayCircle}
+                                    onClick={() => {
+                                      if (confirm(`Reativar o contrato ${c.contractNumber}?\n\nO status voltará para Ativo.`)) {
+                                        reactivateMutation.mutate(c.id);
+                                      }
+                                    }}
+                                  >
+                                    Reativar Contrato
+                                  </DropdownItem>
+                                )}
+                                <DropdownItem
+                                  icon={Ban}
+                                  className="text-brand-red hover:bg-brand-red/5"
+                                  onClick={() => {
+                                    const input = window.prompt(
+                                      `Rescindir o contrato ${c.contractNumber}?\n\nO contrato será rescindido e movido para Contratos Arquivados, com destaque.\n\nInforme o motivo da rescisão (opcional):`
+                                    );
+                                    if (input !== null) rescindMutation.mutate({ id: c.id, reason: input || undefined });
+                                  }}
+                                >
+                                  Rescindir Contrato
+                                </DropdownItem>
+                              </Dropdown>
+                            </div>
+                          )}
+                          {canHardDelete && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const input = window.prompt(
+                                  `ATENÇÃO: esta ação é irreversível.\n\nA exclusão definitiva removerá permanentemente o contrato ${c.contractNumber} e os dados vinculados a ele (fiscalizações, aditivos, ocorrências, pagamentos, comunicados, documentos). Essa operação não poderá ser desfeita.\n\nDigite EXCLUIR para confirmar.`
+                                );
+                                if (input === 'EXCLUIR') hardDeleteMutation.mutate(c.id);
+                              }}
+                              disabled={hardDeleteMutation.isPending}
                               className="rounded-lg p-1.5 text-red-500/60 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-40 cursor-pointer"
-                              title="Excluir contrato">
+                              title="Excluir definitivamente (irreversível)">
                               <X className="h-3.5 w-3.5" />
                             </button>
                           )}

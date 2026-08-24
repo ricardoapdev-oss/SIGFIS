@@ -764,7 +764,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
           <span className={badgeCls(contractStatusColor[c.status] || '')}>{contractStatusLabel[c.status] || c.status}</span>
         </div>
         {isGestor && c.status === 'ACTIVE' && (
-          <button onClick={() => { if (confirm(`Concluir o contrato ${c.contractNumber}? Ele será movido para Contratos Encerrados.`)) concludeContractMutation.mutate(); }}
+          <button onClick={() => { if (confirm(`Concluir o contrato ${c.contractNumber}? Ele será encerrado e movido para Contratos Arquivados.`)) concludeContractMutation.mutate(); }}
             disabled={concludeContractMutation.isPending}
             className="flex items-center gap-1.5 text-[11px] bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 px-3 py-1.5 rounded-lg text-blue-400 font-semibold cursor-pointer disabled:opacity-50 transition-colors">
             {concludeContractMutation.isPending ? 'Encerrando...' : '✓ Concluir Contrato'}
@@ -1806,7 +1806,9 @@ function AlertsTab({ contractAlerts, user, queryClient }: { contractAlerts: Cont
 // Consulta a mesma API institucional da tela de Auditoria (backend/src/audit),
 // filtrando pelos eventos deste contrato. Registro imutável: não há mais
 // exclusão de itens do histórico a partir daqui.
-function ContractHistory({ contractId, user: _user }: { contractId: string; user: User }) {
+// Exportado para reuso na visualização histórica de Contratos Arquivados
+// (ArchivedContractsView) — mesma lógica, sem duplicar a consulta.
+export function ContractHistory({ contractId, user: _user }: { contractId: string; user: User }) {
   const { data, isLoading } = useQuery({
     queryKey: ['audit-logs', 'contract', contractId],
     queryFn: () => api.audit.list({ search: contractId, pageSize: 50, sortDir: 'desc' }),

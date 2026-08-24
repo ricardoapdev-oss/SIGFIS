@@ -51,6 +51,7 @@ export class ContractsService {
     if (role === 'FISCAL') {
       const contracts = await this.prisma.contract.findMany({
         where: {
+          archived: false,
           fiscalAssignments: {
             some: { fiscalId: userId, isActive: true },
           },
@@ -60,10 +61,54 @@ export class ContractsService {
       return addComputedFields(contracts);
     }
 
+    // Listagem operacional principal: nunca inclui contratos arquivados —
+    // esses só aparecem em findArchived(), para os perfis autorizados.
     const contracts = await this.prisma.contract.findMany({
+      where: { archived: false },
       include: sharedInclude,
     });
     return addComputedFields(contracts);
+  }
+
+  /**
+   * Contratos arquivados — visão histórica resumida, restrita a
+   * ADMIN/GESTOR/ALTA_GESTAO (o único outro papel existente, FISCAL, nunca
+   * tem acesso a esta lista, independentemente de ter sido designado no
+   * passado). A checagem de papel também é feita no controller (@Roles),
+   * mas é repetida aqui como segunda camada de defesa.
+   */
+  async findArchived(role: string) {
+    if (role !== UserRole.ADMIN && role !== UserRole.GESTOR && role !== UserRole.ALTA_GESTAO) {
+      throw new ForbiddenException('Acesso negado.');
+    }
+
+    const contracts = await this.prisma.contract.findMany({
+      where: { archived: true },
+      include: {
+        contractor: true,
+        process: { select: { processNumber: true, modality: true } },
+        fiscalAssignments: {
+          where: { isActive: true },
+          include: { fiscal: { select: { id: true, name: true, registrationNumber: true } } },
+        },
+        alterations: { select: { id: true } },
+        occurrences: { select: { id: true } },
+        payments: { select: { value: true } },
+        archivedBy: { select: { id: true, name: true } },
+        restoredBy: { select: { id: true, name: true } },
+      },
+      orderBy: { archivedAt: 'desc' },
+    });
+
+    return contracts.map((c) => {
+      const { alterations, occurrences, payments, ...rest } = c;
+      return {
+        ...rest,
+        aditivoCount: alterations.length,
+        occurrenceCount: occurrences.length,
+        totalPaid: payments.reduce((sum, p) => sum + Number(p.value), 0),
+      };
+    });
   }
 
   async findOne(id: string, userId: string, role: string) {
@@ -128,6 +173,12 @@ export class ContractsService {
       if (!isAssigned) {
         throw new ForbiddenException('Você não tem permissão para visualizar este contrato');
       }
+      // Contratos arquivados saem da operação — FISCAL nunca os visualiza,
+      // mesmo tendo sido designado no passado (único papel sem acesso a
+      // Contratos Arquivados; os demais três papéis existentes têm acesso).
+      if (contract.archived) {
+        throw new ForbiddenException('Este contrato foi arquivado e não está mais disponível para este perfil.');
+      }
     }
 
     return contract;
@@ -165,6 +216,27 @@ export class ContractsService {
     if (data.department !== undefined) updateData.department = data.department;
     if (data.objectDescription) updateData.objectDescription = data.objectDescription;
 
+    // Encerramento e rescisão do contrato: além de mudar a situação, arquivam
+    // automaticamente (saem da listagem operacional, mas o histórico é
+    // preservado em Contratos Arquivados) — regra de negócio explícita,
+    // separada da ação manual de "Arquivar". Suspensão, ao contrário,
+    // permanece na listagem principal — só muda o status.
+    const isConcluding = data.status === ContractStatus.CONCLUDED && contract.status !== ContractStatus.CONCLUDED;
+    const isRescinding = data.status === ContractStatus.RESCINDED && contract.status !== ContractStatus.RESCINDED;
+    if (isConcluding) {
+      updateData.archived = true;
+      updateData.archivedAt = new Date();
+      updateData.archivedById = caller?.id || null;
+      updateData.archiveReason = 'Encerramento do contrato';
+    } else if (isRescinding) {
+      updateData.archived = true;
+      updateData.archivedAt = new Date();
+      updateData.archivedById = caller?.id || null;
+      updateData.archiveReason = data.archiveReason?.trim()
+        ? `Rescisão do contrato — ${data.archiveReason.trim()}`
+        : 'Rescisão do contrato';
+    }
+
     const updated = await this.prisma.contract.update({ where: { id }, data: updateData });
 
     const oldValues: Record<string, any> = {};
@@ -181,7 +253,184 @@ export class ContractsService {
       oldValues, newValues,
     });
 
+    if (isConcluding) {
+      this.auditService.log({
+        userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
+        action: 'CONTRATO_ARQUIVADO', module: 'Contratos', entity: 'Contract', entityId: id,
+        detail: `Contrato ${contract.contractNumber} encerrado e arquivado automaticamente`,
+      });
+    } else if (isRescinding) {
+      this.auditService.log({
+        userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
+        action: 'CONTRATO_ARQUIVADO', module: 'Contratos', entity: 'Contract', entityId: id,
+        detail: `Contrato ${contract.contractNumber} rescindido e arquivado automaticamente${data.archiveReason?.trim() ? ` — motivo: ${data.archiveReason.trim()}` : ''}`,
+      });
+    }
+
     return updated;
+  }
+
+  /**
+   * Arquivamento manual (soft delete) — a ação de "Excluir" na tela de
+   * Contratos para usuários autorizados (GESTOR/ADMIN). Nunca apaga o
+   * registro: apenas o marca como arquivado e o retira da listagem
+   * operacional principal, preservando todos os dados e relacionamentos.
+   */
+  async archive(id: string, caller: any, reason?: string) {
+    const contract = await this.prisma.contract.findUnique({ where: { id } });
+    if (!contract) throw new NotFoundException('Contrato não encontrado.');
+    if (contract.archived) {
+      throw new BadRequestException('Este contrato já está arquivado.');
+    }
+
+    const updated = await this.prisma.contract.update({
+      where: { id },
+      data: {
+        archived: true,
+        archivedAt: new Date(),
+        archivedById: caller?.id || null,
+        archiveReason: reason?.trim() || 'Arquivamento solicitado pelo usuário',
+      },
+    });
+
+    this.auditService.log({
+      userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
+      action: 'CONTRATO_ARQUIVADO', module: 'Contratos', entity: 'Contract', entityId: id,
+      detail: `Contrato ${contract.contractNumber} arquivado por ${caller?.name || 'usuário'}`,
+    });
+
+    return updated;
+  }
+
+  /**
+   * Restaura um contrato arquivado de volta à listagem operacional.
+   * Não altera a "situação" contratual (status) — um contrato Encerrado
+   * restaurado continua Encerrado; a coerência com a realidade contratual
+   * é responsabilidade de quem restaura, não uma inferência automática.
+   */
+  async restore(id: string, caller: any) {
+    const contract = await this.prisma.contract.findUnique({ where: { id } });
+    if (!contract) throw new NotFoundException('Contrato não encontrado.');
+    if (!contract.archived) {
+      throw new BadRequestException('Este contrato não está arquivado.');
+    }
+
+    const updated = await this.prisma.contract.update({
+      where: { id },
+      data: {
+        archived: false,
+        restoredAt: new Date(),
+        restoredById: caller?.id || null,
+      },
+    });
+
+    this.auditService.log({
+      userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
+      action: 'CONTRATO_RESTAURADO', module: 'Contratos', entity: 'Contract', entityId: id,
+      detail: `Contrato ${contract.contractNumber} restaurado por ${caller?.name || 'usuário'}`,
+    });
+
+    return updated;
+  }
+
+  /**
+   * Exclusão definitiva — exclusiva do ADMIN (ver @Roles no controller).
+   * Diferente do arquivamento: remove o registro do contrato de fato. Os
+   * relacionamentos dependentes (designações de fiscais, ocorrências,
+   * medições, aditivos, documentos, comunicados, pagamentos, alertas) têm
+   * onDelete: Cascade no schema e são removidos automaticamente pelo
+   * banco — não há registros órfãos. O AuditLog não tem FK para Contract
+   * (entityId é apenas um identificador solto), então o histórico de
+   * auditoria do contrato sobrevive à exclusão do próprio contrato.
+   */
+  async hardDelete(id: string, caller: any) {
+    const contract = await this.prisma.contract.findUnique({ where: { id } });
+    if (!contract) throw new NotFoundException('Contrato não encontrado.');
+
+    await this.prisma.contract.delete({ where: { id } });
+
+    this.auditService.log({
+      userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
+      action: 'CONTRATO_EXCLUIDO_DEFINITIVAMENTE', module: 'Contratos', entity: 'Contract', entityId: id,
+      detail: `Contrato ${contract.contractNumber} excluído definitivamente por ${caller?.name || 'usuário'} — operação irreversível`,
+    });
+
+    return { ok: true };
+  }
+
+  /**
+   * Painel "Gerenciar dados históricos" (ADMIN) — contagens dos dados
+   * vinculados ao contrato que podem ser apagados individualmente, sem
+   * apagar o contrato inteiro.
+   */
+  async getHistoricalDataSummary(id: string) {
+    const contract = await this.prisma.contract.findUnique({ where: { id }, select: { id: true, contractNumber: true } });
+    if (!contract) throw new NotFoundException('Contrato não encontrado.');
+
+    const [auditCount, alertsCount, occurrencesCount] = await Promise.all([
+      this.prisma.auditLog.count({ where: { entityId: id } }),
+      this.prisma.systemAlert.count({ where: { contractId: id } }),
+      this.prisma.occurrence.count({ where: { contractId: id } }),
+    ]);
+
+    return { auditCount, alertsCount, occurrencesCount };
+  }
+
+  /**
+   * Exclui definitivamente os registros de auditoria deste contrato
+   * (entityId = id do contrato). Separado da exclusão do contrato em si —
+   * excluir histórico não exclui o contrato. A própria exclusão gera um
+   * novo registro de auditoria, gravado depois de apagar os antigos, para
+   * que ele não seja apagado junto.
+   */
+  async deleteContractHistory(id: string, caller: any) {
+    const contract = await this.prisma.contract.findUnique({ where: { id }, select: { id: true, contractNumber: true } });
+    if (!contract) throw new NotFoundException('Contrato não encontrado.');
+
+    const { count } = await this.prisma.auditLog.deleteMany({ where: { entityId: id } });
+
+    this.auditService.log({
+      userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
+      action: 'HISTORICO_EXCLUIDO', module: 'Contratos', entity: 'Contract', entityId: id,
+      detail: `Histórico de auditoria do contrato ${contract.contractNumber} excluído (${count} registro(s)) por ${caller?.name || 'usuário'}`,
+    });
+
+    return { ok: true, count };
+  }
+
+  /** Exclui definitivamente os alertas vinculados ao contrato. Não exclui o contrato. */
+  async deleteContractAlerts(id: string, caller: any) {
+    const contract = await this.prisma.contract.findUnique({ where: { id }, select: { id: true, contractNumber: true } });
+    if (!contract) throw new NotFoundException('Contrato não encontrado.');
+
+    const { count } = await this.prisma.systemAlert.deleteMany({ where: { contractId: id } });
+
+    this.auditService.log({
+      userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
+      action: 'ALERTAS_EXCLUIDOS', module: 'Contratos', entity: 'Contract', entityId: id,
+      detail: `Alertas do contrato ${contract.contractNumber} excluídos (${count} registro(s)) por ${caller?.name || 'usuário'}`,
+    });
+
+    return { ok: true, count };
+  }
+
+  /**
+   * Exclui definitivamente as ocorrências vinculadas ao contrato (e seus
+   * documentos, via onDelete: Cascade). Não exclui o contrato.
+   */
+  async deleteContractOccurrences(id: string, caller: any) {
+    const contract = await this.prisma.contract.findUnique({ where: { id }, select: { id: true, contractNumber: true } });
+    if (!contract) throw new NotFoundException('Contrato não encontrado.');
+
+    const { count } = await this.prisma.occurrence.deleteMany({ where: { contractId: id } });
+
+    this.auditService.log({
+      userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
+      action: 'OCORRENCIAS_EXCLUIDAS', module: 'Contratos', entity: 'Contract', entityId: id,
+      detail: `Ocorrências do contrato ${contract.contractNumber} excluídas (${count} registro(s)) por ${caller?.name || 'usuário'}`,
+    });
+
+    return { ok: true, count };
   }
 
   async deactivateAssignment(contractId: string, assignmentId: string) {
@@ -304,10 +553,12 @@ export class ContractsService {
   }
 
   async getDashboardStats(userId: string, role: string) {
-    // Dashboard consolidado
-    let contractWhereClause = {};
+    // Dashboard consolidado — nunca mistura contratos arquivados nos
+    // indicadores de operação corrente.
+    let contractWhereClause: any = { archived: false };
     if (role === 'FISCAL') {
       contractWhereClause = {
+        archived: false,
         fiscalAssignments: {
           some: { fiscalId: userId, isActive: true }
         }
@@ -369,7 +620,7 @@ export class ContractsService {
     }
 
     const contracts = await this.prisma.contract.findMany({
-      where: { NOT: { status: ContractStatus.DRAFT } },
+      where: { NOT: { status: ContractStatus.DRAFT }, archived: false },
       include: {
         contractor: true,
         process: true,

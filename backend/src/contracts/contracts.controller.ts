@@ -27,6 +27,14 @@ export class ContractsController {
     return this.contractsService.findReport(req.user.role);
   }
 
+  // Rota estática 'archived' precisa vir antes de ':id' — caso contrário o
+  // Nest tentaria resolvê-la como um id de contrato.
+  @Get('archived')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR, UserRole.ALTA_GESTAO)
+  findArchived(@Req() req) {
+    return this.contractsService.findArchived(req.user.role);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string, @Req() req) {
     return this.contractsService.findOne(id, req.user.id, req.user.role);
@@ -70,5 +78,53 @@ export class ContractsController {
   @Audit({ module: 'Fiscalização', action: 'UPDATE', entity: 'FiscalAssignment' })
   updateAssignmentRole(@Param('id') id: string, @Param('assignmentId') assignmentId: string, @Body() body: { role: string }) {
     return this.contractsService.updateAssignmentRole(id, assignmentId, body.role);
+  }
+
+  // ── Arquivamento (soft delete) e restauração ──────────────────────────────
+  // Auditoria própria dentro do service (ações com nomes específicos:
+  // CONTRATO_ARQUIVADO/CONTRATO_RESTAURADO) — sem @Audit aqui, para não
+  // duplicar o registro.
+  @Patch(':id/archive')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  archive(@Param('id') id: string, @Body() body: { reason?: string }, @Req() req) {
+    return this.contractsService.archive(id, req.user, body?.reason);
+  }
+
+  @Patch(':id/restore')
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  restore(@Param('id') id: string, @Req() req) {
+    return this.contractsService.restore(id, req.user);
+  }
+
+  // ── Exclusão definitiva — exclusiva do ADMIN ──────────────────────────────
+  @Delete(':id/permanent')
+  @Roles(UserRole.ADMIN)
+  hardDelete(@Param('id') id: string, @Req() req) {
+    return this.contractsService.hardDelete(id, req.user);
+  }
+
+  // ── Gerenciar dados históricos — exclusivo do ADMIN ───────────────────────
+  @Get(':id/historical-data')
+  @Roles(UserRole.ADMIN)
+  getHistoricalDataSummary(@Param('id') id: string) {
+    return this.contractsService.getHistoricalDataSummary(id);
+  }
+
+  @Delete(':id/history')
+  @Roles(UserRole.ADMIN)
+  deleteContractHistory(@Param('id') id: string, @Req() req) {
+    return this.contractsService.deleteContractHistory(id, req.user);
+  }
+
+  @Delete(':id/alerts')
+  @Roles(UserRole.ADMIN)
+  deleteContractAlerts(@Param('id') id: string, @Req() req) {
+    return this.contractsService.deleteContractAlerts(id, req.user);
+  }
+
+  @Delete(':id/occurrences')
+  @Roles(UserRole.ADMIN)
+  deleteContractOccurrences(@Param('id') id: string, @Req() req) {
+    return this.contractsService.deleteContractOccurrences(id, req.user);
   }
 }

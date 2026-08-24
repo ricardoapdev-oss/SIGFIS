@@ -1077,7 +1077,6 @@ export const api = {
     stats: () => request('/contracts/stats'),
     updateData: (id: string, data: any) => request(`/contracts/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
     conclude: (id: string) => request(`/contracts/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'CONCLUDED' }) }),
-    delete: (id: string) => request(`/contracts/${id}`, { method: 'DELETE' }),
     deactivateAssignment: (contractId: string, assignmentId: string) =>
       request(`/contracts/${contractId}/assignments/${assignmentId}/deactivate`, { method: 'PATCH' }),
     // Exclusão real (não soft-delete) de uma designação da comissão de
@@ -1086,6 +1085,17 @@ export const api = {
       request(`/contracts/${contractId}/assignments/${assignmentId}`, { method: 'DELETE' }),
     updateAssignmentRole: (contractId: string, assignmentId: string, role: string) =>
       request(`/contracts/${contractId}/assignments/${assignmentId}/role`, { method: 'PATCH', body: JSON.stringify({ role }) }),
+    // ── Arquivamento (soft delete), restauração e exclusão definitiva ──────
+    listArchived: () => request('/contracts/archived'),
+    archive: (id: string, reason?: string) => request(`/contracts/${id}/archive`, { method: 'PATCH', body: JSON.stringify({ reason }) }),
+    restore: (id: string) => request(`/contracts/${id}/restore`, { method: 'PATCH' }),
+    // Exclusão definitiva — exclusiva do ADMIN, diferente de archive().
+    hardDelete: (id: string) => request(`/contracts/${id}/permanent`, { method: 'DELETE' }),
+    // Painel "Gerenciar dados históricos" (ADMIN) — não exclui o contrato.
+    getHistoricalDataSummary: (id: string) => request(`/contracts/${id}/historical-data`),
+    deleteHistory: (id: string) => request(`/contracts/${id}/history`, { method: 'DELETE' }),
+    deleteAlerts: (id: string) => request(`/contracts/${id}/alerts`, { method: 'DELETE' }),
+    deleteOccurrences: (id: string) => request(`/contracts/${id}/occurrences`, { method: 'DELETE' }),
   },
   processes: {
     list: () => request('/processes'),

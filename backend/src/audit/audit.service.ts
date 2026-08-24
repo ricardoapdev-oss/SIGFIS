@@ -126,7 +126,17 @@ export class AuditService {
     const [eventsToday, eventsLast7Days, criticalActions, distinctUsers] = await Promise.all([
       this.prisma.auditLog.count({ where: { createdAt: { gte: todayStart } } }),
       this.prisma.auditLog.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
-      this.prisma.auditLog.count({ where: { createdAt: { gte: sevenDaysAgo }, action: { in: ['DELETE', 'STATUS_CHANGE'] } } }),
+      this.prisma.auditLog.count({
+        where: {
+          createdAt: { gte: sevenDaysAgo },
+          action: {
+            in: [
+              'DELETE', 'STATUS_CHANGE',
+              'CONTRATO_EXCLUIDO_DEFINITIVAMENTE', 'HISTORICO_EXCLUIDO', 'ALERTAS_EXCLUIDOS', 'OCORRENCIAS_EXCLUIDAS',
+            ],
+          },
+        },
+      }),
       this.prisma.auditLog.findMany({
         where: { createdAt: { gte: sevenDaysAgo }, userId: { not: null } },
         distinct: ['userId'],

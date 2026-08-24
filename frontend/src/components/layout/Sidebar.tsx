@@ -5,7 +5,7 @@ import { User } from '@/lib/api';
 import { Tooltip } from '@/components/ui/tooltip';
 import { Dropdown, DropdownItem, DropdownSeparator, DropdownLabel } from '@/components/ui/dropdown';
 
-type View = 'dashboard' | 'contracts' | 'details' | 'processes' | 'communications' | 'users' | 'pending' | 'risk' | 'audit' | 'ai' | 'backup';
+type View = 'dashboard' | 'contracts' | 'archived-contracts' | 'details' | 'processes' | 'communications' | 'users' | 'pending' | 'risk' | 'audit' | 'ai' | 'backup';
 
 interface SidebarProps {
   user: User;

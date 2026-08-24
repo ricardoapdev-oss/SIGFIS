@@ -12,7 +12,7 @@ import { Dropdown, DropdownItem, DropdownSeparator, DropdownLabel } from '@/comp
 import { Drawer } from '@/components/ui/drawer';
 import { EmptyState } from '@/components/ui/empty-state';
 
-type View = 'dashboard' | 'contracts' | 'details' | 'processes' | 'communications' | 'users' | 'pending' | 'risk' | 'audit' | 'ai' | 'backup';
+type View = 'dashboard' | 'contracts' | 'archived-contracts' | 'details' | 'processes' | 'communications' | 'users' | 'pending' | 'risk' | 'audit' | 'ai' | 'backup';
 
 interface SearchContract { id: string; contractNumber: string; objectDescription?: string; contractor?: { corporateName?: string } }
 interface SearchProcess { id: string; processNumber: string; subject?: string }
@@ -22,6 +22,7 @@ interface SearchUser { id: string; name: string; email: string }
 const VIEW_META: Record<View, { title: string; description: string; help: string }> = {
   dashboard: { title: 'Centro de Gestão Contratual', description: 'Visão executiva inteligente · Lei 13.303/2016 · RILC IQUEGO', help: 'Aqui você acompanha os principais indicadores dos contratos sob sua responsabilidade: contratos ativos, fiscalizações pendentes, alertas críticos e a execução financeira acumulada. Clique nos cartões e gráficos para navegar direto ao detalhe relacionado.' },
   contracts: { title: 'Contratos', description: 'Listagem e detalhamento de contratos vigentes e históricos', help: 'Liste, busque e filtre todos os contratos aos quais você tem acesso. Use a busca para localizar por número, objeto ou empresa contratada, e os filtros de status para refinar o resultado. Clique em um contrato para abrir seus detalhes completos.' },
+  'archived-contracts': { title: 'Contratos Arquivados', description: 'Consulta histórica de contratos encerrados ou arquivados', help: 'Contratos retirados da listagem operacional principal — encerrados ou arquivados manualmente — permanecem aqui para consulta histórica, com seus dados, aditivos, ocorrências e valores pagos preservados. Restrito a ADMIN, GESTOR e ALTA GESTÃO.' },
   details: { title: 'Detalhe do Contrato', description: 'Dados completos, medições, ocorrências e aditivos', help: 'Esta tela reúne todas as informações de um contrato específico: dados cadastrais, fiscal designado, medições, ocorrências registradas e aditivos. Use as abas para navegar entre as seções.' },
   processes: { title: 'Processos', description: 'Processos administrativos de contratação', help: 'Acompanhe os processos de contratação em andamento, suas fases e prazos. Processos atrasados aparecem sinalizados para ação imediata.' },
   pending: { title: 'Fiscalizações', description: 'Pendências de fiscalização e homologação', help: 'Reúne tudo que depende de uma ação sua: medições aguardando homologação, ocorrências em aberto e aditivos pendentes de aprovação.' },
