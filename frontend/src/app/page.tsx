@@ -35,6 +35,7 @@ import {
 import { Pagination } from '@/components/ui/pagination';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Dropdown, DropdownItem } from '@/components/ui/dropdown';
+import { CurrencyInput } from '@/components/ui/currency-input';
 
 type View = 'dashboard' | 'contracts' | 'archived-contracts' | 'details' | 'processes' | 'communications' | 'users' | 'pending' | 'risk' | 'audit' | 'ai' | 'backup';
 type ContractFilter = 'ALL' | 'active' | 'expiring180' | 'expiring90' | 'expiring60' | 'expiring30' | 'pending_measurements' | 'delayed_processes' | (string & {});
@@ -488,7 +489,7 @@ function ContractsListView({
   initialFilter?: ContractFilter;
 }) {
   const queryClient = useQueryClient();
-  const { data: contracts, isLoading } = useQuery<any[]>({
+  const { data: contracts, isLoading, isError, error, refetch } = useQuery<any[]>({
     queryKey: ['contracts-list', user.id],
     queryFn: () => api.contracts.list(),
     staleTime: 300_000,
@@ -627,6 +628,25 @@ function ContractsListView({
             <div key={i} className="h-16 bg-gray-100/40 rounded-xl animate-pulse" />
           ))}
         </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 py-24 max-w-7xl mx-auto">
+        <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center">
+          <AlertTriangle className="h-6 w-6 text-red-400" />
+        </div>
+        <div className="text-center">
+          <p className="text-sm font-semibold text-gray-900 mb-1">Não foi possível carregar os contratos.</p>
+          <p className="text-xs text-gray-500 font-mono bg-gray-100/40 border border-gray-300 rounded px-3 py-1.5 max-w-sm">
+            {(error as any)?.message || 'Backend indisponível'}
+          </p>
+        </div>
+        <button onClick={() => refetch()} className="text-xs px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-lg transition-colors cursor-pointer">
+          Tentar novamente
+        </button>
       </div>
     );
   }
@@ -874,8 +894,7 @@ function ContractsListView({
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Valor (R$) *</label>
-                  <input type="number" min="0" step="0.01" value={ncValue} onChange={e => setNcValue(e.target.value)} required
-                    placeholder="0,00"
+                  <CurrencyInput value={ncValue} onChange={n => setNcValue(String(n))} required
                     className="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500/50" />
                 </div>
                 <div className="flex flex-col gap-1 col-span-2">

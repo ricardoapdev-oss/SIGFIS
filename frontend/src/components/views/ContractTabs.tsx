@@ -9,6 +9,7 @@ import {
   Activity, Send, X, Trash2, Pencil, Save, GitBranch,
 } from 'lucide-react';
 import { api, User, Contract, ContractAlert } from '@/lib/api';
+import { CurrencyInput } from '@/components/ui/currency-input';
 import {
   contractStatusLabel, contractStatusColor, occurrenceSeverityLabel, occurrenceSeverityColor,
   occurrenceStatusLabel, occurrenceStatusColor, measurementStatusLabel, measurementStatusColor,
@@ -874,11 +875,11 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Valor Inicial (R$)</span>
-                  <input type="number" value={dadosEdits.initialValue ?? c.initialValue} onChange={e => setDadosEdits(p => ({ ...p, initialValue: Number(e.target.value) }))} className={inputCls} />
+                  <CurrencyInput value={dadosEdits.initialValue ?? c.initialValue} onChange={n => setDadosEdits(p => ({ ...p, initialValue: n }))} className={inputCls} />
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Valor Atual (R$)</span>
-                  <input type="number" value={dadosEdits.currentValue ?? c.currentValue} onChange={e => setDadosEdits(p => ({ ...p, currentValue: Number(e.target.value) }))} className={inputCls} />
+                  <CurrencyInput value={dadosEdits.currentValue ?? c.currentValue} onChange={n => setDadosEdits(p => ({ ...p, currentValue: n }))} className={inputCls} />
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Observações</span>
@@ -1182,7 +1183,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Impacto Financeiro (R$)</label>
-                    <input type="number" step="0.01" value={altValueChange} onChange={e => setAltValueChange(e.target.value)}
+                    <CurrencyInput value={altValueChange} onChange={n => setAltValueChange(String(n))} allowNegative
                       placeholder="0,00 (negativo para supressão)"
                       className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500/50" />
                   </div>
@@ -1235,7 +1236,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                           </div>
                           <div className="flex flex-col gap-0.5">
                             <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Impacto Financeiro (R$)</span>
-                            <input type="number" value={altEdits.valueChange ?? alt.valueChange ?? 0} onChange={e => setAltEdits((p: any) => ({ ...p, valueChange: Number(e.target.value) }))} className={inputCls} />
+                            <CurrencyInput value={altEdits.valueChange ?? alt.valueChange ?? 0} onChange={n => setAltEdits((p: any) => ({ ...p, valueChange: n }))} allowNegative className={inputCls} />
                           </div>
                           <div className="flex flex-col gap-0.5 col-span-2">
                             <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Justificativa</span>
@@ -1336,8 +1337,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Valor da Medição (R$) *</label>
-                    <input type="number" min="0" step="0.01" value={msrValue} onChange={e => setMsrValue(e.target.value)}
-                      placeholder="0,00"
+                    <CurrencyInput value={msrValue} onChange={n => setMsrValue(String(n))}
                       className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500/50" />
                   </div>
                   <div className="flex flex-col gap-1">
@@ -1544,8 +1544,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Valor (R$) *</label>
-                    <input type="number" min="0" step="0.01" value={payValue} onChange={e => setPayValue(e.target.value)}
-                      placeholder="0,00"
+                    <CurrencyInput value={payValue} onChange={n => setPayValue(String(n))}
                       className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500/50" />
                   </div>
                   <div className="flex flex-col gap-1">

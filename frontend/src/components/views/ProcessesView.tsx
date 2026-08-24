@@ -11,6 +11,7 @@ import { api, User, ProcessPhase, ChecklistItem, PhaseStatus } from '@/lib/api';
 import { processStatusLabel, processStatusColor, modalityLabel, formatCurrency, formatDate } from '@/lib/labels';
 import { StatCard } from '@/components/ui/stat-card';
 import { EmptyState } from '@/components/ui/empty-state';
+import { CurrencyInput } from '@/components/ui/currency-input';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -370,7 +371,7 @@ export function ProcessesView({ user, initialFilter }: ProcessesViewProps) {
                       </Field>
                     </div>
                     <Field label="Valor Estimado (R$) *">
-                      <input type="number" value={fValue} onChange={e => setFValue(e.target.value)} required min="0" step="0.01" className={inputCls} placeholder="0,00" />
+                      <CurrencyInput value={fValue} onChange={n => setFValue(String(n))} required className={inputCls} />
                     </Field>
                   </div>
                 )}
