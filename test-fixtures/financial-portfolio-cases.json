@@ -1,0 +1,158 @@
+{
+  "_comment": "Fixtures SINTÉTICAS (não são dados reais) para o teste de paridade entre backend/src/contracts/financial-calculations.ts e frontend/src/lib/financial-calculations.ts — Etapa 3, Ponto 3. Os dois módulos devem produzir exatamente os mesmos números `expected` para os mesmos `contracts` de entrada. Ver backend/src/contracts/financial-calculations.parity.spec.ts.",
+  "cases": [
+    {
+      "name": "carteira simples, sem exclusões",
+      "contracts": [
+        {
+          "id": "c1",
+          "contractNumber": "TESTE-001/2026",
+          "initialValue": 100000,
+          "currentValue": 100000,
+          "startDate": "2025-01-01",
+          "endDate": "2026-01-01",
+          "measurements": [
+            {
+              "status": "APPROVED",
+              "measurementValue": 25000
+            },
+            {
+              "status": "PENDING_GESTOR",
+              "measurementValue": 99999
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "contractNumber": "TESTE-002/2026",
+          "initialValue": 240000,
+          "currentValue": 240000,
+          "startDate": "2025-01-01",
+          "endDate": "2027-01-01",
+          "measurements": [
+            {
+              "status": "APPROVED",
+              "measurementValue": 60000
+            },
+            {
+              "status": "REJECTED",
+              "measurementValue": 500
+            }
+          ]
+        }
+      ],
+      "expected": {
+        "valorContratualAtual": 340000,
+        "medicoesAprovadas": 85000,
+        "saldoContratualNaoExecutado": 255000,
+        "taxaExecucaoMedicoes": 25,
+        "valorMensalEstimadoCarteira": 18082.19178082192,
+        "mediaMensalPorContrato": 9041.09589041096,
+        "contratosComValorMensalValido": 2,
+        "contratosComValorMensalInvalido": []
+      }
+    },
+    {
+      "name": "contrato com datas inválidas é excluído do mensal, mas conta no restante",
+      "contracts": [
+        {
+          "id": "c3",
+          "contractNumber": "TESTE-003/2026",
+          "initialValue": 100000,
+          "currentValue": 100000,
+          "startDate": "2025-01-01",
+          "endDate": "2026-01-01",
+          "measurements": []
+        },
+        {
+          "id": "c4",
+          "contractNumber": "TESTE-004/2026",
+          "initialValue": 50000,
+          "currentValue": 60000,
+          "startDate": "2025-06-01",
+          "endDate": "2025-06-01",
+          "measurements": []
+        }
+      ],
+      "expected": {
+        "valorContratualAtual": 160000,
+        "medicoesAprovadas": 0,
+        "saldoContratualNaoExecutado": 160000,
+        "taxaExecucaoMedicoes": 0,
+        "valorMensalEstimadoCarteira": 8219.178082191782,
+        "mediaMensalPorContrato": 8219.178082191782,
+        "contratosComValorMensalValido": 1,
+        "contratosComValorMensalInvalido": [
+          "TESTE-004/2026"
+        ]
+      }
+    },
+    {
+      "name": "medição aprovada acima do valor contratual gera saldo negativo",
+      "contracts": [
+        {
+          "id": "c5",
+          "contractNumber": "TESTE-005/2026",
+          "initialValue": 200000,
+          "currentValue": 200000,
+          "startDate": "2025-01-01",
+          "endDate": "2025-07-01",
+          "measurements": [
+            {
+              "status": "APPROVED",
+              "measurementValue": 250000
+            }
+          ]
+        }
+      ],
+      "expected": {
+        "valorContratualAtual": 200000,
+        "medicoesAprovadas": 250000,
+        "saldoContratualNaoExecutado": -50000,
+        "taxaExecucaoMedicoes": 125,
+        "valorMensalEstimadoCarteira": 33149.17127071823,
+        "mediaMensalPorContrato": 33149.17127071823,
+        "contratosComValorMensalValido": 1,
+        "contratosComValorMensalInvalido": []
+      }
+    },
+    {
+      "name": "contrato de curtíssima duração respeita o piso de 1 mês",
+      "contracts": [
+        {
+          "id": "c6",
+          "contractNumber": "TESTE-006/2026",
+          "initialValue": 3000,
+          "currentValue": 3000,
+          "startDate": "2026-01-01",
+          "endDate": "2026-01-05",
+          "measurements": []
+        }
+      ],
+      "expected": {
+        "valorContratualAtual": 3000,
+        "medicoesAprovadas": 0,
+        "saldoContratualNaoExecutado": 3000,
+        "taxaExecucaoMedicoes": 0,
+        "valorMensalEstimadoCarteira": 3000,
+        "mediaMensalPorContrato": 3000,
+        "contratosComValorMensalValido": 1,
+        "contratosComValorMensalInvalido": []
+      }
+    },
+    {
+      "name": "carteira vazia",
+      "contracts": [],
+      "expected": {
+        "valorContratualAtual": 0,
+        "medicoesAprovadas": 0,
+        "saldoContratualNaoExecutado": 0,
+        "taxaExecucaoMedicoes": 0,
+        "valorMensalEstimadoCarteira": 0,
+        "mediaMensalPorContrato": 0,
+        "contratosComValorMensalValido": 0,
+        "contratosComValorMensalInvalido": []
+      }
+    }
+  ]
+}

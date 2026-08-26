@@ -6,6 +6,7 @@ import {
   Clock, CheckCircle, AlertTriangle, Calendar as CalendarIcon,
   DollarSign, TrendingUp, Users, Building2, BarChart2, ChevronRight,
   RefreshCw, Printer, MoreVertical, ArrowRight, ShieldAlert, FileSignature,
+  Info,
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer,
@@ -13,10 +14,12 @@ import {
 } from 'recharts';
 import { api, User, GestorDashboard as GestorDashboardType } from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/labels';
+import { FINANCIAL_TOOLTIPS } from '@/lib/financial-calculations';
 import { ChartContainer } from '@/components/ui/chart-container';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dropdown, DropdownItem } from '@/components/ui/dropdown';
+import { Tooltip } from '@/components/ui/tooltip';
 import { ContractReport } from './ContractReport';
 
 type View = 'dashboard' | 'contracts' | 'details' | 'processes' | 'communications' | 'users' | 'pending' | 'risk' | 'audit' | 'ai' | 'backup';
@@ -37,7 +40,7 @@ const KPI_TONE: Record<string, string> = {
   red: 'bg-brand-red/10 text-red-600',
 };
 function ExecutiveKpiCard({
-  icon: Icon, title, value, description, tone = 'blue', onClick,
+  icon: Icon, title, value, description, tone = 'blue', onClick, tooltip,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
@@ -45,6 +48,7 @@ function ExecutiveKpiCard({
   description?: string;
   tone?: keyof typeof KPI_TONE;
   onClick?: () => void;
+  tooltip?: string;
 }) {
   const Comp = onClick ? 'button' : 'div';
   const strVal = typeof value === 'string' || typeof value === 'number' ? String(value) : '';
@@ -66,6 +70,11 @@ function ExecutiveKpiCard({
           <p className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground leading-tight truncate" title={title}>
             {title}
           </p>
+          {tooltip && (
+            <Tooltip content={<span className="whitespace-normal block max-w-[220px]">{tooltip}</span>}>
+              <Info className="size-3 shrink-0 text-muted-foreground/70" />
+            </Tooltip>
+          )}
         </div>
         <div className="mt-2.5 flex items-baseline justify-center overflow-hidden">
           <p className={`font-bold leading-none text-foreground whitespace-nowrap tracking-tight ${
@@ -217,16 +226,16 @@ export function GestorDashboard({ user, onNavigate }: Props) {
         <ExecutiveKpiCard icon={CheckCircle} title="Fiscalizações Pendentes" value={k?.pendingFiscalizacoes ?? '—'} tone="cyan" onClick={() => onNavigate('contracts', undefined, 'pending_measurements')} />
         <ExecutiveKpiCard icon={AlertTriangle} title="Alertas Críticos" value={rs?.critical ?? '—'} tone="red" onClick={() => onNavigate('risk')} />
         <ExecutiveKpiCard icon={Clock} title="Contratos a Vencer (90d)" description="Próx. 90 dias" value={k?.expiringIn90 ?? '—'} tone="amber" onClick={() => onNavigate('contracts', undefined, 'expiring90')} />
-        <ExecutiveKpiCard icon={DollarSign} title="Valor Total Contratado" value={f ? formatCurrency(f.totalContracted) : '—'} tone="purple" />
-        <ExecutiveKpiCard icon={TrendingUp} title="Execução Média" value={f ? `${f.executionPercent}%` : '—'} tone="green" />
+        <ExecutiveKpiCard icon={DollarSign} title="Valor Contratual Atual" value={f ? formatCurrency(f.valorContratualAtual) : '—'} tone="purple" />
+        <ExecutiveKpiCard icon={TrendingUp} title="Taxa de Execução (Medições)" value={f ? `${f.taxaExecucaoMedicoes.toFixed(1)}%` : '—'} tone="green" tooltip={FINANCIAL_TOOLTIPS.taxaExecucaoMedicoes} />
       </div>
 
       {/* Execução Financeira + Mapa de Riscos */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <ChartContainer
           className="lg:col-span-2"
-          title="Execução Financeira"
-          description="Valor executado (medições aprovadas) por período"
+          title="Medições Aprovadas por Período"
+          description="Medições aprovadas não equivalem necessariamente a pagamentos realizados."
           action={
             <div className="flex flex-wrap items-center gap-1 rounded-lg bg-muted p-1">
               {PERIODS.map((p) => (
@@ -242,7 +251,7 @@ export function GestorDashboard({ user, onNavigate }: Props) {
           }
         >
           <p className="text-2xl font-bold text-foreground">{formatCurrency(periodTotal)}</p>
-          <p className="text-xs text-muted-foreground">Valor total executado no período selecionado</p>
+          <p className="text-xs text-muted-foreground">Total de medições aprovadas no período selecionado</p>
           {displayedMonthly.length > 0 ? (
             <div className="mt-4 h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -256,7 +265,7 @@ export function GestorDashboard({ user, onNavigate }: Props) {
                   <CartesianGrid strokeDasharray="3 3" stroke="#E4E7EC" vertical={false} />
                   <XAxis dataKey="name" tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1e6 ? `${(v / 1e6).toFixed(1)}mi` : v >= 1e3 ? `${(v / 1e3).toFixed(0)}mil` : v} width={52} />
-                  <RTooltip formatter={(v) => [formatCurrency(Number(v) || 0), 'Executado']} contentStyle={{ borderRadius: 12, border: '1px solid #E4E7EC', fontSize: 12 }} />
+                  <RTooltip formatter={(v) => [formatCurrency(Number(v) || 0), 'Medições Aprovadas']} contentStyle={{ borderRadius: 12, border: '1px solid #E4E7EC', fontSize: 12 }} />
                   <Area type="monotone" dataKey="measured" stroke="#146BFF" strokeWidth={2.5} fill="url(#execArea)" />
                 </AreaChart>
               </ResponsiveContainer>
@@ -267,18 +276,46 @@ export function GestorDashboard({ user, onNavigate }: Props) {
           {(period === '12m' || period === 'custom') && (
             <p className="mt-2 text-[11px] text-muted-foreground">Disponível apenas o histórico dos últimos 6 meses no momento — exibindo o período máximo calculado.</p>
           )}
-          <div className="mt-4 grid grid-cols-3 gap-3 border-t border-border pt-4 text-center">
+          <div className="mt-4 grid grid-cols-3 gap-3 border-t border-border pt-4 text-center sm:grid-cols-5">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Contratado</p>
-              <p className="mt-0.5 text-sm font-bold text-foreground">{f ? formatCurrency(f.totalContracted) : '—'}</p>
+              <p className="mt-0.5 text-sm font-bold text-foreground">{f ? formatCurrency(f.valorContratualAtual) : '—'}</p>
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Executado</p>
-              <p className="mt-0.5 text-sm font-bold text-brand-green">{f ? formatCurrency(f.totalExecuted) : '—'}</p>
+              <p className="flex items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                Medições Aprovadas
+                <Tooltip content={<span className="whitespace-normal block max-w-[220px]">{FINANCIAL_TOOLTIPS.medicoesAprovadas}</span>}>
+                  <Info className="size-3 shrink-0" />
+                </Tooltip>
+              </p>
+              <p className="mt-0.5 text-sm font-bold text-brand-green">{f ? formatCurrency(f.medicoesAprovadas) : '—'}</p>
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Saldo</p>
-              <p className="mt-0.5 text-sm font-bold text-foreground">{f ? formatCurrency(f.balance) : '—'}</p>
+              <p className="flex items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                Saldo Não Executado
+                <Tooltip content={<span className="whitespace-normal block max-w-[220px]">{FINANCIAL_TOOLTIPS.saldoContratualNaoExecutado}</span>}>
+                  <Info className="size-3 shrink-0" />
+                </Tooltip>
+              </p>
+              <p className="mt-0.5 text-sm font-bold text-foreground">{f ? formatCurrency(f.saldoContratualNaoExecutado) : '—'}</p>
+            </div>
+            <div>
+              <p className="flex items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                Estimativa Mensal Calculada (Carteira)
+                <Tooltip content={<span className="whitespace-normal block max-w-[260px]">{FINANCIAL_TOOLTIPS.valorMensalEstimadoCarteira}</span>}>
+                  <Info className="size-3 shrink-0" />
+                </Tooltip>
+              </p>
+              <p className="mt-0.5 text-sm font-bold text-foreground">{f ? formatCurrency(f.valorMensalEstimadoCarteira) : '—'}</p>
+            </div>
+            <div>
+              <p className="flex items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                Média Mensal Calculada por Contrato
+                <Tooltip content={<span className="whitespace-normal block max-w-[260px]">{FINANCIAL_TOOLTIPS.mediaMensalPorContrato}</span>}>
+                  <Info className="size-3 shrink-0" />
+                </Tooltip>
+              </p>
+              <p className="mt-0.5 text-sm font-bold text-foreground">{f ? formatCurrency(f.mediaMensalPorContrato) : '—'}</p>
             </div>
           </div>
         </ChartContainer>

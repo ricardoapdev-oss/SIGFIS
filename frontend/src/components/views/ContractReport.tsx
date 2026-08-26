@@ -4,6 +4,7 @@ import { CSSProperties } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api, User } from '@/lib/api';
 import { X, Printer, FileText, AlertCircle } from 'lucide-react';
+import { summarizeReportContracts, PortfolioFinancials } from '@/lib/financial-calculations';
 
 interface Props {
   user: User;
@@ -79,11 +80,18 @@ export function ContractReport({ user, onClose }: Props) {
     if (pA.y !== pB.y) return pB.y - pA.y;
     return pB.n - pA.n;
   });
-  const activeCount   = sorted.filter(c => c.status === 'ACTIVE').length;
-  const totalValue    = sorted.reduce((s, c) => s + Number(c.currentValue), 0);
-  const totalExecuted = sorted.reduce((s, c) => s + Number(c.totalMeasured), 0);
-  const totalBalance  = sorted.reduce((s, c) => s + Number(c.balance), 0);
-  const avgMonthly    = sorted.length > 0 ? sorted.reduce((s, c) => s + Number(c.monthlyValue), 0) / sorted.length : 0;
+  const activeCount = sorted.filter(c => c.status === 'ACTIVE').length;
+  // Agregação de carteira centralizada — mesma fórmula do Painel Geral e do
+  // backend (ver lib/financial-calculations.ts). O backend já traz, por
+  // contrato, medicoesAprovadas / saldoContratualNaoExecutado / monthlyValue
+  // (null quando as datas do contrato são inválidas — ver ContractsService.findReport).
+  const portfolio: PortfolioFinancials = summarizeReportContracts(sorted.map(c => ({
+    contractNumber: c.contractNumber,
+    currentValue: Number(c.currentValue),
+    medicoesAprovadas: Number(c.medicoesAprovadas),
+    saldoContratualNaoExecutado: Number(c.saldoContratualNaoExecutado),
+    monthlyValue: c.monthlyValue === null || c.monthlyValue === undefined ? null : Number(c.monthlyValue),
+  })));
 
   const handlePrint = () => {
     const source = document.getElementById('sigfis-report-print-root');
@@ -173,8 +181,7 @@ export function ContractReport({ user, onClose }: Props) {
             <ReportContent
               contracts={sorted} user={user}
               emissionDate={emissionDate} emissionTime={emissionTime} periodLabel={periodLabel}
-              activeCount={activeCount} totalValue={totalValue}
-              totalExecuted={totalExecuted} totalBalance={totalBalance} avgMonthly={avgMonthly}
+              activeCount={activeCount} portfolio={portfolio}
             />
           </div>
         )}
@@ -186,8 +193,7 @@ export function ContractReport({ user, onClose }: Props) {
           <ReportContent
             contracts={sorted} user={user}
             emissionDate={emissionDate} emissionTime={emissionTime} periodLabel={periodLabel}
-            activeCount={activeCount} totalValue={totalValue}
-            totalExecuted={totalExecuted} totalBalance={totalBalance} avgMonthly={avgMonthly}
+            activeCount={activeCount} portfolio={portfolio}
           />
         </div>
       )}
@@ -196,11 +202,11 @@ export function ContractReport({ user, onClose }: Props) {
 }
 
 // ── Report content ─────────────────────────────────────────────────────────────
-function ReportContent({ contracts, user, emissionDate, emissionTime, periodLabel, activeCount, totalValue, totalExecuted, totalBalance, avgMonthly }: {
+function ReportContent({ contracts, user, emissionDate, emissionTime, periodLabel, activeCount, portfolio }: {
   contracts: any[]; user: User; emissionDate: string; emissionTime: string; periodLabel: string;
-  activeCount: number; totalValue: number; totalExecuted: number; totalBalance: number; avgMonthly: number;
+  activeCount: number; portfolio: PortfolioFinancials;
 }) {
-  const executionPct = totalValue > 0 ? ((totalExecuted / totalValue) * 100).toFixed(1) : '0.0';
+  const executionPct = portfolio.taxaExecucaoMedicoes.toFixed(1);
 
   return (
     <div style={{
@@ -257,14 +263,15 @@ function ReportContent({ contracts, user, emissionDate, emissionTime, periodLabe
         <div style={{ fontSize: '6.5pt', fontWeight: 800, color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '2.5mm' }}>
           Sumário Executivo
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '2.5mm' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2mm' }}>
           {[
-            { label: 'Contratos Vigentes',      value: activeCount.toString(), sub: `de ${contracts.length} total`,  accent: '#16a34a' },
-            { label: 'Valor Total da Carteira',  value: fmt(totalValue),        sub: 'valor contratual atual',         accent: '#1d4ed8' },
-            { label: 'Total Executado',          value: fmt(totalExecuted),     sub: 'medições aprovadas',             accent: '#059669' },
-            { label: 'Saldo Contratual',         value: fmt(totalBalance),      sub: 'a pagar aos contratados',        accent: '#dc2626' },
-            { label: 'Valor Mensal Médio',       value: fmt(avgMonthly),        sub: 'desembolso mensal estimado',     accent: '#7c3aed' },
-            { label: 'Taxa de Execução',         value: `${executionPct}%`,     sub: 'do valor total executado',       accent: '#0891b2' },
+            { label: 'Contratos Vigentes',                  value: activeCount.toString(),                        sub: `de ${contracts.length} total`,                      accent: '#16a34a' },
+            { label: 'Valor Total da Carteira',              value: fmt(portfolio.valorContratualAtual),           sub: 'valor contratual atual',                            accent: '#1d4ed8' },
+            { label: 'Medições Aprovadas',                   value: fmt(portfolio.medicoesAprovadas),              sub: 'não equivale a pagamento realizado',                accent: '#059669' },
+            { label: 'Saldo Contratual Não Executado',       value: fmt(portfolio.saldoContratualNaoExecutado),    sub: 'contratual atual menos medições aprovadas',         accent: '#dc2626' },
+            { label: 'Estimativa Mensal Calculada (Carteira)', value: fmt(portfolio.valorMensalEstimadoCarteira),  sub: 'valor atual ÷ duração — sem campo mensal cadastrado', accent: '#0891b2' },
+            { label: 'Média Mensal Calculada por Contrato',  value: fmt(portfolio.mediaMensalPorContrato),         sub: `carteira ÷ ${portfolio.contratosComValorMensalValido} contrato(s) com duração válida`, accent: '#7c3aed' },
+            { label: 'Taxa de Execução por Medições',        value: `${executionPct}%`,                            sub: 'medições aprovadas ÷ valor contratual atual',       accent: '#ca8a04' },
           ].map((kpi, i) => (
             <div key={i} style={{
               background: 'white', border: `1px solid ${kpi.accent}25`,
@@ -320,8 +327,8 @@ function ReportContent({ contracts, user, emissionDate, emissionTime, periodLabe
               <th style={{ ...thS, textAlign: 'center' }}>AD.</th>
               <th style={{ ...thS, textAlign: 'right' }}>VALOR<br/>CONTRATUAL</th>
               <th style={{ ...thS, textAlign: 'right' }}>VALOR<br/>MENSAL EST.</th>
-              <th style={{ ...thS, textAlign: 'right' }}>TOTAL<br/>EXECUTADO</th>
-              <th style={{ ...thS, textAlign: 'right' }}>SALDO<br/>A PAGAR</th>
+              <th style={{ ...thS, textAlign: 'right' }}>MEDIÇÕES<br/>APROVADAS</th>
+              <th style={{ ...thS, textAlign: 'right' }}>SALDO NÃO<br/>EXECUTADO</th>
               <th style={{ ...thS, textAlign: 'center' }}>INÍCIO</th>
               <th style={{ ...thS, textAlign: 'center' }}>TÉRMINO</th>
               <th style={{ ...thS, textAlign: 'center' }}>SITUAÇÃO</th>
@@ -390,21 +397,26 @@ function ReportContent({ contracts, user, emissionDate, emissionTime, periodLabe
                     {fmt(Number(c.currentValue))}
                   </td>
                   <td style={{ ...tdS, textAlign: 'right', color: '#374151' }}>
-                    {fmt(Number(c.monthlyValue))}
-                    <div style={{ fontSize: '5pt', color: '#9ca3af' }}>{c.durationMonths}m</div>
+                    {c.monthlyValue === null || c.monthlyValue === undefined ? (
+                      <span style={{ color: '#f59e0b' }} title="Datas de vigência inválidas — contrato excluído do valor mensal da carteira">—</span>
+                    ) : fmt(Number(c.monthlyValue))}
+                    <div style={{ fontSize: '5pt', color: '#9ca3af' }}>{c.durationMonths != null ? Math.round(c.durationMonths) : '—'}m</div>
                   </td>
                   <td style={{ ...tdS, textAlign: 'right', color: '#059669', fontWeight: 600 }}>
-                    {fmt(Number(c.totalMeasured))}
-                    {Number(c.totalMeasured) > 0 && Number(c.currentValue) > 0 && (
+                    {fmt(Number(c.medicoesAprovadas))}
+                    {Number(c.medicoesAprovadas) > 0 && Number(c.currentValue) > 0 && (
                       <div style={{ fontSize: '5pt', color: '#9ca3af' }}>
-                        {((Number(c.totalMeasured)/Number(c.currentValue))*100).toFixed(0)}%
+                        {Number(c.taxaExecucaoMedicoes ?? 0).toFixed(0)}%
                       </div>
                     )}
                   </td>
                   <td style={{ ...tdS, textAlign: 'right', fontWeight: 700,
-                    color: Number(c.balance) < Number(c.currentValue) * 0.1 && Number(c.balance) > 0 ? '#b91c1c' : Number(c.balance) === 0 ? '#059669' : '#374151'
+                    color: Number(c.saldoContratualNaoExecutado) < 0 ? '#b91c1c'
+                      : Number(c.saldoContratualNaoExecutado) < Number(c.currentValue) * 0.1 && Number(c.saldoContratualNaoExecutado) > 0 ? '#b91c1c'
+                      : Number(c.saldoContratualNaoExecutado) === 0 ? '#059669' : '#374151'
                   }}>
-                    {fmt(Number(c.balance))}
+                    {fmt(Number(c.saldoContratualNaoExecutado))}
+                    {Number(c.saldoContratualNaoExecutado) < 0 && <span title="Medição aprovada acima do valor contratual atual"> ⚠</span>}
                   </td>
                   <td style={{ ...tdS, textAlign: 'center', whiteSpace: 'nowrap', color: '#374151', fontSize: '5pt' }}>
                     {fmtDate((c as any).startDate || c.signingDate)}
@@ -448,10 +460,10 @@ function ReportContent({ contracts, user, emissionDate, emissionTime, periodLabe
               <td colSpan={6} style={{ ...tdS, color: 'white', textAlign: 'right', fontWeight: 800, fontSize: '6pt', borderRight: '1px solid rgba(255,255,255,0.15)' }}>
                 TOTAIS GERAIS ({contracts.length} contratos)
               </td>
-              <td style={{ ...tdS, color: 'white', textAlign: 'right', fontWeight: 800 }}>{fmt(contracts.reduce((s, c) => s + Number(c.currentValue), 0))}</td>
-              <td style={{ ...tdS, color: 'rgba(255,255,255,0.6)', textAlign: 'right' }}>{fmt(contracts.reduce((s, c) => s + Number(c.monthlyValue), 0))}</td>
-              <td style={{ ...tdS, color: '#6ee7b7', textAlign: 'right', fontWeight: 700 }}>{fmt(contracts.reduce((s, c) => s + Number(c.totalMeasured), 0))}</td>
-              <td style={{ ...tdS, color: '#fca5a5', textAlign: 'right', fontWeight: 700 }}>{fmt(contracts.reduce((s, c) => s + Number(c.balance), 0))}</td>
+              <td style={{ ...tdS, color: 'white', textAlign: 'right', fontWeight: 800 }}>{fmt(portfolio.valorContratualAtual)}</td>
+              <td style={{ ...tdS, color: 'rgba(255,255,255,0.6)', textAlign: 'right' }}>{fmt(portfolio.valorMensalEstimadoCarteira)}</td>
+              <td style={{ ...tdS, color: '#6ee7b7', textAlign: 'right', fontWeight: 700 }}>{fmt(portfolio.medicoesAprovadas)}</td>
+              <td style={{ ...tdS, color: '#fca5a5', textAlign: 'right', fontWeight: 700 }}>{fmt(portfolio.saldoContratualNaoExecutado)}</td>
               <td colSpan={4} style={{ ...tdS, color: 'rgba(255,255,255,0.4)', fontSize: '5.5pt', borderRight: 'none' }}></td>
             </tr>
           </tfoot>

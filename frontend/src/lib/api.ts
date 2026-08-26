@@ -1,3 +1,5 @@
+import { computePortfolioFinancials } from './financial-calculations';
+
 // Tipos do Sistema
 export type UserRole = 'ADMIN' | 'GESTOR' | 'FISCAL' | 'ALTA_GESTAO';
 export type UserStatus = 'ACTIVE' | 'INACTIVE';
@@ -155,11 +157,21 @@ export interface GestorDashboard {
     pendingRenewals: number; communicationsPendingReply: number;
   };
   financial: {
-    totalContracted: number;
-    totalExecuted: number;
-    balance: number;
+    /** 1. Soma dos valores atuais dos contratos ativos considerados na carteira. */
+    valorContratualAtual: number;
+    /** 2. Medições aprovadas — nunca "pago". Ver frontend/src/lib/financial-calculations.ts. */
+    medicoesAprovadas: number;
+    /** 5. valorContratualAtual − medicoesAprovadas. */
+    saldoContratualNaoExecutado: number;
+    /** medicoesAprovadas / valorContratualAtual × 100. */
+    taxaExecucaoMedicoes: number;
+    /** 7. Soma dos valores mensais estimados de cada contrato ativo com datas válidas. */
+    valorMensalEstimadoCarteira: number;
+    /** 8. valorMensalEstimadoCarteira / contratosComValorMensalValido. */
+    mediaMensalPorContrato: number;
+    contratosComValorMensalValido: number;
+    contratosComValorMensalInvalido: string[];
     savingsEstimate: number;
-    executionPercent: number;
     avgContractValue: number;
   };
   health: {
@@ -850,17 +862,21 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
       return { name: label, contracts: activeInMonth.length, value: activeInMonth.reduce((s, c) => s + c.currentValue, 0), measured };
     });
 
-    // ── Financial ──
-    const totalContracted = active.reduce((s, c) => s + c.currentValue, 0);
-    const totalExecuted = db.measurements.filter(m => m.status === 'APPROVED').reduce((s, m) => s + Number(m.measurementValue), 0);
-    const balance = totalContracted - totalExecuted;
-    const executionPercent = totalContracted > 0 ? Math.round((totalExecuted / totalContracted) * 100) : 0;
+    // ── Financial ── fórmulas centralizadas em lib/financial-calculations.ts.
+    // Carteira considerada aqui: contratos ATIVOS — mesmo recorte que os
+    // demais KPIs do Painel Geral ("Contratos Ativos", Mapa de Riscos etc.,
+    // todos calculados sobre `active`).
+    const activeWithMeasurements = active.map(c => ({
+      ...c,
+      measurements: db.measurements.filter(m => m.contractId === c.id),
+    }));
+    const financial = computePortfolioFinancials(activeWithMeasurements as any);
     const savingsEstimate = db.processes.reduce((s, p) => {
       const rel = db.contracts.find(c => c.processId === p.id);
       if (rel && p.estimatedValue) return s + Math.max(0, p.estimatedValue - rel.initialValue);
       return s;
     }, 0);
-    const avgContractValue = active.length > 0 ? Math.round(totalContracted / active.length) : 0;
+    const avgContractValue = active.length > 0 ? Math.round(financial.valorContratualAtual / active.length) : 0;
 
     // ── Extended Alerts ──
     const expiring30 = active.filter(c => { const d = daysUntil(c.endDate); return d <= 30 && d > 0; }).length;
@@ -922,7 +938,7 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
 
     const result: GestorDashboard = {
       kpis: { activeContracts: active.length, expiringIn180: exp180.length, expiringIn90: exp90.length, expiredContracts: expired.length, processesInProgress: inProgress.length, delayedProcesses: uniqueDelayed.length, pendingFiscalizacoes: pendFisc, pendingRenewals: pendRenewals, communicationsPendingReply: pendComms },
-      financial: { totalContracted, totalExecuted, balance, savingsEstimate, executionPercent, avgContractValue },
+      financial: { ...financial, savingsEstimate, avgContractValue },
       health: { score: healthScore, level: healthLevel as any, factors: healthFactors },
       extendedAlerts: { expiring30, expiring60, contractsWithoutFiscal, openCriticalOccurrences, pendingAlterations },
       fiscalWorkload, upcomingEvents, riskSummary,
@@ -1039,7 +1055,10 @@ export const api = {
   },
   measurements: {
     create: (data: any) => request('/measurements', { method: 'POST', body: JSON.stringify(data) }),
-    approve: (id: string) => request(`/measurements/${id}/approve`, { method: 'POST' }),
+    // `justification` só é necessário quando a medição faria o total
+    // aprovado do contrato superar o valor contratual atual — o backend
+    // recusa (400) sem justificativa nesse caso (ver financial-calculations.ts).
+    approve: (id: string, justification?: string) => request(`/measurements/${id}/approve`, { method: 'POST', body: JSON.stringify({ justification }) }),
     reject: (id: string, reason: string) => request(`/measurements/${id}/reject`, { method: 'POST', body: JSON.stringify({ reason }) }),
     listByContract: (cId: string) => request(`/measurements/contract/${cId}`),
     delete: (id: string) => request(`/measurements/${id}`, { method: 'DELETE' }),

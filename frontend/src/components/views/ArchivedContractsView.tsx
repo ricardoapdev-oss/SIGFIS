@@ -4,14 +4,23 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Archive, ArchiveRestore, ChevronLeft, Eye, Search, X, ShieldAlert,
-  Trash2, AlertTriangle, FileClock, Bell, ClipboardList, Ban,
+  Trash2, AlertTriangle, FileClock, Bell, ClipboardList, Ban, Info,
 } from 'lucide-react';
 import { api, User } from '@/lib/api';
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/labels';
 import { contractStatusLabel, contractStatusColor, modalityLabel } from '@/lib/labels';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Pagination } from '@/components/ui/pagination';
+import { Tooltip } from '@/components/ui/tooltip';
 import { ContractHistory } from './ContractTabs';
+
+// Revisão técnica (Etapa 3, Ponto 2): ContractPayment não tem status,
+// estorno/cancelamento, glosa, retenção, valor líquido nem ordem bancária
+// (auditado no schema real de produção). O total bruto de pagamentos
+// registrados não é tratado como indicador financeiro "efetivo" — ver
+// mesma decisão em ContractTabs.tsx (aba Pagamentos).
+const PAGAMENTOS_INCOMPLETOS_TOOLTIP =
+  'Dados financeiros incompletos: os registros de pagamento não têm status, estorno/cancelamento, glosa, retenção nem valor líquido. Não deve ser tratado como indicador financeiro oficial de pagamento efetivo.';
 
 interface Props {
   user: User;
@@ -219,10 +228,13 @@ function ArchivedContractDetail({ contract, user, onClose, onRestored }: {
             <p className="text-base font-bold text-gray-900 mt-1">{(contract.occurrences || []).length}</p>
           </div>
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-center">
-            <p className="text-[10px] text-gray-500">Total Pago</p>
-            <p className="text-base font-bold text-emerald-600 mt-1">
-              {formatCurrency((contract.payments || []).reduce((s: number, p: any) => s + Number(p.value), 0))}
+            <p className="flex items-center justify-center gap-1 text-[10px] text-gray-500">
+              Total Pago
+              <Tooltip content={<span className="whitespace-normal block max-w-[240px]">{PAGAMENTOS_INCOMPLETOS_TOOLTIP} (bruto registrado: {formatCurrency((contract.payments || []).reduce((s: number, p: any) => s + Number(p.value), 0))})</span>}>
+                <Info className="h-3 w-3 shrink-0" />
+              </Tooltip>
             </p>
+            <p className="text-sm font-bold text-gray-400 mt-1">Dados incompletos</p>
           </div>
         </div>
 
@@ -365,7 +377,14 @@ export function ArchivedContractsView({ user, onBack }: Props) {
                   <th className="px-4 py-2.5 font-semibold text-left">CNPJ</th>
                   <th className="px-4 py-2.5 font-semibold text-left">Fiscal</th>
                   <th className="px-4 py-2.5 font-semibold text-left">Status</th>
-                  <th className="px-4 py-2.5 font-semibold text-left">Total Pago</th>
+                  <th className="px-4 py-2.5 font-semibold text-left">
+                    <span className="inline-flex items-center gap-1">
+                      Total Pago
+                      <Tooltip content={<span className="whitespace-normal block max-w-[240px] normal-case tracking-normal">{PAGAMENTOS_INCOMPLETOS_TOOLTIP}</span>}>
+                        <Info className="h-3 w-3 shrink-0" />
+                      </Tooltip>
+                    </span>
+                  </th>
                   <th className="px-4 py-2.5 font-semibold text-left">Arquivado em</th>
                   <th className="px-4 py-2.5 font-semibold text-left">Motivo</th>
                   <th className="px-4 py-2.5 font-semibold text-right">Ações</th>
@@ -394,7 +413,7 @@ export function ArchivedContractsView({ user, onBack }: Props) {
                           {contractStatusLabel[c.status] || c.status}
                         </span>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-emerald-700 whitespace-nowrap">{formatCurrency(c.totalPaid)}</td>
+                      <td className="px-4 py-3 font-semibold text-gray-400 whitespace-nowrap" title={`${PAGAMENTOS_INCOMPLETOS_TOOLTIP} (bruto registrado: ${formatCurrency(c.totalPaid)})`}>Dados incompletos</td>
                       <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{c.archivedAt ? formatDate(c.archivedAt) : '—'}</td>
                       <td className={`max-w-[180px] px-4 py-3 ${isRescinded ? 'text-red-700 font-medium' : 'text-gray-500'}`} title={c.archiveReason || undefined}>
                         <span className="line-clamp-1">{c.archiveReason || '—'}</span>

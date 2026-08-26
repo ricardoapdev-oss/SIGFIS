@@ -1,6 +1,17 @@
-import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { AlterationStatus, AlterationType, UserRole, AlertType } from '@prisma/client';
+import {
+  AlterationStatus,
+  AlterationType,
+  UserRole,
+  AlertType,
+} from '@prisma/client';
+import { sumDecimal } from '../contracts/financial-calculations';
 
 @Injectable()
 export class AlterationsService {
@@ -18,36 +29,49 @@ export class AlterationsService {
     // Apenas FISCAL designado ou GESTOR pode solicitar
     if (role === UserRole.FISCAL) {
       const isAssigned = await this.prisma.fiscalAssignment.findFirst({
-        where: { contractId: data.contractId, fiscalId: userId, isActive: true },
+        where: {
+          contractId: data.contractId,
+          fiscalId: userId,
+          isActive: true,
+        },
       });
       if (!isAssigned) {
         throw new ForbiddenException('Acesso negado a este contrato');
       }
     } else if (role === UserRole.ADMIN) {
-      throw new ForbiddenException('Perfil administrativo não pode propor alterações.');
+      throw new ForbiddenException(
+        'Perfil administrativo não pode propor alterações.',
+      );
     }
 
     const valueChange = Number(data.valueChange || 0);
 
     // Validação da Regra R01 (Limite de Aditivos de Valor) para acréscimos
     if (data.type === AlterationType.ADDENDUM_VALUE_INCREASE) {
-      const isReform = contract.objectDescription.toLowerCase().includes('reforma') || 
-                       contract.objectDescription.toLowerCase().includes('retrofit') || 
-                       contract.objectDescription.toLowerCase().includes('readequação de espaço');
-      
-      const limitPercentage = isReform ? 0.50 : 0.25;
+      const isReform =
+        contract.objectDescription.toLowerCase().includes('reforma') ||
+        contract.objectDescription.toLowerCase().includes('retrofit') ||
+        contract.objectDescription
+          .toLowerCase()
+          .includes('readequação de espaço');
+
+      const limitPercentage = isReform ? 0.5 : 0.25;
       const limitValue = Number(contract.initialValue) * limitPercentage;
 
       // Somar alterações de acréscimo já aprovadas
       const approvedValueIncreases = contract.alterations
-        .filter(alt => alt.type === AlterationType.ADDENDUM_VALUE_INCREASE && alt.status === AlterationStatus.APPROVED)
+        .filter(
+          (alt) =>
+            alt.type === AlterationType.ADDENDUM_VALUE_INCREASE &&
+            alt.status === AlterationStatus.APPROVED,
+        )
         .reduce((sum, alt) => sum + Number(alt.valueChange), 0);
 
       const totalProjectedIncrease = approvedValueIncreases + valueChange;
 
       if (totalProjectedIncrease > limitValue) {
         throw new BadRequestException(
-          `Limite de aditivo de valor excedido. O limite acumulado permitido para este contrato é de R$ ${limitValue.toFixed(2)} (${limitPercentage * 100}%). Projetado: R$ ${totalProjectedIncrease.toFixed(2)}`
+          `Limite de aditivo de valor excedido. O limite acumulado permitido para este contrato é de R$ ${limitValue.toFixed(2)} (${limitPercentage * 100}%). Projetado: R$ ${totalProjectedIncrease.toFixed(2)}`,
         );
       }
     }
@@ -102,9 +126,13 @@ export class AlterationsService {
         },
       });
 
-      // Atualizar dados no Contrato
-      const newCurrentValue = Number(alteration.contract.currentValue) + Number(alteration.valueChange);
-      
+      // Atualizar dados no Contrato — precisão decimal, sem passar por
+      // Number() intermediário (ver financial-calculations.ts).
+      const newCurrentValue = sumDecimal([
+        alteration.contract.currentValue,
+        alteration.valueChange,
+      ]);
+
       const updateData: any = {
         currentValue: newCurrentValue,
       };
@@ -187,14 +215,29 @@ export class AlterationsService {
   }
 
   async update(id: string, data: any) {
-    const alt = await this.prisma.contractAlteration.findUnique({ where: { id } });
+    const alt = await this.prisma.contractAlteration.findUnique({
+      where: { id },
+    });
     if (!alt) throw new NotFoundException('Aditivo não encontrado');
-    const { id: _id, contractId: _cid, requesterId: _rid, reviewerId: _rvid, createdAt, updatedAt, ...updateData } = data;
-    return this.prisma.contractAlteration.update({ where: { id }, data: updateData });
+    const {
+      id: _id,
+      contractId: _cid,
+      requesterId: _rid,
+      reviewerId: _rvid,
+      createdAt,
+      updatedAt,
+      ...updateData
+    } = data;
+    return this.prisma.contractAlteration.update({
+      where: { id },
+      data: updateData,
+    });
   }
 
   async delete(id: string) {
-    const alt = await this.prisma.contractAlteration.findUnique({ where: { id } });
+    const alt = await this.prisma.contractAlteration.findUnique({
+      where: { id },
+    });
     if (!alt) throw new NotFoundException('Aditivo não encontrado');
     await this.prisma.contractAlteration.delete({ where: { id } });
     return { ok: true };

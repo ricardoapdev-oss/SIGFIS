@@ -6,16 +6,21 @@ import {
   Building, FileText, Users, UserCheck, Calendar, ClipboardList,
   AlertTriangle, DollarSign, Bell, History, ChevronLeft, Plus,
   CheckCircle, XCircle, Clock, Shield, ExternalLink, FileSignature,
-  Activity, Send, X, Trash2, Pencil, Save, GitBranch,
+  Activity, Send, X, Trash2, Pencil, Save, GitBranch, Info,
 } from 'lucide-react';
 import { api, User, Contract, ContractAlert } from '@/lib/api';
 import { CurrencyInput } from '@/components/ui/currency-input';
+import { Tooltip } from '@/components/ui/tooltip';
 import {
   contractStatusLabel, contractStatusColor, occurrenceSeverityLabel, occurrenceSeverityColor,
   occurrenceStatusLabel, occurrenceStatusColor, measurementStatusLabel, measurementStatusColor,
   alterationTypeLabel, alterationStatusLabel, alterationStatusColor, fiscalRoleLabel,
   formatCurrency, formatDate, formatDateTime,
 } from '@/lib/labels';
+import {
+  sumApprovedMeasurements, contractualBalanceNotExecuted, executionRateByMeasurement,
+  sumPayments, FINANCIAL_TOOLTIPS, LIQUIDACAO_NAO_DISPONIVEL,
+} from '@/lib/financial-calculations';
 
 // ── Tipos de aba ──────────────────────────────────────────────────────────────
 type TabId = 'dados' | 'empresa' | 'fiscal' | 'gestor' | 'vigencia' | 'aditivos'
@@ -56,9 +61,16 @@ interface Props {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const inputCls = 'w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500/50';
 const badgeCls = (color: string) => `px-2 py-0.5 rounded text-[10px] font-semibold border ${color}`;
-const infoRow = (label: string, value: React.ReactNode) => (
+const infoRow = (label: string, value: React.ReactNode, tooltip?: string) => (
   <div key={label} className="flex flex-col gap-0.5">
-    <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">{label}</span>
+    <span className="flex items-center gap-1 text-[10px] font-medium text-gray-500 uppercase tracking-widest">
+      {label}
+      {tooltip && (
+        <Tooltip content={<span className="whitespace-normal block max-w-[220px]">{tooltip}</span>}>
+          <Info className="h-3 w-3 shrink-0" />
+        </Tooltip>
+      )}
+    </span>
     <span className="text-xs text-gray-800">{value || '—'}</span>
   </div>
 );
@@ -498,11 +510,23 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
     onError: (e: any) => alert(`Erro ao registrar medição: ${e.message}`),
   });
   const approveMeasurementMutation = useMutation({
-    mutationFn: (id: string) => api.measurements.approve(id),
+    mutationFn: ({ id, justification }: { id: string; justification?: string }) => api.measurements.approve(id, justification),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contract', contractId] });
     },
-    onError: (e: any) => alert(`Erro: ${e.message}`),
+    onError: (e: any, variables) => {
+      // O backend recusa (sem justificativa) aprovar medição que levaria o
+      // total aprovado do contrato a superar o valor contratual atual —
+      // pede a justificativa aqui e tenta novamente com ela.
+      if (!variables.justification && /justificativa/i.test(e.message)) {
+        const justification = window.prompt(`${e.message}\n\nDigite a justificativa para aprovar mesmo assim:`);
+        if (justification?.trim()) {
+          approveMeasurementMutation.mutate({ id: variables.id, justification: justification.trim() });
+        }
+        return;
+      }
+      alert(`Erro: ${e.message}`);
+    },
   });
   const rejectMeasurementMutation = useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) => api.measurements.reject(id, reason),
@@ -605,10 +629,15 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
   const daysLeft = Math.ceil((toContractDate(c.endDate).getTime() - Date.now()) / 86400000);
   const daysTotal = Math.ceil((toContractDate(c.endDate).getTime() - toContractDate(c.startDate || c.signingDate).getTime()) / 86400000);
   const progress = Math.max(0, Math.min(100, ((daysTotal - daysLeft) / daysTotal) * 100));
-  const totalMeasured = (c.measurements || []).filter((m: any) => m.status === 'APPROVED').reduce((s: number, m: any) => s + Number(m.measurementValue), 0);
-  const executionPctRaw = c.currentValue > 0 ? (totalMeasured / c.currentValue) * 100 : 0;
+  // Medições aprovadas (conceito 2) — nunca "pago"; fórmulas centralizadas
+  // em lib/financial-calculations.ts, mesmas usadas no Painel Geral e no
+  // Relatório PDF.
+  const medicoesAprovadas = sumApprovedMeasurements(c.measurements || []);
+  const saldoContratualNaoExecutado = contractualBalanceNotExecuted(Number(c.currentValue), medicoesAprovadas);
+  const executionPctRaw = executionRateByMeasurement(Number(c.currentValue), medicoesAprovadas);
   const executionPct = executionPctRaw.toFixed(1);
   const executionOverrun = executionPctRaw > 100;
+  const totalPago = sumPayments(c.payments || []);
 
   return (
     <div className="space-y-4 max-w-7xl mx-auto">
@@ -785,7 +814,12 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
             <div className="text-right"><span className="text-gray-500 block text-[10px]">Valor Inicial</span><strong className="text-gray-800">{formatCurrency(c.initialValue)}</strong></div>
             <div className="text-right"><span className="text-gray-500 block text-[10px]">Valor Atual</span><strong className="text-emerald-400">{formatCurrency(c.currentValue)}</strong></div>
             <div className="text-right">
-              <span className="text-gray-500 block text-[10px]">Executado</span>
+              <span className="flex items-center justify-end gap-1 text-gray-500 text-[10px]">
+                Tx. Execução
+                <Tooltip content={<span className="whitespace-normal block max-w-[220px]">{FINANCIAL_TOOLTIPS.taxaExecucaoMedicoes} {FINANCIAL_TOOLTIPS.medicoesAprovadas}</span>}>
+                  <Info className="h-3 w-3 shrink-0" />
+                </Tooltip>
+              </span>
               <strong className={executionOverrun ? 'text-red-400' : 'text-blue-400'}>
                 {executionPct}%{executionOverrun && <span className="ml-0.5 text-[9px]">⚠</span>}
               </strong>
@@ -896,7 +930,8 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                 {infoRow('Fim da Vigência', formatDate(c.endDate))}
                 {infoRow('Valor Inicial', formatCurrency(c.initialValue))}
                 {infoRow('Valor Atual', formatCurrency(c.currentValue))}
-                {infoRow('Total Medido', formatCurrency(totalMeasured))}
+                {infoRow('Medições Aprovadas', formatCurrency(medicoesAprovadas), FINANCIAL_TOOLTIPS.medicoesAprovadas)}
+                {infoRow('Saldo Contratual Não Executado', formatCurrency(saldoContratualNaoExecutado), FINANCIAL_TOOLTIPS.saldoContratualNaoExecutado)}
                 {c.processId && infoRow('Processo de Origem', c.process?.processNumber || c.processId)}
                 {c.department && infoRow('Unidade Administrativa', c.department)}
                 {c.observations && infoRow('Observação', <span className="text-amber-400 font-medium">{c.observations}</span>)}
@@ -1308,11 +1343,12 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
             <div className="flex justify-between items-center">
               <div>
                 <h4 className="text-xs font-semibold text-gray-700">Medições de Fiscalização</h4>
-                <p className="text-[10px] text-gray-500 mt-0.5">Total medido (aprovado): {formatCurrency(totalMeasured)} de {formatCurrency(c.currentValue)}</p>
+                <p className="text-[10px] text-gray-500 mt-0.5">Medições aprovadas: {formatCurrency(medicoesAprovadas)} de {formatCurrency(c.currentValue)} (valor contratual atual)</p>
+                <p className="text-[9px] text-gray-400 mt-0.5">{FINANCIAL_TOOLTIPS.medicoesAprovadas}</p>
               </div>
               {(user.role === 'FISCAL' || isGestor) && (
                 <button onClick={() => setShowMeasurementForm(v => !v)} className="flex items-center gap-1.5 text-[11px] bg-white hover:bg-gray-100 border border-gray-300 px-3 py-1.5 rounded-lg text-gray-700 cursor-pointer"
-                  title="Registre a medição do período fiscalizado, com valor executado e relatório">
+                  title="Registre a medição do período fiscalizado, com valor medido e relatório">
                   <Plus className="h-3.5 w-3.5" /> Nova Medição
                 </button>
               )}
@@ -1322,7 +1358,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
               <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-4 space-y-4">
                 <div>
                   <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Registrar Nova Medição de Fiscalização</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">Informe o período fiscalizado, o valor executado e um relatório descritivo da medição.</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">Informe o período fiscalizado, o valor medido e um relatório descritivo da medição.</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
@@ -1381,7 +1417,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                         <span className={badgeCls(measurementStatusColor[msr.status] || '')}>{measurementStatusLabel[msr.status] || msr.status}</span>
                         {isGestor && msr.status === 'PENDING_GESTOR' && (
                           <div className="flex gap-1.5">
-                            <button onClick={() => approveMeasurementMutation.mutate(msr.id)} disabled={approveMeasurementMutation.isPending} title="Aprovar medição" className="p-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400 cursor-pointer disabled:opacity-50 hover:bg-emerald-500/20"><CheckCircle className="h-3.5 w-3.5" /></button>
+                            <button onClick={() => approveMeasurementMutation.mutate({ id: msr.id })} disabled={approveMeasurementMutation.isPending} title="Aprovar medição" className="p-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400 cursor-pointer disabled:opacity-50 hover:bg-emerald-500/20"><CheckCircle className="h-3.5 w-3.5" /></button>
                             <button onClick={() => setRejectMsrModal({ id: msr.id })} title="Rejeitar medição" className="p-1.5 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 cursor-pointer hover:bg-red-500/20"><XCircle className="h-3.5 w-3.5" /></button>
                           </div>
                         )}
@@ -1583,25 +1619,50 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
               </div>
             )}
 
-            {/* Resumo financeiro */}
+            {/* Resumo financeiro — valor pago (conceito 4), nunca confundido com
+                medição aprovada (conceito 2). "Saldo liquidado a pagar" (conceito
+                6 = valor liquidado − valor pago) depende de liquidação, que o
+                SIGFIS ainda não modela — por isso "Não informado", em vez de
+                aproximar com valor contratual ou medição.
+
+                Revisão técnica (Etapa 3): ContractPayment hoje não tem status,
+                estorno/cancelamento, glosa, retenção, valor líquido, vínculo com
+                medição nem ordem bancária (auditado no schema real de produção,
+                supabase/migrations/20260823134034_remote_schema.sql) — só valor
+                bruto informado manualmente, data e quem registrou. Por isso os
+                indicadores agregados abaixo (Total Pago / % Pago) NÃO são
+                tratados como indicador financeiro "efetivo" (cenário B da
+                classificação de confiabilidade); mostramos "Dados financeiros
+                incompletos" em vez de um número que passaria confiança indevida.
+                A lista de pagamentos individuais abaixo continua real e visível
+                — não é um agregado, é o registro bruto. */}
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-gray-100/40 border border-gray-200 p-4 rounded-xl text-center">
-                <p className="text-[10px] text-gray-500">Total Pago (NFs)</p>
-                <p className="text-lg font-bold text-emerald-400 mt-1">
-                  {formatCurrency((c.payments || []).reduce((s: number, p: any) => s + Number(p.value), 0))}
+                <p className="flex items-center justify-center gap-1 text-[10px] text-gray-500">
+                  Total Pago (NFs)
+                  <Tooltip content={<span className="whitespace-normal block max-w-[240px]">Dados financeiros incompletos: os registros de pagamento não têm status, estorno/cancelamento, glosa, retenção nem valor líquido. Este total bruto ({formatCurrency(totalPago)}) não deve ser tratado como indicador financeiro oficial de pagamento efetivo.</span>}>
+                    <Info className="h-3 w-3 shrink-0" />
+                  </Tooltip>
                 </p>
+                <p className="text-lg font-bold text-gray-400 mt-1">Dados financeiros incompletos</p>
               </div>
               <div className="bg-gray-100/40 border border-gray-200 p-4 rounded-xl text-center">
-                <p className="text-[10px] text-gray-500">Saldo Contratual</p>
-                <p className="text-lg font-bold text-blue-400 mt-1">
-                  {formatCurrency(c.currentValue - (c.payments || []).reduce((s: number, p: any) => s + Number(p.value), 0))}
+                <p className="flex items-center justify-center gap-1 text-[10px] text-gray-500">
+                  Saldo Liquidado a Pagar
+                  <Tooltip content={<span className="whitespace-normal block max-w-[220px]">{LIQUIDACAO_NAO_DISPONIVEL}</span>}>
+                    <Info className="h-3 w-3 shrink-0" />
+                  </Tooltip>
                 </p>
+                <p className="text-lg font-bold text-gray-400 mt-1">Não informado</p>
               </div>
               <div className="bg-gray-100/40 border border-gray-200 p-4 rounded-xl text-center">
-                <p className="text-[10px] text-gray-500">% Pago</p>
-                <p className="text-lg font-bold text-amber-400 mt-1">
-                  {c.currentValue > 0 ? (((c.payments || []).reduce((s: number, p: any) => s + Number(p.value), 0) / c.currentValue) * 100).toFixed(1) : '0.0'}%
+                <p className="flex items-center justify-center gap-1 text-[10px] text-gray-500">
+                  % do Valor Contratual Pago
+                  <Tooltip content={<span className="whitespace-normal block max-w-[240px]">Dados financeiros incompletos — mesma limitação do Total Pago (NFs) ao lado.</span>}>
+                    <Info className="h-3 w-3 shrink-0" />
+                  </Tooltip>
                 </p>
+                <p className="text-lg font-bold text-gray-400 mt-1">Dados financeiros incompletos</p>
               </div>
             </div>
 

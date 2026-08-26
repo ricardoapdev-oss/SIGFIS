@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { api, User } from '@/lib/api';
 import { formatCurrency } from '@/lib/labels';
+import { classifyFinancialIntent, buildFinancialAnswer } from '@/lib/ai-financial-intent';
 import { Area, ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface Props {
@@ -778,6 +779,16 @@ export function AIInsightsPanel({ user, onNavigate }: Props) {
 
   const processQuestion = useMemo(() => (q: string): string => {
     if (!dash || !contracts.length) return 'Carregando dados...';
+
+    // Intenções financeiras (saldo, pagamento, medições aprovadas, execução/
+    // valor genérico) são resolvidas primeiro, nesta ordem de especificidade
+    // — ver frontend/src/lib/ai-financial-intent.ts para o porquê e os testes
+    // (frontend/scripts/verify-ai-intent.cjs). Isso corrige o bug em que
+    // "Qual o saldo financeiro a pagar?" caía no handler genérico de valor/
+    // financeiro e respondia com taxa de execução em vez de saldo.
+    const financialAnswer = buildFinancialAnswer(classifyFinancialIntent(q), dash?.financial);
+    if (financialAnswer) return financialAnswer;
+
     const ql = q.toLowerCase();
     const now = new Date();
     if (ql.match(/quantos contratos|total de contratos/)) {
@@ -799,10 +810,6 @@ export function AIInsightsPanel({ user, onNavigate }: Props) {
     if (ql.match(/ocorrência|ocorr|problema/)) {
       const occ = contracts.filter(c => c.hasOpenOccurrences);
       return `${occ.length} contrato(s) com ocorrências abertas.\n${occ.slice(0, 3).map(c => c.contractNumber).join(', ')}${occ.length > 3 ? ` +${occ.length - 3}` : ''}.`;
-    }
-    if (ql.match(/valor|financ|dinheiro|r\$/)) {
-      const fin = dash?.financial;
-      return `Carteira: R$ ${fin?.totalContracted?.toLocaleString('pt-BR') ?? '-'}\nExecutado: R$ ${fin?.totalExecuted?.toLocaleString('pt-BR') ?? '-'}\nExecução: ${fin?.executionPercent?.toFixed(1) ?? '-'}%`;
     }
     if (ql.match(/risco|crítico|alerta/)) {
       const rs = dash?.riskSummary;
@@ -828,10 +835,6 @@ export function AIInsightsPanel({ user, onNavigate }: Props) {
     if (ql.match(/ocorrência|ocorr|problema/)) {
       const occ = contracts.filter(c => c.hasOpenOccurrences);
       return `${occ.length} contrato(s) com ocorrências abertas:\n${occ.slice(0, 5).map(c => `• ${c.contractNumber}`).join('\n')}${occ.length > 5 ? `\n+${occ.length - 5} outros` : ''}`;
-    }
-    if (ql.match(/taxa.*execu|execu.*financ|percent.*execu/)) {
-      const fin = dash?.financial;
-      return `Taxa de Execução Financeira: ${fin?.executionPercent?.toFixed(1) ?? '-'}%\nContratado: R$ ${fin?.totalContracted?.toLocaleString('pt-BR') ?? '-'}\nExecutado: R$ ${fin?.totalExecuted?.toLocaleString('pt-BR') ?? '-'}\nSaldo: R$ ${fin?.balance?.toLocaleString('pt-BR') ?? '-'}`;
     }
     if (ql.match(/90 dias|noventa dias|trim/)) {
       const e90 = contracts.filter(c => { const d = Math.round((new Date(c.endDate).getTime() - now.getTime()) / 86400000); return c.status === 'ACTIVE' && d >= 0 && d <= 90; });
@@ -861,10 +864,6 @@ export function AIInsightsPanel({ user, onNavigate }: Props) {
     if (ql.match(/processo.*atras|atras.*processo|processo.*atraso/)) {
       const delayed = contracts.filter(c => c.hasDelayedProcesses);
       return delayed.length > 0 ? `${delayed.length} contrato(s) com processo atrasado:\n${delayed.slice(0, 5).map(c => `• ${c.contractNumber}`).join('\n')}${delayed.length > 5 ? `\n+${delayed.length - 5} outros` : ''}` : '✅ Nenhum processo com atraso identificado.';
-    }
-    if (ql.match(/saldo|a pagar|restante.*financ|financ.*restante/)) {
-      const fin = dash?.financial;
-      return `Saldo financeiro a pagar: R$ ${fin?.balance?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) ?? '-'}\nCorresponde a ${fin?.executionPercent != null ? (100 - fin.executionPercent).toFixed(1) : '-'}% do valor total contratado.`;
     }
     return `Não encontrei uma resposta específica. Exemplos de perguntas:\n• "Qual contrato tem o maior valor?"\n• "Quantos contratos vencem em 90 dias?"\n• "Qual a taxa de execução financeira?"\n• "Quais fornecedores têm nota abaixo de C?"\n• "Qual contrato tem menos dias restantes?"\n• "Quais contratos foram encerrados?"\n• "Qual o saldo financeiro a pagar?"`;
   }, [dash, contracts, suppliers]);

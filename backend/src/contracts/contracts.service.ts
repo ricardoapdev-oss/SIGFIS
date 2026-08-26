@@ -1,11 +1,35 @@
-import { BadRequestException, Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
-import { AlterationStatus, ContractStatus, FiscalRole, MeasurementStatus, OccurrenceStatus, UserRole } from '@prisma/client';
+import {
+  AlterationStatus,
+  AlterationType,
+  ContractStatus,
+  FiscalRole,
+  MeasurementStatus,
+  OccurrenceStatus,
+  UserRole,
+} from '@prisma/client';
+import {
+  computePortfolioFinancials,
+  contractDurationMonths,
+  contractualBalanceNotExecuted,
+  executionRateByMeasurement,
+  sumApprovedMeasurements,
+  checkSuppressionWithoutRecord,
+} from './financial-calculations';
 
 @Injectable()
 export class ContractsService {
-  constructor(private prisma: PrismaService, private auditService: AuditService) {}
+  constructor(
+    private prisma: PrismaService,
+    private auditService: AuditService,
+  ) {}
 
   async findAll(userId: string, role: string) {
     const sharedInclude = {
@@ -13,7 +37,13 @@ export class ContractsService {
       fiscalAssignments: {
         include: {
           fiscal: {
-            select: { id: true, name: true, email: true, role: true, registrationNumber: true },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true,
+              registrationNumber: true,
+            },
           },
         },
       },
@@ -28,7 +58,9 @@ export class ContractsService {
         const parse = (str: string) => {
           if (!str) return { n: 0, y: 0 };
           const p = str.split('/');
-          return p.length === 2 ? { n: parseInt(p[0]) || 0, y: parseInt(p[1]) || 0 } : { n: 0, y: 0 };
+          return p.length === 2
+            ? { n: parseInt(p[0]) || 0, y: parseInt(p[1]) || 0 }
+            : { n: 0, y: 0 };
         };
         const pA = parse(a.contractNumber);
         const pB = parse(b.contractNumber);
@@ -40,12 +72,13 @@ export class ContractsService {
     const addComputedFields = (contracts: any[]) =>
       sortContracts(contracts).map((c) => ({
         ...c,
-        hasPendingMeasurements: c.measurements?.some(
-          (m: any) => m.status === 'PENDING_GESTOR' || m.status === 'PENDING_FISCAL',
-        ) ?? false,
-        hasOpenOccurrences: c.occurrences?.some(
-          (o: any) => o.status !== 'RESOLVED',
-        ) ?? false,
+        hasPendingMeasurements:
+          c.measurements?.some(
+            (m: any) =>
+              m.status === 'PENDING_GESTOR' || m.status === 'PENDING_FISCAL',
+          ) ?? false,
+        hasOpenOccurrences:
+          c.occurrences?.some((o: any) => o.status !== 'RESOLVED') ?? false,
       }));
 
     if (role === 'FISCAL') {
@@ -78,7 +111,11 @@ export class ContractsService {
    * mas é repetida aqui como segunda camada de defesa.
    */
   async findArchived(role: string) {
-    if (role !== UserRole.ADMIN && role !== UserRole.GESTOR && role !== UserRole.ALTA_GESTAO) {
+    if (
+      role !== UserRole.ADMIN &&
+      role !== UserRole.GESTOR &&
+      role !== UserRole.ALTA_GESTAO
+    ) {
       throw new ForbiddenException('Acesso negado.');
     }
 
@@ -89,7 +126,11 @@ export class ContractsService {
         process: { select: { processNumber: true, modality: true } },
         fiscalAssignments: {
           where: { isActive: true },
-          include: { fiscal: { select: { id: true, name: true, registrationNumber: true } } },
+          include: {
+            fiscal: {
+              select: { id: true, name: true, registrationNumber: true },
+            },
+          },
         },
         alterations: { select: { id: true } },
         occurrences: { select: { id: true } },
@@ -120,7 +161,13 @@ export class ContractsService {
         fiscalAssignments: {
           include: {
             fiscal: {
-              select: { id: true, name: true, email: true, role: true, registrationNumber: true },
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                registrationNumber: true,
+              },
             },
           },
         },
@@ -168,16 +215,20 @@ export class ContractsService {
 
     if (role === 'FISCAL') {
       const isAssigned = contract.fiscalAssignments.some(
-        (assignment) => assignment.fiscalId === userId && assignment.isActive
+        (assignment) => assignment.fiscalId === userId && assignment.isActive,
       );
       if (!isAssigned) {
-        throw new ForbiddenException('Você não tem permissão para visualizar este contrato');
+        throw new ForbiddenException(
+          'Você não tem permissão para visualizar este contrato',
+        );
       }
       // Contratos arquivados saem da operação — FISCAL nunca os visualiza,
       // mesmo tendo sido designado no passado (único papel sem acesso a
       // Contratos Arquivados; os demais três papéis existentes têm acesso).
       if (contract.archived) {
-        throw new ForbiddenException('Este contrato foi arquivado e não está mais disponível para este perfil.');
+        throw new ForbiddenException(
+          'Este contrato foi arquivado e não está mais disponível para este perfil.',
+        );
       }
     }
 
@@ -209,20 +260,27 @@ export class ContractsService {
     if (!contract) throw new NotFoundException('Contrato não encontrado');
 
     const updateData: any = {};
-    if (data.currentValue !== undefined) updateData.currentValue = data.currentValue;
+    if (data.currentValue !== undefined)
+      updateData.currentValue = data.currentValue;
     if (data.endDate) updateData.endDate = new Date(data.endDate);
     if (data.status) updateData.status = data.status as ContractStatus;
-    if (data.observations !== undefined) updateData.observations = data.observations;
+    if (data.observations !== undefined)
+      updateData.observations = data.observations;
     if (data.department !== undefined) updateData.department = data.department;
-    if (data.objectDescription) updateData.objectDescription = data.objectDescription;
+    if (data.objectDescription)
+      updateData.objectDescription = data.objectDescription;
 
     // Encerramento e rescisão do contrato: além de mudar a situação, arquivam
     // automaticamente (saem da listagem operacional, mas o histórico é
     // preservado em Contratos Arquivados) — regra de negócio explícita,
     // separada da ação manual de "Arquivar". Suspensão, ao contrário,
     // permanece na listagem principal — só muda o status.
-    const isConcluding = data.status === ContractStatus.CONCLUDED && contract.status !== ContractStatus.CONCLUDED;
-    const isRescinding = data.status === ContractStatus.RESCINDED && contract.status !== ContractStatus.RESCINDED;
+    const isConcluding =
+      data.status === ContractStatus.CONCLUDED &&
+      contract.status !== ContractStatus.CONCLUDED;
+    const isRescinding =
+      data.status === ContractStatus.RESCINDED &&
+      contract.status !== ContractStatus.RESCINDED;
     if (isConcluding) {
       updateData.archived = true;
       updateData.archivedAt = new Date();
@@ -237,7 +295,10 @@ export class ContractsService {
         : 'Rescisão do contrato';
     }
 
-    const updated = await this.prisma.contract.update({ where: { id }, data: updateData });
+    const updated = await this.prisma.contract.update({
+      where: { id },
+      data: updateData,
+    });
 
     const oldValues: Record<string, any> = {};
     const newValues: Record<string, any> = {};
@@ -247,24 +308,50 @@ export class ContractsService {
     }
 
     this.auditService.log({
-      userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
-      action: 'UPDATE', module: 'Contratos', entity: 'Contract', entityId: id,
+      userId: caller?.id,
+      userEmail: caller?.email,
+      userName: caller?.name,
+      userRole: caller?.role,
+      action: 'UPDATE',
+      module: 'Contratos',
+      entity: 'Contract',
+      entityId: id,
       detail: `Contrato ${contract.contractNumber} atualizado`,
-      oldValues, newValues,
+      oldValues,
+      newValues,
     });
 
     if (isConcluding) {
       this.auditService.log({
-        userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
-        action: 'CONTRATO_ARQUIVADO', module: 'Contratos', entity: 'Contract', entityId: id,
+        userId: caller?.id,
+        userEmail: caller?.email,
+        userName: caller?.name,
+        userRole: caller?.role,
+        action: 'CONTRATO_ARQUIVADO',
+        module: 'Contratos',
+        entity: 'Contract',
+        entityId: id,
         detail: `Contrato ${contract.contractNumber} encerrado e arquivado automaticamente`,
       });
     } else if (isRescinding) {
       this.auditService.log({
-        userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
-        action: 'CONTRATO_ARQUIVADO', module: 'Contratos', entity: 'Contract', entityId: id,
+        userId: caller?.id,
+        userEmail: caller?.email,
+        userName: caller?.name,
+        userRole: caller?.role,
+        action: 'CONTRATO_ARQUIVADO',
+        module: 'Contratos',
+        entity: 'Contract',
+        entityId: id,
         detail: `Contrato ${contract.contractNumber} rescindido e arquivado automaticamente${data.archiveReason?.trim() ? ` — motivo: ${data.archiveReason.trim()}` : ''}`,
       });
+    }
+
+    // Regra: "alertar contrato com valor atual inferior ao valor original
+    // sem registro de supressão" — não bloqueia a atualização, só registra
+    // em auditoria para revisão.
+    if (data.currentValue !== undefined) {
+      this.warnIfSuppressedWithoutRecord(id, caller).catch(() => {});
     }
 
     return updated;
@@ -294,8 +381,14 @@ export class ContractsService {
     });
 
     this.auditService.log({
-      userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
-      action: 'CONTRATO_ARQUIVADO', module: 'Contratos', entity: 'Contract', entityId: id,
+      userId: caller?.id,
+      userEmail: caller?.email,
+      userName: caller?.name,
+      userRole: caller?.role,
+      action: 'CONTRATO_ARQUIVADO',
+      module: 'Contratos',
+      entity: 'Contract',
+      entityId: id,
       detail: `Contrato ${contract.contractNumber} arquivado por ${caller?.name || 'usuário'}`,
     });
 
@@ -325,8 +418,14 @@ export class ContractsService {
     });
 
     this.auditService.log({
-      userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
-      action: 'CONTRATO_RESTAURADO', module: 'Contratos', entity: 'Contract', entityId: id,
+      userId: caller?.id,
+      userEmail: caller?.email,
+      userName: caller?.name,
+      userRole: caller?.role,
+      action: 'CONTRATO_RESTAURADO',
+      module: 'Contratos',
+      entity: 'Contract',
+      entityId: id,
       detail: `Contrato ${contract.contractNumber} restaurado por ${caller?.name || 'usuário'}`,
     });
 
@@ -350,8 +449,14 @@ export class ContractsService {
     await this.prisma.contract.delete({ where: { id } });
 
     this.auditService.log({
-      userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
-      action: 'CONTRATO_EXCLUIDO_DEFINITIVAMENTE', module: 'Contratos', entity: 'Contract', entityId: id,
+      userId: caller?.id,
+      userEmail: caller?.email,
+      userName: caller?.name,
+      userRole: caller?.role,
+      action: 'CONTRATO_EXCLUIDO_DEFINITIVAMENTE',
+      module: 'Contratos',
+      entity: 'Contract',
+      entityId: id,
       detail: `Contrato ${contract.contractNumber} excluído definitivamente por ${caller?.name || 'usuário'} — operação irreversível`,
     });
 
@@ -364,7 +469,10 @@ export class ContractsService {
    * apagar o contrato inteiro.
    */
   async getHistoricalDataSummary(id: string) {
-    const contract = await this.prisma.contract.findUnique({ where: { id }, select: { id: true, contractNumber: true } });
+    const contract = await this.prisma.contract.findUnique({
+      where: { id },
+      select: { id: true, contractNumber: true },
+    });
     if (!contract) throw new NotFoundException('Contrato não encontrado.');
 
     const [auditCount, alertsCount, occurrencesCount] = await Promise.all([
@@ -384,14 +492,25 @@ export class ContractsService {
    * que ele não seja apagado junto.
    */
   async deleteContractHistory(id: string, caller: any) {
-    const contract = await this.prisma.contract.findUnique({ where: { id }, select: { id: true, contractNumber: true } });
+    const contract = await this.prisma.contract.findUnique({
+      where: { id },
+      select: { id: true, contractNumber: true },
+    });
     if (!contract) throw new NotFoundException('Contrato não encontrado.');
 
-    const { count } = await this.prisma.auditLog.deleteMany({ where: { entityId: id } });
+    const { count } = await this.prisma.auditLog.deleteMany({
+      where: { entityId: id },
+    });
 
     this.auditService.log({
-      userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
-      action: 'HISTORICO_EXCLUIDO', module: 'Contratos', entity: 'Contract', entityId: id,
+      userId: caller?.id,
+      userEmail: caller?.email,
+      userName: caller?.name,
+      userRole: caller?.role,
+      action: 'HISTORICO_EXCLUIDO',
+      module: 'Contratos',
+      entity: 'Contract',
+      entityId: id,
       detail: `Histórico de auditoria do contrato ${contract.contractNumber} excluído (${count} registro(s)) por ${caller?.name || 'usuário'}`,
     });
 
@@ -400,14 +519,25 @@ export class ContractsService {
 
   /** Exclui definitivamente os alertas vinculados ao contrato. Não exclui o contrato. */
   async deleteContractAlerts(id: string, caller: any) {
-    const contract = await this.prisma.contract.findUnique({ where: { id }, select: { id: true, contractNumber: true } });
+    const contract = await this.prisma.contract.findUnique({
+      where: { id },
+      select: { id: true, contractNumber: true },
+    });
     if (!contract) throw new NotFoundException('Contrato não encontrado.');
 
-    const { count } = await this.prisma.systemAlert.deleteMany({ where: { contractId: id } });
+    const { count } = await this.prisma.systemAlert.deleteMany({
+      where: { contractId: id },
+    });
 
     this.auditService.log({
-      userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
-      action: 'ALERTAS_EXCLUIDOS', module: 'Contratos', entity: 'Contract', entityId: id,
+      userId: caller?.id,
+      userEmail: caller?.email,
+      userName: caller?.name,
+      userRole: caller?.role,
+      action: 'ALERTAS_EXCLUIDOS',
+      module: 'Contratos',
+      entity: 'Contract',
+      entityId: id,
       detail: `Alertas do contrato ${contract.contractNumber} excluídos (${count} registro(s)) por ${caller?.name || 'usuário'}`,
     });
 
@@ -419,14 +549,25 @@ export class ContractsService {
    * documentos, via onDelete: Cascade). Não exclui o contrato.
    */
   async deleteContractOccurrences(id: string, caller: any) {
-    const contract = await this.prisma.contract.findUnique({ where: { id }, select: { id: true, contractNumber: true } });
+    const contract = await this.prisma.contract.findUnique({
+      where: { id },
+      select: { id: true, contractNumber: true },
+    });
     if (!contract) throw new NotFoundException('Contrato não encontrado.');
 
-    const { count } = await this.prisma.occurrence.deleteMany({ where: { contractId: id } });
+    const { count } = await this.prisma.occurrence.deleteMany({
+      where: { contractId: id },
+    });
 
     this.auditService.log({
-      userId: caller?.id, userEmail: caller?.email, userName: caller?.name, userRole: caller?.role,
-      action: 'OCORRENCIAS_EXCLUIDAS', module: 'Contratos', entity: 'Contract', entityId: id,
+      userId: caller?.id,
+      userEmail: caller?.email,
+      userName: caller?.name,
+      userRole: caller?.role,
+      action: 'OCORRENCIAS_EXCLUIDAS',
+      module: 'Contratos',
+      entity: 'Contract',
+      entityId: id,
       detail: `Ocorrências do contrato ${contract.contractNumber} excluídas (${count} registro(s)) por ${caller?.name || 'usuário'}`,
     });
 
@@ -448,7 +589,9 @@ export class ContractsService {
    * substitui outro no mesmo papel, preservando o histórico).
    */
   async removeAssignment(contractId: string, assignmentId: string) {
-    const assignment = await this.prisma.fiscalAssignment.findUnique({ where: { id: assignmentId } });
+    const assignment = await this.prisma.fiscalAssignment.findUnique({
+      where: { id: assignmentId },
+    });
     if (!assignment || assignment.contractId !== contractId) {
       throw new NotFoundException('Designação não encontrada neste contrato.');
     }
@@ -457,7 +600,9 @@ export class ContractsService {
         where: { contractId, isActive: true },
       });
       if (activeCount <= 1) {
-        throw new BadRequestException('Não é possível remover o último fiscal ativo do contrato.');
+        throw new BadRequestException(
+          'Não é possível remover o último fiscal ativo do contrato.',
+        );
       }
     }
     await this.prisma.fiscalAssignment.delete({ where: { id: assignmentId } });
@@ -472,13 +617,23 @@ export class ContractsService {
    * (reativada/renovada) em vez de duplicada.
    */
   async assignFiscalSafe(contractId: string, data: any) {
-    const contract = await this.prisma.contract.findUnique({ where: { id: contractId } });
+    const contract = await this.prisma.contract.findUnique({
+      where: { id: contractId },
+    });
     if (!contract) {
       throw new NotFoundException('Contrato não encontrado');
     }
 
-    if (!data.fiscalId || !data.role || !data.designationAct || !data.designationDate || !data.startDate) {
-      throw new BadRequestException('Preencha todos os campos obrigatórios da designação.');
+    if (
+      !data.fiscalId ||
+      !data.role ||
+      !data.designationAct ||
+      !data.designationDate ||
+      !data.startDate
+    ) {
+      throw new BadRequestException(
+        'Preencha todos os campos obrigatórios da designação.',
+      );
     }
 
     const normalizedRole = data.role as FiscalRole;
@@ -524,13 +679,19 @@ export class ContractsService {
   }
 
   /** Muda o papel (Titular/Substituto/Suplente) de uma designação já existente. */
-  async updateAssignmentRole(contractId: string, assignmentId: string, role: string) {
+  async updateAssignmentRole(
+    contractId: string,
+    assignmentId: string,
+    role: string,
+  ) {
     const normalizedRole = role as FiscalRole;
     if (!Object.values(FiscalRole).includes(normalizedRole)) {
       throw new BadRequestException('Função de fiscal inválida.');
     }
 
-    const assignment = await this.prisma.fiscalAssignment.findUnique({ where: { id: assignmentId } });
+    const assignment = await this.prisma.fiscalAssignment.findUnique({
+      where: { id: assignmentId },
+    });
     if (!assignment || assignment.contractId !== contractId) {
       throw new NotFoundException('Designação não encontrada neste contrato.');
     }
@@ -540,10 +701,16 @@ export class ContractsService {
     }
 
     const conflict = await this.prisma.fiscalAssignment.findFirst({
-      where: { contractId, fiscalId: assignment.fiscalId, role: normalizedRole },
+      where: {
+        contractId,
+        fiscalId: assignment.fiscalId,
+        role: normalizedRole,
+      },
     });
     if (conflict) {
-      throw new BadRequestException('Este fiscal já possui uma designação com essa função neste contrato.');
+      throw new BadRequestException(
+        'Este fiscal já possui uma designação com essa função neste contrato.',
+      );
     }
 
     return this.prisma.fiscalAssignment.update({
@@ -552,16 +719,26 @@ export class ContractsService {
     });
   }
 
+  /**
+   * Estatísticas consolidadas do Painel Geral — fonte única para os
+   * indicadores financeiros da carteira (ver `financial-calculations.ts`).
+   * A "carteira" considerada aqui é a mesma de `findReport` (Relatório PDF):
+   * contratos não arquivados e fora do rascunho (DRAFT) — minutas ainda não
+   * assinadas não compõem carteira contratual. Isso mantém os dois painéis
+   * (Geral e Relatório) contando o mesmo universo de contratos.
+   */
   async getDashboardStats(userId: string, role: string) {
-    // Dashboard consolidado — nunca mistura contratos arquivados nos
-    // indicadores de operação corrente.
-    let contractWhereClause: any = { archived: false };
+    let contractWhereClause: any = {
+      archived: false,
+      NOT: { status: ContractStatus.DRAFT },
+    };
     if (role === 'FISCAL') {
       contractWhereClause = {
         archived: false,
+        NOT: { status: ContractStatus.DRAFT },
         fiscalAssignments: {
-          some: { fiscalId: userId, isActive: true }
-        }
+          some: { fiscalId: userId, isActive: true },
+        },
       };
     }
 
@@ -571,25 +748,21 @@ export class ContractsService {
         measurements: true,
         occurrences: true,
         alterations: true,
-      }
+      },
     });
 
     const totalContracts = contracts.length;
-    const activeContracts = contracts.filter(c => c.status === ContractStatus.ACTIVE).length;
-    
-    let totalValue = 0;
-    let totalMeasured = 0;
-    let openOccurrences = 0;
+    const activeContracts = contracts.filter(
+      (c) => c.status === ContractStatus.ACTIVE,
+    ).length;
+    const openOccurrences = contracts.reduce(
+      (sum, c) =>
+        sum +
+        c.occurrences.filter((o) => o.status === OccurrenceStatus.OPEN).length,
+      0,
+    );
 
-    contracts.forEach(c => {
-      totalValue += Number(c.currentValue);
-      c.measurements.forEach(m => {
-        if (m.status === MeasurementStatus.APPROVED) {
-          totalMeasured += Number(m.measurementValue);
-        }
-      });
-      openOccurrences += c.occurrences.filter(o => o.status === OccurrenceStatus.OPEN).length;
-    });
+    const financial = computePortfolioFinancials(contracts);
 
     // Buscar últimos alertas se for GESTOR ou FISCAL
     let alerts: any[] = [];
@@ -607,15 +780,18 @@ export class ContractsService {
     return {
       totalContracts,
       activeContracts,
-      totalValue,
-      totalMeasured,
       openOccurrences,
       alerts,
+      ...financial,
     };
   }
 
   async findReport(role: string) {
-    if (role !== UserRole.ADMIN && role !== UserRole.GESTOR && role !== UserRole.ALTA_GESTAO) {
+    if (
+      role !== UserRole.ADMIN &&
+      role !== UserRole.GESTOR &&
+      role !== UserRole.ALTA_GESTAO
+    ) {
       throw new ForbiddenException('Acesso negado');
     }
 
@@ -632,7 +808,7 @@ export class ContractsService {
         },
         measurements: {
           where: { status: MeasurementStatus.APPROVED },
-          select: { measurementValue: true },
+          select: { status: true, measurementValue: true },
         },
         alterations: {
           where: { status: AlterationStatus.APPROVED },
@@ -643,40 +819,102 @@ export class ContractsService {
     });
 
     return contracts.map((c) => {
-      const totalMeasured = c.measurements.reduce(
-        (sum, m) => sum + Number(m.measurementValue),
-        0,
-      );
+      // Medições aprovadas (conceito 2) — nunca "pago"; ver financial-calculations.ts.
+      const medicoesAprovadas = sumApprovedMeasurements(
+        c.measurements,
+      ).toNumber();
       const currentValue = Number(c.currentValue);
-      const balance = Math.max(0, currentValue - totalMeasured);
-
-      const start = new Date(c.startDate || c.signingDate);
-      const end = c.endDate ? new Date(c.endDate) : new Date();
-      const durationMonths = Math.max(
-        1,
-        Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 30.44)),
+      // Saldo contratual não executado (conceito 5) — não é limitado a zero:
+      // um valor negativo aqui é sinal de medição aprovada acima do valor
+      // contratual, que MeasurementsService.approve já impede sem
+      // justificativa. Não escondemos esse sinal arredondando para zero.
+      const saldoContratualNaoExecutado = contractualBalanceNotExecuted(
+        currentValue,
+        medicoesAprovadas,
+      ).toNumber();
+      const taxaExecucaoMedicoes = executionRateByMeasurement(
+        currentValue,
+        medicoesAprovadas,
       );
-      const monthlyValue = currentValue / durationMonths;
 
-      const titularAsg = c.fiscalAssignments.find((a) => a.role === FiscalRole.TITULAR);
-      const substitutoAsg = c.fiscalAssignments.find((a) => a.role === FiscalRole.SUBSTITUTO);
+      const durationMonths = contractDurationMonths(
+        c.startDate || c.signingDate,
+        c.endDate,
+      );
+      const monthlyValue =
+        durationMonths !== null ? currentValue / durationMonths : null;
+
+      const titularAsg = c.fiscalAssignments.find(
+        (a) => a.role === FiscalRole.TITULAR,
+      );
+      const substitutoAsg = c.fiscalAssignments.find(
+        (a) => a.role === FiscalRole.SUBSTITUTO,
+      );
 
       const { measurements, alterations, fiscalAssignments, ...rest } = c;
 
       return {
         ...rest,
-        totalMeasured,
-        balance,
+        medicoesAprovadas,
+        saldoContratualNaoExecutado,
+        taxaExecucaoMedicoes,
         durationMonths,
         monthlyValue,
         aditivoCount: alterations.length,
         titular: titularAsg
-          ? { ...titularAsg.fiscal, designationAct: titularAsg.designationAct, designationDate: titularAsg.designationDate }
+          ? {
+              ...titularAsg.fiscal,
+              designationAct: titularAsg.designationAct,
+              designationDate: titularAsg.designationDate,
+            }
           : null,
         substituto: substitutoAsg
-          ? { ...substitutoAsg.fiscal, designationAct: substitutoAsg.designationAct }
+          ? {
+              ...substitutoAsg.fiscal,
+              designationAct: substitutoAsg.designationAct,
+            }
           : null,
       };
+    });
+  }
+
+  /**
+   * Alerta (não bloqueia) contratos cujo valor atual está abaixo do valor
+   * original sem aditivo(s) de supressão (ADDENDUM_VALUE_DECREASE) aprovados
+   * que cubram a diferença — grava em auditoria para o time de gestão
+   * revisar. Chamada por `update()` sempre que o valor atual é alterado.
+   */
+  private async warnIfSuppressedWithoutRecord(contractId: string, caller: any) {
+    const contract = await this.prisma.contract.findUnique({
+      where: { id: contractId },
+      include: {
+        alterations: {
+          where: {
+            type: AlterationType.ADDENDUM_VALUE_DECREASE,
+            status: AlterationStatus.APPROVED,
+          },
+        },
+      },
+    });
+    if (!contract) return;
+
+    const flagged = checkSuppressionWithoutRecord(
+      contract.initialValue,
+      contract.currentValue,
+      contract.alterations.map((a) => a.valueChange),
+    );
+    if (!flagged) return;
+
+    this.auditService.log({
+      userId: caller?.id,
+      userEmail: caller?.email,
+      userName: caller?.name,
+      userRole: caller?.role,
+      action: 'ALERTA_VALOR_ATUAL_ABAIXO_DO_ORIGINAL',
+      module: 'Contratos',
+      entity: 'Contract',
+      entityId: contractId,
+      detail: `Contrato ${contract.contractNumber}: valor atual (R$ ${Number(contract.currentValue).toFixed(2)}) é inferior ao valor original (R$ ${Number(contract.initialValue).toFixed(2)}) sem aditivo de supressão aprovado que cubra integralmente a diferença. Verifique se a redução foi registrada corretamente.`,
     });
   }
 }

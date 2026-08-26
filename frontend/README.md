@@ -1,5 +1,42 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Rodando localmente com o build de produção (standalone)
+
+O `next.config.ts` deste projeto usa `output: "standalone"` fora da Vercel
+(necessário para o Docker da intranet). Nesse modo, **`next start` não
+funciona** — o Next avisa e encerra sem servir a aplicação, porque o build
+standalone não inclui `public/` nem `.next/static/` (é responsabilidade de
+quem sobe o servidor copiar essas duas pastas antes de rodar
+`.next/standalone/server.js` — comportamento documentado do próprio Next.js).
+
+Para não fazer essa cópia manualmente toda vez, use:
+
+```bash
+# 1. Build (gera .next/standalone)
+npm run build
+
+# 2. Copia public/ e .next/static para dentro do standalone e sobe o servidor
+npm run start:standalone
+
+# Porta customizada (padrão: 3000)
+PORT=4000 npm run start:standalone
+```
+
+Abra [http://localhost:3000](http://localhost:3000) (ou a porta escolhida).
+
+**Variável de ambiente necessária**: o backend (NestJS, porta 3001 por
+padrão) precisa estar rodando e configurado com `DATABASE_URL`/`DIRECT_URL`
+válidos (ver `backend/.env.example`) — o frontend fala com ele via proxy
+`/api/*` (`BACKEND_URL`, padrão `http://localhost:3001`, configurável em
+`next.config.ts`).
+
+**⚠️ Atenção — banco real, sem staging isolado**: hoje o projeto tem um
+único banco configurado (Supabase), sem um ambiente de staging separado do
+que é usado em produção. Antes de fazer qualquer teste local que **escreva**
+dados (criar/editar/aprovar/excluir contratos, medições, pagamentos etc.),
+confirme qual `DATABASE_URL` está apontado em `backend/.env` — navegação e
+leitura são seguras, mas uma escrita local afeta o mesmo banco real.
+
 ## Getting Started
 
 First, run the development server:
