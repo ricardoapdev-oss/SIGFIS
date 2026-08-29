@@ -1,9 +1,18 @@
 ﻿'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ShieldAlert, ShieldCheck, AlertTriangle, ChevronRight, RefreshCw, TrendingUp } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, AlertTriangle, ChevronRight, RefreshCw, TrendingUp, Info } from 'lucide-react';
 import { api, User, RiskItem, RiskLevel } from '@/lib/api';
 import { formatDate } from '@/lib/labels';
+import { Tooltip } from '@/components/ui/tooltip';
+
+// Explicação de cada nível — usa exatamente as faixas da "Metodologia de
+// Cálculo" abaixo (fonte: cálculo do /risk-panel em lib/api.ts).
+const RISK_LEVEL_TOOLTIP: Record<RiskLevel, string> = {
+  RED: 'Contratos com pontuação de risco igual ou acima de 40. Em geral: contrato vencido, vencimento em até 30 dias, ocorrência crítica aberta ou várias pendências somadas. Pedem atenção imediata. Começa antes do “Alertas Críticos” do Painel Geral, que só conta a partir de 60.',
+  YELLOW: 'Contratos com pontuação de risco entre 20 e 39. Em geral: vencimento se aproximando (até 90 dias), ocorrência aberta ou medição pendente. Convém monitorar.',
+  GREEN: 'Contratos com pontuação de risco abaixo de 20. Sem sinais relevantes de prazo, ocorrência ou pendência no momento.',
+};
 
 interface Props {
   user: User;
@@ -118,10 +127,19 @@ export function RiskPanel({ user, onNavigate }: Props) {
         ].map(({ level, count, label }) => {
           const cfg = riskConfig[level];
           return (
-            <div key={level} className={`p-5 rounded-xl border ${cfg.bg} ${cfg.border} flex items-center gap-4`}>
+            <div key={level} className={`relative p-5 rounded-xl border ${cfg.bg} ${cfg.border} flex items-center gap-4`}>
               <div className={`p-3 rounded-xl border ${cfg.bg} ${cfg.border} ${cfg.color}`}>{cfg.icon}</div>
               <div>
-                <p className="text-[10px] text-gray-500 uppercase tracking-widest">{label}</p>
+                <p className="text-[10px] text-gray-500 uppercase tracking-widest flex items-center gap-1">
+                  {label}
+                  <Tooltip
+                    side="bottom"
+                    className="top-full bottom-auto left-0 right-auto translate-x-0 mb-0 mt-2 z-[60] max-w-[260px] whitespace-normal normal-case tracking-normal"
+                    content={<span className="whitespace-normal block max-w-[240px]">{RISK_LEVEL_TOOLTIP[level]}</span>}
+                  >
+                    <Info className="h-3 w-3 shrink-0 text-gray-400" />
+                  </Tooltip>
+                </p>
                 <p className={`text-3xl font-bold ${cfg.color}`}>{count}</p>
                 <p className="text-[9px] text-gray-500">{count === 1 ? 'contrato' : 'contratos'}</p>
               </div>

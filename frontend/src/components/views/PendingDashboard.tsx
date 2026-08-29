@@ -12,6 +12,7 @@ import type {
   FiscalPendingItem, FiscalPriority, FiscalCategory, FiscalizacaoSummary,
 } from '@/lib/fiscalizacao-engine';
 import { PRIORITY_LABEL, CATEGORY_LABEL } from '@/lib/fiscalizacao-engine';
+import { CONTRACT_PARAMETERS, CONTRACT_PARAMETERS_TITLE, CONTRACT_PARAMETERS_NOTE } from '@/lib/contract-parameters';
 import { formatDateTime } from '@/lib/labels';
 
 interface PendingDashboardProps {
@@ -394,13 +395,18 @@ export function PendingDashboard({ user, onNavigate }: PendingDashboardProps) {
             )}
 
             <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-xl mt-4">
-              <p className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest mb-2">Lei 13.303/2016 — Limites Legais</p>
+              <p className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest mb-2">{CONTRACT_PARAMETERS_TITLE}</p>
               <div className="space-y-1 text-[10px] text-gray-500">
-                <div className="flex justify-between"><span>Termos aditivos (compras/serviços)</span><strong className="text-gray-700">25%</strong></div>
-                <div className="flex justify-between"><span>Termos aditivos (obras/reformas)</span><strong className="text-gray-700">50%</strong></div>
-                <div className="flex justify-between"><span>Alerta de vencimento</span><strong className="text-gray-700">180 dias</strong></div>
-                <div className="flex justify-between"><span>Prorrogação urgente</span><strong className="text-gray-700">90 dias</strong></div>
+                {CONTRACT_PARAMETERS.map(p => (
+                  <div key={p.label} className="flex items-start justify-between gap-3">
+                    <span className="leading-snug">{p.label}</span>
+                    <strong className={`shrink-0 whitespace-nowrap ${p.kind === 'operacional' ? 'font-semibold text-gray-500' : 'text-gray-700'}`}>
+                      {p.value}{p.kind === 'operacional' ? ' *' : ''}
+                    </strong>
+                  </div>
+                ))}
               </div>
+              <p className="mt-2 text-[8px] leading-snug text-gray-400 italic">{CONTRACT_PARAMETERS_NOTE}</p>
             </div>
           </div>
         </div>

@@ -40,7 +40,7 @@ const KPI_TONE: Record<string, string> = {
   red: 'bg-brand-red/10 text-red-600',
 };
 function ExecutiveKpiCard({
-  icon: Icon, title, value, description, tone = 'blue', onClick, tooltip,
+  icon: Icon, title, value, description, tone = 'blue', onClick, tooltip, tooltipAlign = 'left',
 }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
@@ -49,6 +49,8 @@ function ExecutiveKpiCard({
   tone?: keyof typeof KPI_TONE;
   onClick?: () => void;
   tooltip?: string;
+  /** lado para onde o balão da explicação se estende (evita cortar nas bordas do grid). */
+  tooltipAlign?: 'left' | 'right';
 }) {
   const Comp = onClick ? 'button' : 'div';
   const strVal = typeof value === 'string' || typeof value === 'number' ? String(value) : '';
@@ -73,7 +75,9 @@ function ExecutiveKpiCard({
           {tooltip && (
             <Tooltip
               side="bottom"
-              className="top-full bottom-auto left-auto right-0 translate-x-0 mb-0 mt-2 z-[60] max-w-[240px] whitespace-normal"
+              className={`top-full bottom-auto translate-x-0 mb-0 mt-2 z-[60] max-w-[240px] whitespace-normal ${
+                tooltipAlign === 'right' ? 'left-auto right-0' : 'left-0 right-auto'
+              }`}
               content={<span className="whitespace-normal block max-w-[220px]">{tooltip}</span>}
             >
               <Info className="size-3 shrink-0 text-muted-foreground/70" />
@@ -231,12 +235,17 @@ export function GestorDashboard({ user, onNavigate }: Props) {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <ExecutiveKpiCard icon={FileSignature} title="Contratos Ativos" value={k?.activeContracts ?? '—'} tone="blue" onClick={() => onNavigate('contracts', undefined, 'active')} />
-        <ExecutiveKpiCard icon={CheckCircle} title="Fiscalizações Pendentes" value={k?.pendingFiscalizacoes ?? '—'} tone="cyan" onClick={() => onNavigate('contracts', undefined, 'pending_measurements')} />
-        <ExecutiveKpiCard icon={AlertTriangle} title="Alertas Críticos" value={rs?.critical ?? '—'} tone="red" onClick={() => onNavigate('risk')} />
-        <ExecutiveKpiCard icon={Clock} title="Contratos a Vencer (90d)" description="Próx. 90 dias" value={k?.expiringIn90 ?? '—'} tone="amber" onClick={() => onNavigate('contracts', undefined, 'expiring90')} />
-        <ExecutiveKpiCard icon={DollarSign} title="Valor Contratual Atual" value={f ? formatCurrency(f.valorContratualAtual) : '—'} tone="purple" />
-        <ExecutiveKpiCard icon={TrendingUp} title="Taxa de Execução" value={f ? `${f.taxaExecucaoMedicoes.toFixed(1)}%` : '—'} tone="green" tooltip={FINANCIAL_TOOLTIPS.taxaExecucaoMedicoes} />
+        <ExecutiveKpiCard icon={FileSignature} title="Contratos Ativos" value={k?.activeContracts ?? '—'} tone="blue" onClick={() => onNavigate('contracts', undefined, 'active')}
+          tooltip={'Contratos com situação “Ativo” hoje. Não inclui minutas, contratos suspensos, encerrados ou rescindidos.'} />
+        <ExecutiveKpiCard icon={CheckCircle} title="Fiscalizações Pendentes" value={k?.pendingFiscalizacoes ?? '—'} tone="cyan" onClick={() => onNavigate('contracts', undefined, 'pending_measurements')}
+          tooltip="Medições que o fiscal já enviou e que aguardam a homologação do gestor. Não conta medições ainda em preenchimento pelo fiscal." />
+        <ExecutiveKpiCard icon={AlertTriangle} title="Alertas Críticos" value={rs?.critical ?? '—'} tone="red" onClick={() => onNavigate('risk')}
+          tooltip={'Contratos ativos em risco crítico: pontuação de risco igual ou acima de 60, somando prazo, ocorrências abertas, medições pendentes e alertas ativos. É mais restrito que o “Alto risco” do Painel de Risco, que começa em 40 — por isso os números podem ser diferentes.'} />
+        <ExecutiveKpiCard icon={Clock} title="Contratos a Vencer (90d)" description="Próx. 90 dias" value={k?.expiringIn90 ?? '—'} tone="amber" onClick={() => onNavigate('contracts', undefined, 'expiring90')} tooltipAlign="right"
+          tooltip="Contratos ativos que encerram nos próximos 90 dias. Serve para começar a tempo a análise de continuidade ou de uma nova contratação, quando cabível." />
+        <ExecutiveKpiCard icon={DollarSign} title="Valor Contratual Atual" value={f ? formatCurrency(f.valorContratualAtual) : '—'} tone="purple" tooltipAlign="right"
+          tooltip="Soma do valor atual de todos os contratos ativos, já com os aditivos de acréscimo e de supressão aprovados. Não é valor pago nem empenhado." />
+        <ExecutiveKpiCard icon={TrendingUp} title="Taxa de Execução" value={f ? `${f.taxaExecucaoMedicoes.toFixed(1)}%` : '—'} tone="green" tooltipAlign="right" tooltip={FINANCIAL_TOOLTIPS.taxaExecucaoMedicoes} />
       </div>
 
       {/* Execução Financeira + Mapa de Riscos */}
