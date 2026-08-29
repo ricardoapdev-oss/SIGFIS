@@ -58,7 +58,7 @@ function ExecutiveKpiCard({
   return (
     <Comp
       onClick={onClick}
-      className={`flex flex-col justify-between rounded-2xl border border-border bg-surface p-3.5 sm:p-4 text-left shadow-card transition-all overflow-hidden ${
+      className={`relative flex flex-col justify-between rounded-2xl border border-border bg-surface p-3.5 sm:p-4 text-left shadow-card transition-all overflow-visible ${
         onClick ? 'cursor-pointer hover:shadow-card-hover hover:border-brand-blue/30' : ''
       }`}
     >
@@ -71,7 +71,11 @@ function ExecutiveKpiCard({
             {title}
           </p>
           {tooltip && (
-            <Tooltip content={<span className="whitespace-normal block max-w-[220px]">{tooltip}</span>}>
+            <Tooltip
+              side="bottom"
+              className="top-full bottom-auto left-auto right-0 translate-x-0 mb-0 mt-2 z-[60] max-w-[240px] whitespace-normal"
+              content={<span className="whitespace-normal block max-w-[220px]">{tooltip}</span>}
+            >
               <Info className="size-3 shrink-0 text-muted-foreground/70" />
             </Tooltip>
           )}
@@ -99,7 +103,6 @@ const PERIODS = [
   { key: '90d', label: '90 dias' },
   { key: '6m', label: '6 meses' },
   { key: '12m', label: '12 meses' },
-  { key: 'custom', label: 'Personalizado' },
 ] as const;
 type PeriodKey = typeof PERIODS[number]['key'];
 
@@ -132,7 +135,7 @@ export function GestorDashboard({ user, onNavigate }: Props) {
     if (period === '90d') return monthly.slice(-3);
     if (period === '6m') return monthly.slice(-6);
     if (period === '12m') return monthly.slice(-12);
-    return monthly; // custom — todo o histórico disponível calculado
+    return monthly.slice(-6);
   }, [monthly, period]);
   const periodTotal = sumMoney(displayedMonthly.map((m) => m.measured));
 
@@ -233,7 +236,7 @@ export function GestorDashboard({ user, onNavigate }: Props) {
         <ExecutiveKpiCard icon={AlertTriangle} title="Alertas Críticos" value={rs?.critical ?? '—'} tone="red" onClick={() => onNavigate('risk')} />
         <ExecutiveKpiCard icon={Clock} title="Contratos a Vencer (90d)" description="Próx. 90 dias" value={k?.expiringIn90 ?? '—'} tone="amber" onClick={() => onNavigate('contracts', undefined, 'expiring90')} />
         <ExecutiveKpiCard icon={DollarSign} title="Valor Contratual Atual" value={f ? formatCurrency(f.valorContratualAtual) : '—'} tone="purple" />
-        <ExecutiveKpiCard icon={TrendingUp} title="Taxa de Execução (Medições)" value={f ? `${f.taxaExecucaoMedicoes.toFixed(1)}%` : '—'} tone="green" tooltip={FINANCIAL_TOOLTIPS.taxaExecucaoMedicoes} />
+        <ExecutiveKpiCard icon={TrendingUp} title="Taxa de Execução" value={f ? `${f.taxaExecucaoMedicoes.toFixed(1)}%` : '—'} tone="green" tooltip={FINANCIAL_TOOLTIPS.taxaExecucaoMedicoes} />
       </div>
 
       {/* Execução Financeira + Mapa de Riscos */}
@@ -279,26 +282,23 @@ export function GestorDashboard({ user, onNavigate }: Props) {
           ) : (
             <EmptyState className="mt-4" icon={TrendingUp} title="Sem histórico suficiente" description="Ainda não há medições aprovadas para exibir evolução." />
           )}
-          {period === 'custom' && (
-            <p className="mt-2 text-[11px] text-muted-foreground">&ldquo;Personalizado&rdquo; exibe todo o histórico calculado (desde o contrato ativo mais antigo ou a medição aprovada mais antiga) — ainda não há seleção de intervalo customizado.</p>
-          )}
           <div className="mt-4 grid grid-cols-3 gap-3 border-t border-border pt-4 text-center sm:grid-cols-5">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Contratado</p>
+              <p className="text-[10px] font-bold tracking-wide text-muted-foreground">Contratado</p>
               <p className="mt-0.5 text-sm font-bold text-foreground">{f ? formatCurrency(f.valorContratualAtual) : '—'}</p>
             </div>
             <div>
-              <p className="flex items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                Medições Aprovadas
+              <p className="flex items-center justify-center gap-1 text-[10px] font-bold tracking-wide text-muted-foreground">
+                Medições aprovadas
                 <Tooltip content={<span className="whitespace-normal block max-w-[220px]">{FINANCIAL_TOOLTIPS.medicoesAprovadas}</span>}>
                   <Info className="size-3 shrink-0" />
                 </Tooltip>
               </p>
-              <p className="mt-0.5 text-sm font-bold text-brand-green">{f ? formatCurrency(f.medicoesAprovadas) : '—'}</p>
+              <p className="mt-0.5 text-sm font-bold text-foreground">{f ? formatCurrency(f.medicoesAprovadas) : '—'}</p>
             </div>
             <div>
-              <p className="flex items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                Saldo Não Executado
+              <p className="flex items-center justify-center gap-1 text-[10px] font-bold tracking-wide text-muted-foreground">
+                Saldo não executado
                 <Tooltip content={<span className="whitespace-normal block max-w-[220px]">{FINANCIAL_TOOLTIPS.saldoContratualNaoExecutado}</span>}>
                   <Info className="size-3 shrink-0" />
                 </Tooltip>
@@ -306,8 +306,8 @@ export function GestorDashboard({ user, onNavigate }: Props) {
               <p className="mt-0.5 text-sm font-bold text-foreground">{f ? formatCurrency(f.saldoContratualNaoExecutado) : '—'}</p>
             </div>
             <div>
-              <p className="flex items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                Estimativa Mensal Calculada (Carteira)
+              <p className="flex items-center justify-center gap-1 text-[10px] font-bold tracking-wide text-muted-foreground">
+                Estimativa mensal calculada (carteira)
                 <Tooltip content={<span className="whitespace-normal block max-w-[260px]">{FINANCIAL_TOOLTIPS.valorMensalEstimadoCarteira}</span>}>
                   <Info className="size-3 shrink-0" />
                 </Tooltip>
@@ -315,8 +315,8 @@ export function GestorDashboard({ user, onNavigate }: Props) {
               <p className="mt-0.5 text-sm font-bold text-foreground">{f ? formatCurrency(f.valorMensalEstimadoCarteira) : '—'}</p>
             </div>
             <div>
-              <p className="flex items-center justify-center gap-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                Média Mensal Calculada por Contrato
+              <p className="flex items-center justify-center gap-1 text-[10px] font-bold tracking-wide text-muted-foreground">
+                Média mensal calculada por contrato
                 <Tooltip content={<span className="whitespace-normal block max-w-[260px]">{FINANCIAL_TOOLTIPS.mediaMensalPorContrato}</span>}>
                   <Info className="size-3 shrink-0" />
                 </Tooltip>

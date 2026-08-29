@@ -40,11 +40,11 @@ export const ESTIMATIVA_MENSAL_TOOLTIP =
 
 /** Textos-padrão de tooltip — usar estes textos (não parafrasear) em qualquer lugar que exiba os indicadores abaixo. */
 export const FINANCIAL_TOOLTIPS = {
-  medicoesAprovadas: 'Soma de todas as medições aprovadas da carteira ativa, em todo o histórico — independente do período selecionado no gráfico acima. Medições aprovadas não equivalem necessariamente a pagamentos realizados.',
-  saldoContratualNaoExecutado: 'Saldo contratual não executado = valor contratual atual menos medições aprovadas.',
-  valorMensalEstimadoCarteira: `Estimativa mensal calculada da carteira — soma dos valores mensais calculados por contrato. ${ESTIMATIVA_MENSAL_TOOLTIP}`,
-  mediaMensalPorContrato: `Média mensal calculada por contrato = estimativa mensal calculada da carteira dividida pela quantidade de contratos com duração válida. ${ESTIMATIVA_MENSAL_TOOLTIP}`,
-  taxaExecucaoMedicoes: 'Taxa de execução por medições = medições aprovadas dividido pelo valor contratual atual.',
+  medicoesAprovadas: 'Soma de tudo o que já foi medido e aprovado nos contratos ativos, considerando todo o histórico e não apenas o período mostrado no gráfico. A medição aprovada confirma que o serviço foi entregue e aceito, mas ainda não quer dizer que o pagamento foi feito.',
+  saldoContratualNaoExecutado: 'Parte do contrato que ainda não foi executada, ou seja, quanto ainda pode ser gasto até o fim do contrato. É o valor contratual atual menos o total de medições aprovadas.',
+  valorMensalEstimadoCarteira: `Estimativa de quanto todos os contratos ativos, somados, custam por mês. Cada contrato entra com o seu valor mensal calculado. ${ESTIMATIVA_MENSAL_TOOLTIP}`,
+  mediaMensalPorContrato: `Quanto um contrato custa por mês, em média. É a estimativa mensal de toda a carteira dividida pelo número de contratos com prazo cadastrado. ${ESTIMATIVA_MENSAL_TOOLTIP}`,
+  taxaExecucaoMedicoes: 'Quanto do contrato já foi executado, em percentual. É o total de medições aprovadas dividido pelo valor contratual atual: 100% significa que todo o valor previsto já foi medido e aprovado.',
   saldoLiquidadoAPagar: LIQUIDACAO_NAO_DISPONIVEL,
 } as const;
 
