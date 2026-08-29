@@ -573,10 +573,11 @@ function processAlertResponse(alertId: string, response: ContractAlertResponse, 
 
 // ── Requisição HTTP ────────────────────────────────────────────────────────────
 
-// O frontend usa /api/* — o Next.js proxy (next.config.ts rewrites) encaminha
-// esses requests para o backend NestJS em localhost:3001 no servidor.
-// Isso funciona para todos os usuários da intranet sem hardcodar IPs.
-const BACKEND_URL = '/api';
+// O frontend chama o backend NestJS diretamente pela URL pública (sem proxy
+// via next.config.ts rewrites) — NEXT_PUBLIC_API_URL é lida em build/runtime
+// no navegador; sem ela definida, cai no domínio de produção do backend.
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_API_URL || 'https://sigfis-backend-ashy.vercel.app';
 
 // Endpoints de CRUD real que devem ir direto ao backend (sem fallback localStorage)
 // '/audit-logs' inclui também /audit-logs/summary e /audit-logs/filters (mesmo prefixo).
