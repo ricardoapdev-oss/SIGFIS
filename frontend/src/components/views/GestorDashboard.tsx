@@ -14,7 +14,7 @@ import {
 } from 'recharts';
 import { api, User, GestorDashboard as GestorDashboardType } from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/labels';
-import { FINANCIAL_TOOLTIPS } from '@/lib/financial-calculations';
+import { FINANCIAL_TOOLTIPS, sumMoney } from '@/lib/financial-calculations';
 import { ChartContainer } from '@/components/ui/chart-container';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -122,13 +122,19 @@ export function GestorDashboard({ user, onNavigate }: Props) {
   const fw = data?.fiscalWorkload ?? [];
   const ea = data?.extendedAlerts;
 
-  const monthly = useMemo(() => (c?.monthlyEvolution ?? []).map((m) => ({ ...m, measured: Math.round(m.measured) })), [c]);
+  // Auditoria 2026-08-24: os valores mensais já chegam limpos (sumMoney no
+  // backend/fallback) — não arredondar aqui, ou o total do período (abaixo)
+  // perde centavos em relação à mesma soma feita em outros lugares do
+  // sistema (ex.: financial.medicoesAprovadas).
+  const monthly = useMemo(() => c?.monthlyEvolution ?? [], [c]);
   const displayedMonthly = useMemo(() => {
     if (period === '30d') return monthly.slice(-1);
     if (period === '90d') return monthly.slice(-3);
-    return monthly; // 6m/12m/custom — só há 6 meses computados hoje, ver nota abaixo do gráfico
+    if (period === '6m') return monthly.slice(-6);
+    if (period === '12m') return monthly.slice(-12);
+    return monthly; // custom — todo o histórico disponível calculado
   }, [monthly, period]);
-  const periodTotal = displayedMonthly.reduce((s, m) => s + m.measured, 0);
+  const periodTotal = sumMoney(displayedMonthly.map((m) => m.measured));
 
   const situacao = useMemo(() => {
     if (!k) return [];
@@ -273,8 +279,8 @@ export function GestorDashboard({ user, onNavigate }: Props) {
           ) : (
             <EmptyState className="mt-4" icon={TrendingUp} title="Sem histórico suficiente" description="Ainda não há medições aprovadas para exibir evolução." />
           )}
-          {(period === '12m' || period === 'custom') && (
-            <p className="mt-2 text-[11px] text-muted-foreground">Disponível apenas o histórico dos últimos 6 meses no momento — exibindo o período máximo calculado.</p>
+          {period === 'custom' && (
+            <p className="mt-2 text-[11px] text-muted-foreground">&ldquo;Personalizado&rdquo; exibe todo o histórico calculado (desde o contrato ativo mais antigo ou a medição aprovada mais antiga) — ainda não há seleção de intervalo customizado.</p>
           )}
           <div className="mt-4 grid grid-cols-3 gap-3 border-t border-border pt-4 text-center sm:grid-cols-5">
             <div>

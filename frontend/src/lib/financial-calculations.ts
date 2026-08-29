@@ -40,7 +40,7 @@ export const ESTIMATIVA_MENSAL_TOOLTIP =
 
 /** Textos-padrão de tooltip — usar estes textos (não parafrasear) em qualquer lugar que exiba os indicadores abaixo. */
 export const FINANCIAL_TOOLTIPS = {
-  medicoesAprovadas: 'Medições aprovadas não equivalem necessariamente a pagamentos realizados.',
+  medicoesAprovadas: 'Soma de todas as medições aprovadas da carteira ativa, em todo o histórico — independente do período selecionado no gráfico acima. Medições aprovadas não equivalem necessariamente a pagamentos realizados.',
   saldoContratualNaoExecutado: 'Saldo contratual não executado = valor contratual atual menos medições aprovadas.',
   valorMensalEstimadoCarteira: `Estimativa mensal calculada da carteira — soma dos valores mensais calculados por contrato. ${ESTIMATIVA_MENSAL_TOOLTIP}`,
   mediaMensalPorContrato: `Média mensal calculada por contrato = estimativa mensal calculada da carteira dividida pela quantidade de contratos com duração válida. ${ESTIMATIVA_MENSAL_TOOLTIP}`,

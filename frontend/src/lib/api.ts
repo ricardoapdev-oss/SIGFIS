@@ -1,4 +1,4 @@
-import { computePortfolioFinancials } from './financial-calculations';
+import { computePortfolioFinancials, sumMoney } from './financial-calculations';
 
 // Tipos do Sistema
 export type UserRole = 'ADMIN' | 'GESTOR' | 'FISCAL' | 'ALTA_GESTAO';
@@ -837,10 +837,39 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
     const byUnit = Object.entries(active.reduce((acc, c) => { const k = deptAbbrev[(c as any).department || ''] || (c as any).department || 'Outros'; acc[k] = (acc[k] || 0) + 1; return acc; }, {} as Record<string, number>)).sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }));
     const phaseStatusMap: Record<string, string> = { PENDING: 'Pendente', IN_PROGRESS: 'Em Andamento', COMPLETED: 'Concluída', OVERDUE: 'Atrasada', BLOCKED: 'Bloqueada' };
     const byPhaseStatus = Object.entries((db.processPhases || []).reduce((acc, ph) => { const k = phaseStatusMap[ph.status] || ph.status; acc[k] = (acc[k] || 0) + 1; return acc; }, {} as Record<string, number>)).map(([name, value]) => ({ name, value }));
+    // Auditoria (Etapa "Execução Financeira" do Painel Geral, 2026-08-24):
+    // "Medições Aprovadas" (bottom row, todo o histórico) e o gráfico "por
+    // período" divergiam porque usavam populações e precisões diferentes —
+    // o gráfico somava medições de QUALQUER contrato (mesmo encerrado/
+    // rescindido/suspenso) num float bruto, enquanto o valor de carteira
+    // (financial.medicoesAprovadas, abaixo) soma só contratos ATIVOS via
+    // computePortfolioFinancials/sumMoney. Corrigido para usar exatamente a
+    // mesma população (`active`) e a mesma soma segura (sumMoney) nos dois —
+    // agora são a mesma fonte de verdade, só filtrada por período diferente.
+    const activeContractIds = new Set(active.map(c => c.id));
+    const activeApprovedMeasurements = db.measurements.filter(m => activeContractIds.has(m.contractId) && m.status === 'APPROVED');
+
     const _monthLabels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
     const _now6 = new Date();
-    const _dynMonths = Array.from({ length: 6 }, (_, i) => {
-      const d = new Date(_now6.getFullYear(), _now6.getMonth() - 5 + i, 1);
+    // Janela dinâmica: cobre desde o início do contrato ativo mais antigo (ou
+    // a medição aprovada mais antiga) até o mês atual — nunca menos que 6
+    // meses, limitada a 10 anos (120 meses) como teto de segurança. Antes a
+    // janela era sempre fixa em 6 meses: "12 meses"/"Personalizado" mostravam
+    // exatamente o mesmo total que "6 meses" sempre que havia dado mais
+    // antigo que isso, o que também causava a divergência relatada.
+    const _relevantDates = [
+      ...active.map(c => new Date((c as any).startDate || (c as any).signingDate || _now6)),
+      ...activeApprovedMeasurements.map(m => new Date(m.periodEnd)),
+    ].filter(d => !isNaN(d.getTime()));
+    const _earliest = _relevantDates.length > 0
+      ? new Date(Math.min(..._relevantDates.map(d => d.getTime())))
+      : new Date(_now6.getFullYear(), _now6.getMonth() - 5, 1);
+    const _monthsSpan = Math.max(
+      6,
+      Math.min(120, (_now6.getFullYear() - _earliest.getFullYear()) * 12 + (_now6.getMonth() - _earliest.getMonth()) + 1),
+    );
+    const _dynMonths = Array.from({ length: _monthsSpan }, (_, i) => {
+      const d = new Date(_now6.getFullYear(), _now6.getMonth() - (_monthsSpan - 1) + i, 1);
       return { label: _monthLabels[d.getMonth()], year: d.getFullYear(), month: d.getMonth() };
     });
     const monthlyEvolution = _dynMonths.map(({ label, year, month }) => {
@@ -852,13 +881,11 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
         const cEnd = new Date(c.endDate);
         return cStart <= mEnd && cEnd >= mStart;
       });
-      const measured = db.measurements
-        .filter(m => {
-          if (m.status !== 'APPROVED') return false;
-          const d = new Date(m.periodEnd);
-          return d.getFullYear() === year && d.getMonth() === month;
-        })
-        .reduce((s, m) => s + Number(m.measurementValue), 0);
+      const measured = sumMoney(
+        activeApprovedMeasurements
+          .filter(m => { const d = new Date(m.periodEnd); return d.getFullYear() === year && d.getMonth() === month; })
+          .map(m => Number(m.measurementValue)),
+      );
       return { name: label, contracts: activeInMonth.length, value: activeInMonth.reduce((s, c) => s + c.currentValue, 0), measured };
     });
 
