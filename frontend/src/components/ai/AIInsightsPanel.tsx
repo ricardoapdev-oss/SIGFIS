@@ -6,11 +6,17 @@ import {
   Brain, AlertTriangle, TrendingUp, CheckCircle, Clock,
   BarChart2, Building2, MessageSquare, Search, Shield,
   RefreshCw, Send, Activity, ArrowUpRight, ArrowDownRight,
-  Minus, Target, FileText, ChevronRight, Users, Zap, XCircle, Info,
+  Minus, Target, FileText, ChevronRight, Users, Zap, Info,
 } from 'lucide-react';
 import { api, User } from '@/lib/api';
 import { formatCurrency } from '@/lib/labels';
 import { classifyFinancialIntent, buildFinancialAnswer } from '@/lib/ai-financial-intent';
+import {
+  deriveContractDiagnostic,
+  type ContractDiagnostic,
+  type DimensionStatus,
+  type EngineData,
+} from '@/lib/fiscalizacao-engine';
 import { Area, ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface Props {
@@ -533,10 +539,21 @@ function AssistantSection({ chatHistory, setChatHistory, chatInput, setChatInput
 }
 
 // ── Section 7: Diagnosis ──────────────────────────────────────────────────────
+const DIM_STATUS_STYLE: Record<DimensionStatus, { badge: string; label: string; dot: string }> = {
+  REGULAR: { badge: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/25', label: 'Regular', dot: 'bg-emerald-500' },
+  ATENCAO: { badge: 'text-amber-600 bg-amber-500/10 border-amber-500/25', label: 'Atenção', dot: 'bg-amber-500' },
+  CRITICO: { badge: 'text-red-500 bg-red-500/10 border-red-500/25', label: 'Crítico', dot: 'bg-red-500' },
+  SEM_DADOS: { badge: 'text-slate-400 bg-slate-100 border-slate-200', label: 'Sem dados', dot: 'bg-slate-300' },
+};
+
 function DiagnosisSection({ contracts, selectedContractId, setSelectedContractId, diagnosis, onNavigate }: {
   contracts: any[]; selectedContractId: string; setSelectedContractId: (v: string) => void;
-  diagnosis: any; onNavigate: Props['onNavigate'];
+  diagnosis: ContractDiagnostic | null; onNavigate: Props['onNavigate'];
 }) {
+  const c: any = contracts.find(x => x.id === selectedContractId);
+  const fiscal = c?.fiscalAssignments?.find((a: any) => a.isActive && a.role === 'TITULAR')?.fiscal
+    ?? c?.fiscalAssignments?.[0]?.fiscal;
+
   return (
     <div className="space-y-4">
       <div>
@@ -544,78 +561,89 @@ function DiagnosisSection({ contracts, selectedContractId, setSelectedContractId
         <select value={selectedContractId} onChange={e => setSelectedContractId(e.target.value)}
           className="w-full bg-white border border-gray-300 rounded-xl px-3 py-2.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-500/50 cursor-pointer">
           <option value="">— Selecione um contrato ativo —</option>
-          {contracts.filter((c: any) => c.status === 'ACTIVE').map((c: any) => (
-            <option key={c.id} value={c.id}>{c.contractNumber} — {(c.objectDescription ?? '').substring(0, 55)}</option>
+          {contracts.filter((x: any) => x.status === 'ACTIVE').map((x: any) => (
+            <option key={x.id} value={x.id}>{x.contractNumber} — {(x.objectDescription ?? '').substring(0, 55)}</option>
           ))}
         </select>
       </div>
-      {!diagnosis ? (
+
+      {!diagnosis || !c ? (
         <div className="bg-gray-100/20 border border-gray-200 rounded-xl p-10 text-center">
           <Search className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-          <p className="text-xs text-gray-400">Selecione um contrato para gerar o diagnóstico de saúde</p>
+          <p className="text-xs text-gray-400">Selecione um contrato para gerar o diagnóstico consolidado</p>
         </div>
-      ) : (() => {
-        const { contract: c, daysRemaining, issues, score } = diagnosis;
-        const grade = score >= 90 ? 'A' : score >= 75 ? 'B' : score >= 60 ? 'C' : score >= 45 ? 'D' : 'F';
-        const fiscal = c.fiscalAssignments?.[0]?.fiscal;
-        return (
-          <div className="space-y-4">
-            <div className="bg-gray-100/30 border border-gray-200 rounded-xl p-5">
-              <div className="flex items-start gap-4">
-                <div className="text-center shrink-0">
-                  <ScoreGauge score={score} />
-                  <div className="mt-1"><GradeChip grade={grade} /></div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Diagnóstico Individual</p>
-                  <p className="text-sm font-black text-gray-900 mt-0.5">{c.contractNumber}</p>
-                  <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{c.objectDescription}</p>
-                  <div className="flex flex-wrap gap-4 mt-3 text-[10px]">
-                    <div><p className="text-gray-400">Contratada</p><p className="text-gray-700 font-bold">{c.contractor?.tradeName || c.contractor?.name || '—'}</p></div>
-                    <div><p className="text-gray-400">Valor</p><p className="text-gray-700 font-bold">{formatCurrency(c.currentValue ?? 0)}</p></div>
-                    <div><p className="text-gray-400">Vencimento</p><p className={`font-bold ${daysRemaining <= 30 ? 'text-red-400' : daysRemaining <= 90 ? 'text-amber-400' : 'text-gray-700'}`}>{new Date(c.endDate).toLocaleDateString('pt-BR')} ({daysRemaining}d)</p></div>
-                    <div><p className="text-gray-400">Fiscal</p><p className={`font-bold ${fiscal ? 'text-gray-700' : 'text-red-400'}`}>{fiscal?.name ?? 'Sem designação'}</p></div>
+      ) : (
+        <div className="space-y-4">
+          {/* Cabeçalho — nota geral + metadados */}
+          <div className="bg-gray-100/30 border border-gray-200 rounded-xl p-5">
+            <div className="flex items-start gap-4">
+              <div className="text-center shrink-0">
+                {diagnosis.overallScore !== null ? (
+                  <ScoreGauge score={diagnosis.overallScore} />
+                ) : (
+                  <div className="w-[120px] h-[70px] flex items-center justify-center">
+                    <span className="text-[10px] text-gray-400 leading-tight">Sem nota<br />(dados insuf.)</span>
                   </div>
+                )}
+                <p className="text-[10px] font-bold text-gray-600 mt-1">{diagnosis.overallLabel}</p>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Diagnóstico do Contrato</p>
+                <p className="text-sm font-black text-gray-900 mt-0.5">{diagnosis.contractNumber}</p>
+                <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{c.objectDescription}</p>
+                <div className="flex flex-wrap gap-4 mt-3 text-[10px]">
+                  <div><p className="text-gray-400">Contratada</p><p className="text-gray-700 font-bold">{c.contractor?.tradeName || c.contractor?.corporateName || c.contractor?.name || '—'}</p></div>
+                  <div><p className="text-gray-400">Valor atual</p><p className="text-gray-700 font-bold">{formatCurrency(c.currentValue ?? 0)}</p></div>
+                  <div><p className="text-gray-400">Vencimento</p><p className="text-gray-700 font-bold">{new Date(c.endDate).toLocaleDateString('pt-BR')}</p></div>
+                  <div><p className="text-gray-400">Fiscal titular</p><p className={`font-bold ${fiscal ? 'text-gray-700' : 'text-red-400'}`}>{fiscal?.name ?? 'Sem designação'}</p></div>
                 </div>
+                <p className="text-[10px] text-gray-400 mt-2">Cobertura de dados: {Math.round(diagnosis.dataCompleteness * 100)}% das dimensões avaliáveis.</p>
               </div>
             </div>
-            {issues.length > 0 ? (
-              <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-4">
-                <p className="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-2">Não conformidades identificadas</p>
-                <ul className="space-y-1.5">
-                  {issues.map((issue: string, i: number) => (
-                    <li key={i} className="flex items-center gap-2 text-[11px] text-gray-700">
-                      <AlertTriangle className="h-3 w-3 text-red-400 shrink-0" /> {issue}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : (
-              <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4 flex items-center gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-400 shrink-0" />
-                <p className="text-xs font-bold text-emerald-400">Contrato em conformidade — nenhuma não conformidade identificada</p>
-              </div>
-            )}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { label: 'Fiscal Designado', ok: (c.fiscalAssignments?.length ?? 0) > 0 },
-                { label: 'Sem Ocorrências Abertas', ok: !c.hasOpenOccurrences },
-                { label: 'Medições em Dia', ok: !c.hasPendingMeasurements },
-                { label: 'Processo sem Atraso', ok: !c.hasDelayedProcesses },
-              ].map(({ label, ok }) => (
-                <div key={label} className={`rounded-xl p-3 border text-center ${ok ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-red-500/5 border-red-500/20'}`}>
-                  {ok ? <CheckCircle className="h-4 w-4 text-emerald-400 mx-auto mb-1" /> : <XCircle className="h-4 w-4 text-red-400 mx-auto mb-1" />}
-                  <p className="text-[9px] text-gray-500">{label}</p>
-                </div>
-              ))}
-            </div>
-            <button onClick={() => onNavigate('details', c.id)}
-              className="w-full flex items-center justify-center gap-2 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/30 text-violet-400 font-bold text-xs py-3 rounded-xl transition-colors cursor-pointer">
-              <FileText className="h-3.5 w-3.5" /> Abrir Contrato Completo
-            </button>
           </div>
-        );
-      })()}
+
+          {/* Dimensões */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {diagnosis.dimensions.map(dim => {
+              const st = DIM_STATUS_STYLE[dim.status];
+              return (
+                <div key={dim.key} className="rounded-xl border border-gray-200 bg-gray-100/20 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-bold text-gray-700">{dim.label}</span>
+                    <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${st.badge}`}>{st.label}</span>
+                  </div>
+                  <p className="text-[10px] text-gray-500 mt-1.5 leading-snug">{dim.note}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Recomendações */}
+          {diagnosis.recommendations.length > 0 ? (
+            <div className="bg-violet-500/5 border border-violet-500/20 rounded-xl p-4">
+              <p className="text-[10px] font-bold text-violet-500 uppercase tracking-widest mb-2">Recomendações</p>
+              <ul className="space-y-1.5">
+                {diagnosis.recommendations.map((rec, i) => (
+                  <li key={i} className="flex items-start gap-2 text-[11px] text-gray-700">
+                    <Target className="h-3 w-3 text-violet-500 shrink-0 mt-0.5" /> {rec}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[9px] text-gray-400 mt-2">Recomendações derivadas dos dados existentes — não constituem determinação jurídica.</p>
+            </div>
+          ) : (
+            <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4 flex items-center gap-3">
+              <CheckCircle className="h-5 w-5 text-emerald-400 shrink-0" />
+              <p className="text-xs font-bold text-emerald-500">Nenhuma providência recomendada com base nos dados disponíveis.</p>
+            </div>
+          )}
+
+          <button onClick={() => onNavigate('details', c.id)}
+            className="w-full flex items-center justify-center gap-2 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/30 text-violet-400 font-bold text-xs py-3 rounded-xl transition-colors cursor-pointer">
+            <FileText className="h-3.5 w-3.5" /> Abrir Contrato Completo
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -869,20 +897,51 @@ export function AIInsightsPanel({ user, onNavigate }: Props) {
   }, [dash, contracts, suppliers]);
 
   const selectedContract = useMemo(() => contracts.find(c => c.id === selectedContractId), [contracts, selectedContractId]);
-  const diagnosis = useMemo(() => {
+
+  // Dados do motor de fiscalização, montados a partir dos contratos já
+  // carregados (com seus arrays aninhados) — mesma fonte usada em toda a tela.
+  const engineData: EngineData = useMemo(() => {
+    const num = (v: unknown) => Number(v) || 0;
+    return {
+      contracts: contracts.map(c => ({
+        id: c.id, contractNumber: c.contractNumber, status: c.status,
+        startDate: c.startDate, endDate: c.endDate,
+        initialValue: num(c.initialValue), currentValue: num(c.currentValue),
+        managerId: c.managerId ?? null,
+      })),
+      assignments: contracts.flatMap(c => (c.fiscalAssignments ?? []).map((a: Record<string, unknown>) => ({
+        id: a.id, contractId: c.id, fiscalId: a.fiscalId, role: a.role,
+        isActive: a.isActive, endDate: a.endDate ?? null,
+      }))),
+      occurrences: contracts.flatMap(c => (c.occurrences ?? []).map((o: Record<string, unknown>) => ({
+        id: o.id, contractId: c.id, fiscalId: o.fiscalId ?? null, title: o.title,
+        severity: o.severity, status: o.status, createdAt: o.createdAt, resolvedAt: o.resolvedAt ?? null,
+      }))),
+      measurements: contracts.flatMap(c => (c.measurements ?? []).map((m: Record<string, unknown>) => ({
+        id: m.id, contractId: c.id, fiscalId: m.fiscalId ?? null,
+        measurementValue: num(m.measurementValue), status: m.status, createdAt: m.createdAt,
+      }))),
+      alterations: contracts.flatMap(c => (c.alterations ?? []).map((a: Record<string, unknown>) => ({
+        id: a.id, contractId: c.id, type: a.type, status: a.status,
+        newEndDate: a.newEndDate ?? null, createdAt: a.createdAt,
+      }))),
+      payments: [],
+    } as EngineData;
+  }, [contracts]);
+
+  const diagnosis: ContractDiagnostic | null = useMemo(() => {
     if (!selectedContract) return null;
     const c = selectedContract;
-    const now = new Date();
-    const daysRemaining = Math.round((new Date(c.endDate).getTime() - now.getTime()) / 86400000);
-    const issues: string[] = [];
-    if (!c.fiscalAssignments?.length) issues.push('Sem fiscal designado');
-    if (c.hasOpenOccurrences) issues.push('Ocorrência em aberto');
-    if (c.hasPendingMeasurements) issues.push('Medição pendente de aprovação');
-    if (c.hasDelayedProcesses) issues.push('Processo com fase atrasada');
-    if (daysRemaining >= 0 && daysRemaining <= 30) issues.push(`Vence em ${daysRemaining} dias — URGENTE`);
-    else if (daysRemaining >= 0 && daysRemaining <= 90) issues.push(`Vence em ${daysRemaining} dias`);
-    return { contract: c, daysRemaining, issues, score: Math.max(0, 100 - issues.length * 18) };
-  }, [selectedContract]);
+    return deriveContractDiagnostic(
+      {
+        id: c.id, contractNumber: c.contractNumber, status: c.status,
+        startDate: c.startDate, endDate: c.endDate,
+        initialValue: Number(c.initialValue) || 0, currentValue: Number(c.currentValue) || 0,
+        managerId: c.managerId ?? null,
+      },
+      engineData,
+    );
+  }, [selectedContract, engineData]);
 
   if (isLoading) return (
     <div className="flex flex-col items-center justify-center h-48 gap-3">

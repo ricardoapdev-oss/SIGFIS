@@ -1,0 +1,362 @@
+{
+  "_comment": "Fixtures SINTÉTICAS (não são dados reais) para o teste de paridade entre backend/src/contracts/fiscalizacao-engine.ts e frontend/src/lib/fiscalizacao-engine.ts. Os dois módulos devem produzir exatamente o mesmo `summary` e a mesma sequência de `items` (id + priority + category) para a mesma entrada. Ver backend/src/contracts/fiscalizacao-engine.parity.spec.ts e frontend/scripts/verify-fiscalizacao-parity.cjs. NOW fixo = 2026-08-29T12:00:00Z (1788004800000).",
+  "now": 1788004800000,
+  "cases": [
+    {
+      "name": "gestor — carteira mista (vencido, vencendo, medição, ocorrência reincidente, execução alta)",
+      "viewer": {
+        "viewerId": "gestor-1",
+        "viewerRole": "GESTOR"
+      },
+      "input": {
+        "contracts": [
+          {
+            "id": "c1",
+            "contractNumber": "001/2024",
+            "status": "ACTIVE",
+            "startDate": "2023-01-01",
+            "endDate": "2026-07-01",
+            "initialValue": 200000,
+            "currentValue": 200000,
+            "managerId": "gestor-1"
+          },
+          {
+            "id": "c2",
+            "contractNumber": "002/2025",
+            "status": "ACTIVE",
+            "startDate": "2025-01-01",
+            "endDate": "2026-10-05",
+            "initialValue": 120000,
+            "currentValue": 120000,
+            "managerId": "gestor-1"
+          },
+          {
+            "id": "c3",
+            "contractNumber": "003/2025",
+            "status": "ACTIVE",
+            "startDate": "2024-02-01",
+            "endDate": "2027-02-01",
+            "initialValue": 100000,
+            "currentValue": 100000,
+            "managerId": "gestor-1"
+          },
+          {
+            "id": "c4",
+            "contractNumber": "004/2026",
+            "status": "DRAFT",
+            "startDate": "2026-08-01",
+            "endDate": "2027-08-01",
+            "initialValue": 50000,
+            "currentValue": 50000,
+            "managerId": "gestor-1"
+          }
+        ],
+        "assignments": [
+          {
+            "id": "a1",
+            "contractId": "c1",
+            "fiscalId": "fiscal-1",
+            "role": "TITULAR",
+            "isActive": true,
+            "endDate": null
+          },
+          {
+            "id": "a2",
+            "contractId": "c2",
+            "fiscalId": "fiscal-1",
+            "role": "TITULAR",
+            "isActive": true,
+            "endDate": null
+          },
+          {
+            "id": "a3",
+            "contractId": "c3",
+            "fiscalId": "fiscal-2",
+            "role": "TITULAR",
+            "isActive": true,
+            "endDate": null
+          }
+        ],
+        "occurrences": [
+          {
+            "id": "o1",
+            "contractId": "c3",
+            "fiscalId": "fiscal-2",
+            "title": "Atraso recorrente",
+            "severity": "MEDIUM",
+            "status": "OPEN",
+            "createdAt": "2026-08-01"
+          },
+          {
+            "id": "o2",
+            "contractId": "c3",
+            "fiscalId": "fiscal-2",
+            "title": "Atraso recorrente",
+            "severity": "MEDIUM",
+            "status": "OPEN",
+            "createdAt": "2026-06-20"
+          },
+          {
+            "id": "o3",
+            "contractId": "c3",
+            "fiscalId": "fiscal-2",
+            "title": "Atraso recorrente",
+            "severity": "LOW",
+            "status": "RESOLVED",
+            "createdAt": "2026-05-25"
+          }
+        ],
+        "measurements": [
+          {
+            "id": "m1",
+            "contractId": "c2",
+            "fiscalId": "fiscal-1",
+            "measurementValue": 30000,
+            "status": "PENDING_GESTOR",
+            "createdAt": "2026-07-10"
+          },
+          {
+            "id": "m2",
+            "contractId": "c1",
+            "fiscalId": "fiscal-1",
+            "measurementValue": 210000,
+            "status": "APPROVED",
+            "createdAt": "2026-03-01"
+          }
+        ],
+        "alterations": [
+          {
+            "id": "alt1",
+            "contractId": "c2",
+            "type": "PRICE_REAJUSTE",
+            "status": "PENDING_APPROVAL",
+            "newEndDate": null,
+            "createdAt": "2026-08-05"
+          }
+        ],
+        "payments": []
+      },
+      "expected": {
+        "summary": {
+          "CRITICA": 2,
+          "ALTA": 5,
+          "MEDIA": 0,
+          "BAIXA": 1,
+          "INFORMATIVA": 2,
+          "total": 10
+        },
+        "items": [
+          {
+            "id": "prazo:c1",
+            "category": "PRAZO",
+            "priority": "CRITICA"
+          },
+          {
+            "id": "financeiro-exec:c1",
+            "category": "FINANCEIRO",
+            "priority": "CRITICA"
+          },
+          {
+            "id": "ocorrencia:o2",
+            "category": "OCORRENCIA",
+            "priority": "ALTA"
+          },
+          {
+            "id": "medicao:m1",
+            "category": "MEDICAO",
+            "priority": "ALTA"
+          },
+          {
+            "id": "ocorrencia:o1",
+            "category": "OCORRENCIA",
+            "priority": "ALTA"
+          },
+          {
+            "id": "aditivo:alt1",
+            "category": "ADITIVO",
+            "priority": "ALTA"
+          },
+          {
+            "id": "prazo:c2",
+            "category": "PRAZO",
+            "priority": "ALTA"
+          },
+          {
+            "id": "prazo:c3",
+            "category": "PRAZO",
+            "priority": "BAIXA"
+          },
+          {
+            "id": "reajuste:c1",
+            "category": "REAJUSTE",
+            "priority": "INFORMATIVA"
+          },
+          {
+            "id": "reajuste:c3",
+            "category": "REAJUSTE",
+            "priority": "INFORMATIVA"
+          }
+        ]
+      }
+    },
+    {
+      "name": "fiscal — escopo restrito aos contratos designados",
+      "viewer": {
+        "viewerId": "fiscal-1",
+        "viewerRole": "FISCAL"
+      },
+      "input": {
+        "contracts": [
+          {
+            "id": "c1",
+            "contractNumber": "001",
+            "status": "ACTIVE",
+            "startDate": "2025-01-01",
+            "endDate": "2026-09-15",
+            "initialValue": 100000,
+            "currentValue": 100000,
+            "managerId": "gestor-1"
+          },
+          {
+            "id": "c2",
+            "contractNumber": "002",
+            "status": "ACTIVE",
+            "startDate": "2025-01-01",
+            "endDate": "2026-09-15",
+            "initialValue": 100000,
+            "currentValue": 100000,
+            "managerId": "gestor-1"
+          }
+        ],
+        "assignments": [
+          {
+            "id": "a1",
+            "contractId": "c1",
+            "fiscalId": "fiscal-1",
+            "role": "TITULAR",
+            "isActive": true,
+            "endDate": null
+          },
+          {
+            "id": "a2",
+            "contractId": "c2",
+            "fiscalId": "fiscal-9",
+            "role": "TITULAR",
+            "isActive": true,
+            "endDate": null
+          }
+        ],
+        "occurrences": [
+          {
+            "id": "o1",
+            "contractId": "c1",
+            "fiscalId": "fiscal-1",
+            "title": "Item pendente",
+            "severity": "HIGH",
+            "status": "OPEN",
+            "createdAt": "2026-08-10"
+          }
+        ],
+        "measurements": [
+          {
+            "id": "m1",
+            "contractId": "c1",
+            "fiscalId": "fiscal-1",
+            "measurementValue": 12000,
+            "status": "PENDING_FISCAL",
+            "createdAt": "2026-08-01"
+          }
+        ],
+        "alterations": [],
+        "payments": []
+      },
+      "expected": {
+        "summary": {
+          "CRITICA": 1,
+          "ALTA": 1,
+          "MEDIA": 1,
+          "BAIXA": 0,
+          "INFORMATIVA": 1,
+          "total": 4
+        },
+        "items": [
+          {
+            "id": "prazo:c1",
+            "category": "PRAZO",
+            "priority": "CRITICA"
+          },
+          {
+            "id": "ocorrencia:o1",
+            "category": "OCORRENCIA",
+            "priority": "ALTA"
+          },
+          {
+            "id": "medicao:m1",
+            "category": "MEDICAO",
+            "priority": "MEDIA"
+          },
+          {
+            "id": "reajuste:c1",
+            "category": "REAJUSTE",
+            "priority": "INFORMATIVA"
+          }
+        ]
+      }
+    },
+    {
+      "name": "contrato completamente regular — nenhuma pendência",
+      "viewer": {
+        "viewerId": "gestor-1",
+        "viewerRole": "GESTOR"
+      },
+      "input": {
+        "contracts": [
+          {
+            "id": "c1",
+            "contractNumber": "010/2025",
+            "status": "ACTIVE",
+            "startDate": "2025-11-01",
+            "endDate": "2027-11-01",
+            "initialValue": 100000,
+            "currentValue": 100000,
+            "managerId": "gestor-1"
+          }
+        ],
+        "assignments": [
+          {
+            "id": "a1",
+            "contractId": "c1",
+            "fiscalId": "fiscal-1",
+            "role": "TITULAR",
+            "isActive": true,
+            "endDate": null
+          }
+        ],
+        "occurrences": [],
+        "measurements": [
+          {
+            "id": "m1",
+            "contractId": "c1",
+            "fiscalId": "fiscal-1",
+            "measurementValue": 15000,
+            "status": "APPROVED",
+            "createdAt": "2026-06-01"
+          }
+        ],
+        "alterations": [],
+        "payments": []
+      },
+      "expected": {
+        "summary": {
+          "CRITICA": 0,
+          "ALTA": 0,
+          "MEDIA": 0,
+          "BAIXA": 0,
+          "INFORMATIVA": 0,
+          "total": 0
+        },
+        "items": []
+      }
+    }
+  ]
+}

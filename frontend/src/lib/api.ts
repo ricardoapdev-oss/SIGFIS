@@ -1,4 +1,5 @@
 import { computePortfolioFinancials, sumMoney } from './financial-calculations';
+import { deriveFiscalizacaoCentral, FiscalPendingItem } from './fiscalizacao-engine';
 
 // Tipos do Sistema
 export type UserRole = 'ADMIN' | 'GESTOR' | 'FISCAL' | 'ALTA_GESTAO';
@@ -782,33 +783,81 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
   // são todas reais (REAL_CRUD_PREFIXES); o simulador local que existia aqui
   // foi removido.
 
-  // ── Central de Pendências ─────────────────────────────────────────────────────
+  // ── Central de Fiscalização ──────────────────────────────────────────────────
+  // Pendências de EXECUÇÃO CONTRATUAL derivadas pelo motor compartilhado
+  // (lib/fiscalizacao-engine.ts, espelhado no backend). Prazos de fase do
+  // módulo Processos são anexados aqui (categoria PROCESSO) por não fazerem
+  // parte das regras de execução contratual do motor.
 
   if (endpoint === '/pending-dashboard' && method === 'GET') {
     const pendingAlerts = (db.contractAlerts || []).filter(a => a.targetUserId === user.id && a.status === 'PENDING');
-    const result: any = { alerts: pendingAlerts, items: [] };
 
-    if (user.role === 'FISCAL') {
-      const myContractIds = db.assignments.filter(a => a.fiscalId === user.id && a.isActive).map(a => a.contractId);
-      const openOccs = db.occurrences.filter(o => myContractIds.includes(o.contractId) && o.status !== 'RESOLVED');
-      openOccs.forEach(o => { const c = db.contracts.find(c => c.id === o.contractId); result.items.push({ type: 'OCCURRENCE', priority: o.severity === 'CRITICAL' ? 'HIGH' : o.severity === 'HIGH' ? 'HIGH' : 'MEDIUM', title: o.title, detail: c?.contractNumber, daysOpen: daysSince(o.createdAt), id: o.id, contractId: o.contractId }); });
-      const myPhases = (db.processPhases || []).filter(ph => ph.responsibleId === user.id && ph.status !== 'COMPLETED' && ph.plannedEnd && daysUntil(ph.plannedEnd) < 0);
-      myPhases.forEach(ph => { const p = db.processes.find(p => p.id === ph.processId); result.items.push({ type: 'PHASE', priority: 'HIGH', title: ph.name, detail: p?.processNumber, daysLate: Math.abs(daysUntil(ph.plannedEnd!)), id: ph.id, processId: ph.processId }); });
-      myContractIds.forEach(cId => { const c = db.contracts.find(c => c.id === cId); if (c) { const d = daysUntil(c.endDate); if (d <= 180 && d > 0) result.items.push({ type: 'CONTRACT_EXPIRY', priority: d <= 30 ? 'CRITICAL' : d <= 90 ? 'HIGH' : 'MEDIUM', title: `Contrato ${c.contractNumber} encerra em ${d} dias`, detail: fmtDate(c.endDate), daysUntil: d, id: c.id, contractId: c.id }); } });
-    }
+    const central = deriveFiscalizacaoCentral({
+      contracts: db.contracts.map(c => ({
+        id: c.id, contractNumber: c.contractNumber, status: c.status,
+        startDate: c.startDate, endDate: c.endDate,
+        initialValue: Number(c.initialValue) || 0, currentValue: Number(c.currentValue) || 0,
+        managerId: (c as any).managerId ?? null,
+      })),
+      assignments: db.assignments.map(a => ({
+        id: a.id, contractId: a.contractId, fiscalId: a.fiscalId,
+        role: a.role, isActive: a.isActive, endDate: a.endDate ?? null,
+      })),
+      occurrences: db.occurrences.map(o => ({
+        id: o.id, contractId: o.contractId, fiscalId: (o as any).fiscalId ?? null,
+        title: o.title, severity: o.severity, status: o.status,
+        createdAt: o.createdAt, resolvedAt: (o as any).resolvedAt ?? null,
+      })),
+      measurements: db.measurements.map(m => ({
+        id: m.id, contractId: m.contractId, fiscalId: (m as any).fiscalId ?? null,
+        measurementValue: Number(m.measurementValue) || 0, status: m.status, createdAt: m.createdAt,
+      })),
+      alterations: db.alterations.map(a => ({
+        id: a.id, contractId: a.contractId, type: a.type, status: a.status,
+        newEndDate: a.newEndDate ?? null, createdAt: a.createdAt,
+      })),
+      viewerId: user.id,
+      viewerRole: user.role,
+    });
 
-    if (user.role === 'GESTOR' || user.role === 'ADMIN') {
-      const pendMsrs = db.measurements.filter(m => m.status === 'PENDING_GESTOR');
-      pendMsrs.forEach(m => { const c = db.contracts.find(c => c.id === m.contractId); result.items.push({ type: 'MEASUREMENT', priority: daysSince(m.createdAt) > 10 ? 'HIGH' : 'MEDIUM', title: `Medição pendente: ${fmtCur(Number(m.measurementValue))}`, detail: c?.contractNumber, daysPending: daysSince(m.createdAt), id: m.id, contractId: m.contractId }); });
-      const pendAlts = db.alterations.filter(a => a.status === 'PENDING_APPROVAL');
-      pendAlts.forEach(alt => { const c = db.contracts.find(c => c.id === alt.contractId); result.items.push({ type: 'ALTERATION', priority: 'MEDIUM', title: `Aditivo pendente: ${alt.alterationNumber || alt.type}`, detail: c?.contractNumber, daysPending: daysSince(alt.createdAt), id: alt.id, contractId: alt.contractId }); });
-      const critOccs = db.occurrences.filter(o => o.status !== 'RESOLVED' && (o.severity === 'CRITICAL' || o.severity === 'HIGH'));
-      critOccs.forEach(o => { const c = db.contracts.find(c => c.id === o.contractId); result.items.push({ type: 'OCCURRENCE', priority: o.severity === 'CRITICAL' ? 'CRITICAL' : 'HIGH', title: o.title, detail: c?.contractNumber, daysOpen: daysSince(o.createdAt), id: o.id, contractId: o.contractId }); });
-      db.contracts.filter(c => c.status === 'ACTIVE').forEach(c => { const d = daysUntil(c.endDate); if (d <= 90 && d > 0) result.items.push({ type: 'CONTRACT_EXPIRY', priority: d <= 30 ? 'CRITICAL' : 'HIGH', title: `Contrato ${c.contractNumber} encerra em ${d} dias`, detail: fmtDate(c.endDate), daysUntil: d, id: c.id, contractId: c.id }); });
-    }
+    // Prazos de fase de processo (módulo Processos) — mantém o comportamento
+    // anterior da tela para o fiscal responsável e para o gestor.
+    const phaseItems: FiscalPendingItem[] = (db.processPhases || [])
+      .filter(ph => ph.status !== 'COMPLETED' && ph.plannedEnd)
+      .filter(ph => {
+        if (user.role === 'FISCAL') return ph.responsibleId === user.id;
+        return true;
+      })
+      .map(ph => {
+        const p = db.processes.find(p => p.id === ph.processId);
+        const d = daysUntil(ph.plannedEnd!);
+        if (d >= 0 && d > 30) return null;
+        return {
+          id: `fase:${ph.id}`,
+          category: 'PROCESSO' as const,
+          priority: (d < 0 ? 'ALTA' : d <= 7 ? 'MEDIA' : 'BAIXA') as FiscalPendingItem['priority'],
+          title: `Fase "${ph.name}" — ${p?.processNumber || 'processo'}`,
+          reason: d < 0
+            ? `Fase do processo atrasada há ${Math.abs(d)} dia(s) (prazo em ${fmtDate(ph.plannedEnd!)}).`
+            : `Fase do processo encerra em ${d} dia(s) (${fmtDate(ph.plannedEnd!)}).`,
+          processId: ph.processId,
+          daysReference: d,
+          dueDate: ph.plannedEnd!,
+        } as FiscalPendingItem;
+      })
+      .filter((x): x is FiscalPendingItem => x !== null);
 
-    result.items.sort((a: any, b: any) => { const p: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }; return (p[a.priority] ?? 3) - (p[b.priority] ?? 3); });
-    return result;
+    const items = [...central.items, ...phaseItems].sort((a, b) => {
+      const order: Record<string, number> = { CRITICA: 0, ALTA: 1, MEDIA: 2, BAIXA: 3, INFORMATIVA: 4 };
+      const p = (order[a.priority] ?? 5) - (order[b.priority] ?? 5);
+      if (p !== 0) return p;
+      return (a.daysReference ?? 0) - (b.daysReference ?? 0);
+    });
+
+    const summary = { ...central.summary, total: items.length };
+    for (const it of phaseItems) (summary as any)[it.priority]++;
+
+    return { alerts: pendingAlerts, items, summary };
   }
 
   // ── Dashboard Gestor ─────────────────────────────────────────────────────────

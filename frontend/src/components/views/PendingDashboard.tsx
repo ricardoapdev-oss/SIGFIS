@@ -1,63 +1,53 @@
-﻿'use client';
+'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AlertTriangle, Clock, FileText, CheckCircle, Bell, ChevronRight, ChevronDown, TrendingUp, Activity, Shield, MessageSquare, ChevronUp, X } from 'lucide-react';
+import {
+  AlertTriangle, Clock, FileText, CheckCircle, Bell, ChevronRight, ChevronDown,
+  TrendingUp, Activity, Shield, MessageSquare, ChevronUp, X, DollarSign,
+  CalendarClock, UserCog, RefreshCcw, Filter, Info,
+} from 'lucide-react';
 import { api, User, ContractAlert } from '@/lib/api';
-import { formatCurrency, formatDate, formatDateTime } from '@/lib/labels';
+import type {
+  FiscalPendingItem, FiscalPriority, FiscalCategory, FiscalizacaoSummary,
+} from '@/lib/fiscalizacao-engine';
+import { PRIORITY_LABEL, CATEGORY_LABEL } from '@/lib/fiscalizacao-engine';
+import { formatDateTime } from '@/lib/labels';
 
 interface PendingDashboardProps {
   user: User;
   onNavigate: (view: any, contractId?: string, processId?: string) => void;
 }
 
-type PriorityLevel = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
-type PendingItemType = 'MEASUREMENT' | 'ALTERATION' | 'OCCURRENCE' | 'CONTRACT_EXPIRY' | 'PHASE' | 'COMMUNICATION';
-
-interface PendingItem {
-  type: PendingItemType;
-  priority: PriorityLevel;
-  title: string;
-  detail?: string;
-  daysPending?: number;
-  daysOpen?: number;
-  daysLate?: number;
-  daysUntil?: number;
-  id: string;
-  contractId?: string;
-  processId?: string;
-}
-
-const priorityColor: Record<PriorityLevel, string> = {
-  CRITICAL: 'bg-red-500/10 border-red-500/30 text-red-400',
-  HIGH: 'bg-amber-500/10 border-amber-500/30 text-amber-400',
-  MEDIUM: 'bg-blue-500/10 border-blue-500/30 text-blue-400',
-  LOW: 'bg-gray-100 border-gray-300 text-gray-500',
+// ── Estilos por prioridade (identidade visual SIGFIS preservada) ────────────
+const priorityAccent: Record<FiscalPriority, string> = {
+  CRITICA: 'bg-red-500/10 border-red-500/30 text-red-500',
+  ALTA: 'bg-amber-500/10 border-amber-500/30 text-amber-600',
+  MEDIA: 'bg-blue-500/10 border-blue-500/30 text-blue-500',
+  BAIXA: 'bg-slate-100 border-slate-300 text-slate-500',
+  INFORMATIVA: 'bg-slate-50 border-slate-200 text-slate-400',
+};
+const priorityDot: Record<FiscalPriority, string> = {
+  CRITICA: 'bg-red-500', ALTA: 'bg-amber-500', MEDIA: 'bg-blue-500',
+  BAIXA: 'bg-slate-400', INFORMATIVA: 'bg-slate-300',
+};
+const priorityText: Record<FiscalPriority, string> = {
+  CRITICA: 'text-red-500', ALTA: 'text-amber-600', MEDIA: 'text-blue-500',
+  BAIXA: 'text-slate-500', INFORMATIVA: 'text-slate-400',
 };
 
-const priorityLabel: Record<PriorityLevel, string> = {
-  CRITICAL: 'Crítico', HIGH: 'Alto', MEDIUM: 'Médio', LOW: 'Baixo',
+const categoryIcon: Record<FiscalCategory, React.ReactNode> = {
+  PRAZO: <CalendarClock className="h-4 w-4" />,
+  FINANCEIRO: <DollarSign className="h-4 w-4" />,
+  MEDICAO: <CheckCircle className="h-4 w-4" />,
+  OCORRENCIA: <AlertTriangle className="h-4 w-4" />,
+  ADITIVO: <FileText className="h-4 w-4" />,
+  FISCAL_DESIGNACAO: <UserCog className="h-4 w-4" />,
+  REAJUSTE: <TrendingUp className="h-4 w-4" />,
+  PROCESSO: <Activity className="h-4 w-4" />,
 };
 
-const priorityDot: Record<PriorityLevel, string> = {
-  CRITICAL: 'bg-red-500', HIGH: 'bg-amber-500', MEDIUM: 'bg-blue-500', LOW: 'bg-zinc-500',
-};
-
-const itemIcon: Record<PendingItemType, React.ReactNode> = {
-  MEASUREMENT: <CheckCircle className="h-4 w-4" />,
-  ALTERATION: <FileText className="h-4 w-4" />,
-  OCCURRENCE: <AlertTriangle className="h-4 w-4" />,
-  CONTRACT_EXPIRY: <Clock className="h-4 w-4" />,
-  PHASE: <Activity className="h-4 w-4" />,
-  COMMUNICATION: <Bell className="h-4 w-4" />,
-};
-
-const itemLabel: Record<PendingItemType, string> = {
-  MEASUREMENT: 'Medição', ALTERATION: 'Aditivo', OCCURRENCE: 'Ocorrência',
-  CONTRACT_EXPIRY: 'Vencimento', PHASE: 'Fase', COMMUNICATION: 'Comunicado',
-};
-
-// ── Painel de Mensagens Enviadas (exclusivo Gestor) ─────────────────────────
+// ── Painel de Mensagens Enviadas (exclusivo Gestor) — inalterado ────────────
 function GestorMessagesPanel({ user }: { user: User }) {
   const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState(true);
@@ -104,7 +94,6 @@ function GestorMessagesPanel({ user }: { user: User }) {
 
   return (
     <div className="bg-gray-100/20 border border-gray-200 rounded-xl overflow-hidden">
-      {/* Header */}
       <button
         onClick={() => setExpanded(v => !v)}
         className="w-full flex items-center justify-between p-4 hover:bg-gray-100/30 transition-colors cursor-pointer"
@@ -137,7 +126,6 @@ function GestorMessagesPanel({ user }: { user: User }) {
 
       {expanded && (
         <div className="border-t border-gray-200">
-          {/* Tabs */}
           <div className="flex border-b border-gray-200 px-4">
             <TabBtn active={activeTab === 'pending'} onClick={() => setActiveTab('pending')} count={pendingAlerts.length} color="amber">
               Não Respondidas
@@ -150,7 +138,6 @@ function GestorMessagesPanel({ user }: { user: User }) {
             </TabBtn>
           </div>
 
-          {/* Lista */}
           <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
             {currentList.length === 0 ? (
               <div className="bg-gray-100/10 border border-gray-200 rounded-xl p-6 text-center">
@@ -189,7 +176,6 @@ function GestorMessagesPanel({ user }: { user: User }) {
                   </div>
                 </div>
 
-                {/* Ações para alertas PENDING */}
                 {alert.status === 'PENDING' && (
                   <div className="flex gap-2 pt-1">
                     <button
@@ -213,7 +199,6 @@ function GestorMessagesPanel({ user }: { user: User }) {
                   </div>
                 )}
 
-                {/* Ações para alertas RESPONDED/DISMISSED */}
                 {(alert.status === 'RESPONDED' || alert.status === 'DISMISSED') && (
                   <div className="flex gap-2 pt-1">
                     <button
@@ -260,13 +245,16 @@ function TabBtn({ active, onClick, count, color, children }: { active: boolean; 
   );
 }
 
-// ── Dashboard Principal ────────────────────────────────────────────────────────
+// ── Central de Fiscalização ────────────────────────────────────────────────────
 export function PendingDashboard({ user, onNavigate }: PendingDashboardProps) {
-  const queryClient = useQueryClient();
+  const [onlyMine, setOnlyMine] = useState(false);
+  const [fPriority, setFPriority] = useState<FiscalPriority | 'ALL'>('ALL');
+  const [fCategory, setFCategory] = useState<FiscalCategory | 'ALL'>('ALL');
+  const [contractQuery, setContractQuery] = useState('');
 
-  const { data: dashboard, isLoading } = useQuery({
+  const { data: dashboard, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['pending-dashboard', user.id],
-    queryFn: () => api.pendingDashboard.get(),
+    queryFn: () => api.pendingDashboard.get() as Promise<{ alerts: ContractAlert[]; items: FiscalPendingItem[]; summary: FiscalizacaoSummary }>,
     enabled: !!user,
     staleTime: 300_000,
   });
@@ -278,87 +266,133 @@ export function PendingDashboard({ user, onNavigate }: PendingDashboardProps) {
     staleTime: 300_000,
   });
 
-  const items: PendingItem[] = dashboard?.items ?? [];
-  const critical = items.filter(i => i.priority === 'CRITICAL');
-  const high = items.filter(i => i.priority === 'HIGH');
-  const medium = items.filter(i => i.priority === 'MEDIUM' || i.priority === 'LOW');
+  const allItems: FiscalPendingItem[] = useMemo(() => dashboard?.items ?? [], [dashboard]);
+
+  const items = useMemo(() => {
+    let list = allItems;
+    if (onlyMine) list = list.filter(i => !i.fiscalId || i.fiscalId === user.id);
+    if (fPriority !== 'ALL') list = list.filter(i => i.priority === fPriority);
+    if (fCategory !== 'ALL') list = list.filter(i => i.category === fCategory);
+    if (contractQuery.trim()) {
+      const q = contractQuery.trim().toLowerCase();
+      list = list.filter(i => (i.contractNumber ?? '').toLowerCase().includes(q));
+    }
+    return list;
+  }, [allItems, onlyMine, fPriority, fCategory, contractQuery, user.id]);
+
+  const summary = dashboard?.summary;
+  const critical = items.filter(i => i.priority === 'CRITICA');
+  const alta = items.filter(i => i.priority === 'ALTA');
+  const media = items.filter(i => i.priority === 'MEDIA' || i.priority === 'BAIXA');
+  const informativa = items.filter(i => i.priority === 'INFORMATIVA');
+
+  const filtersActive = onlyMine || fPriority !== 'ALL' || fCategory !== 'ALL' || contractQuery.trim() !== '';
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div>
-        <h2 className="text-base font-semibold text-gray-900">Central de Pendências</h2>
-        <p className="text-xs text-gray-500 mt-0.5">Visão consolidada de todos os itens que requerem ação imediata</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-base font-semibold text-gray-900">Central de Fiscalização</h2>
+          <p className="text-xs text-gray-500 mt-0.5">Controle da execução contratual — o que precisa de ação, o que está em risco e o que providenciar preventivamente. Cada pendência traz o motivo da prioridade.</p>
+        </div>
+        <button
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-gray-300 bg-gray-100/40 px-3 py-1.5 text-[10px] font-semibold text-gray-600 hover:text-gray-900 transition-colors cursor-pointer disabled:opacity-60"
+        >
+          <RefreshCcw className={`h-3 w-3 ${isFetching ? 'animate-spin' : ''}`} /> Atualizar
+        </button>
       </div>
 
       {/* Resumo numérico */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <SummaryCard label="Alertas Ativos" value={pendingAlerts.length} color="text-amber-400" icon={<Bell className="h-4 w-4" />} accent="bg-amber-500/10 border-amber-500/20" />
-        <SummaryCard label="Prioridade Crítica" value={critical.length} color="text-red-400" icon={<AlertTriangle className="h-4 w-4" />} accent="bg-red-500/10 border-red-500/20" />
-        <SummaryCard label="Prioridade Alta" value={high.length} color="text-amber-400" icon={<Shield className="h-4 w-4" />} accent="bg-amber-500/10 border-amber-500/20" />
-        <SummaryCard label="Demais Pendências" value={medium.length} color="text-blue-400" icon={<TrendingUp className="h-4 w-4" />} accent="bg-blue-500/10 border-blue-500/20" />
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+        <SummaryCard label="Alertas Ativos" value={pendingAlerts.length} tone="amber" icon={<Bell className="h-4 w-4" />} onClick={() => { setFPriority('ALL'); setFCategory('ALL'); }} />
+        <SummaryCard label="Prioridade Crítica" value={summary?.CRITICA ?? critical.length} tone="red" icon={<AlertTriangle className="h-4 w-4" />} active={fPriority === 'CRITICA'} onClick={() => setFPriority(p => p === 'CRITICA' ? 'ALL' : 'CRITICA')} />
+        <SummaryCard label="Prioridade Alta" value={summary?.ALTA ?? alta.length} tone="amber" icon={<Shield className="h-4 w-4" />} active={fPriority === 'ALTA'} onClick={() => setFPriority(p => p === 'ALTA' ? 'ALL' : 'ALTA')} />
+        <SummaryCard label="Prioridade Média" value={summary?.MEDIA ?? 0} tone="blue" icon={<TrendingUp className="h-4 w-4" />} active={fPriority === 'MEDIA'} onClick={() => setFPriority(p => p === 'MEDIA' ? 'ALL' : 'MEDIA')} />
+        <SummaryCard label="Prioridade Baixa" value={summary?.BAIXA ?? 0} tone="slate" icon={<Clock className="h-4 w-4" />} active={fPriority === 'BAIXA'} onClick={() => setFPriority(p => p === 'BAIXA' ? 'ALL' : 'BAIXA')} />
+        <SummaryCard label="Informativas" value={summary?.INFORMATIVA ?? informativa.length} tone="slate" icon={<Info className="h-4 w-4" />} active={fPriority === 'INFORMATIVA'} onClick={() => setFPriority(p => p === 'INFORMATIVA' ? 'ALL' : 'INFORMATIVA')} />
       </div>
 
-      {/* Painel de mensagens enviadas — exclusivo para Gestor */}
+      {/* Filtros */}
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-gray-100/20 p-3">
+        <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500"><Filter className="h-3 w-3" /> Filtros</span>
+        <select value={fCategory} onChange={e => setFCategory(e.target.value as FiscalCategory | 'ALL')}
+          className="rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-[11px] text-gray-700 cursor-pointer">
+          <option value="ALL">Todos os tipos</option>
+          {(Object.keys(CATEGORY_LABEL) as FiscalCategory[]).map(c => (
+            <option key={c} value={c}>{CATEGORY_LABEL[c]}</option>
+          ))}
+        </select>
+        <select value={fPriority} onChange={e => setFPriority(e.target.value as FiscalPriority | 'ALL')}
+          className="rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-[11px] text-gray-700 cursor-pointer">
+          <option value="ALL">Todas as prioridades</option>
+          {(['CRITICA', 'ALTA', 'MEDIA', 'BAIXA', 'INFORMATIVA'] as FiscalPriority[]).map(p => (
+            <option key={p} value={p}>{PRIORITY_LABEL[p]}</option>
+          ))}
+        </select>
+        <input value={contractQuery} onChange={e => setContractQuery(e.target.value)}
+          placeholder="Contrato nº…"
+          className="rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-[11px] text-gray-700 placeholder-gray-400 w-32" />
+        <label className="flex items-center gap-1.5 text-[11px] text-gray-600 cursor-pointer select-none">
+          <input type="checkbox" checked={onlyMine} onChange={e => setOnlyMine(e.target.checked)} className="cursor-pointer" />
+          Somente minhas pendências
+        </label>
+        {filtersActive && (
+          <button onClick={() => { setOnlyMine(false); setFPriority('ALL'); setFCategory('ALL'); setContractQuery(''); }}
+            className="text-[10px] font-semibold text-blue-500 hover:text-blue-700 cursor-pointer">Limpar</button>
+        )}
+        <span className="ml-auto text-[10px] text-gray-400">{items.length} de {allItems.length} pendência(s)</span>
+      </div>
+
       {user.role === 'GESTOR' && <GestorMessagesPanel user={user} />}
 
       {isLoading ? (
         <div className="space-y-3">{[...Array(4)].map((_, i) => <div key={i} className="h-16 bg-gray-100/40 rounded-xl animate-pulse" />)}</div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Coluna 1: Alertas obrigatórios */}
+          {/* Coluna 1: Ação imediata (alertas + críticas) */}
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-amber-500 inline-block animate-pulse" />
-              Para Ação Imediata
-            </h3>
-            {pendingAlerts.length > 0 ? (
+            <BlockTitle dot="bg-red-500" pulse>Ação Imediata</BlockTitle>
+            {pendingAlerts.length === 0 && critical.length === 0 ? (
+              <EmptyState icon={<CheckCircle className="h-8 w-8" />} text="Nada para ação imediata" sub="Sem alertas nem pendências críticas" />
+            ) : (
               <div className="space-y-3">
-                {pendingAlerts.slice(0, 5).map(alert => (
-                  <AlertCard key={alert.id} alert={alert} />
-                ))}
-                {pendingAlerts.length > 5 && (
-                  <p className="text-[10px] text-gray-500 text-center py-2">+{pendingAlerts.length - 5} alertas adicionais pendentes</p>
+                {pendingAlerts.slice(0, 4).map(alert => <AlertCard key={alert.id} alert={alert} />)}
+                {pendingAlerts.length > 4 && (
+                  <p className="text-[10px] text-gray-500 text-center py-1">+{pendingAlerts.length - 4} alerta(s) adicionais</p>
                 )}
+                {critical.map(item => <PendingItemCard key={item.id} item={item} onNavigate={onNavigate} />)}
               </div>
-            ) : (
-              <EmptyState icon={<Bell className="h-8 w-8" />} text="Nenhum alerta pendente" sub="Todos os itens foram tratados" />
             )}
           </div>
 
-          {/* Coluna 2: Pendências críticas/altas */}
+          {/* Coluna 2: Prioridade alta */}
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-red-500 inline-block" />
-              Pendências Críticas e Altas
-            </h3>
-            {[...critical, ...high].length > 0 ? (
-              <div className="space-y-3">
-                {[...critical, ...high].map(item => (
-                  <PendingItemCard key={item.id} item={item} onNavigate={onNavigate} />
-                ))}
-              </div>
+            <BlockTitle dot="bg-amber-500">Prioridade Alta</BlockTitle>
+            {alta.length > 0 ? (
+              <div className="space-y-3">{alta.map(item => <PendingItemCard key={item.id} item={item} onNavigate={onNavigate} />)}</div>
             ) : (
-              <EmptyState icon={<CheckCircle className="h-8 w-8" />} text="Nenhuma pendência crítica" sub="Situação sob controle" />
+              <EmptyState icon={<Shield className="h-8 w-8" />} text="Nenhuma pendência alta" sub="Situação sob controle" />
             )}
           </div>
 
-          {/* Coluna 3: Demais pendências + indicadores */}
+          {/* Coluna 3: Acompanhamento + informativo */}
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-blue-500 inline-block" />
-              Acompanhamento Geral
-            </h3>
-            {medium.length > 0 ? (
-              <div className="space-y-3">
-                {medium.map(item => (
-                  <PendingItemCard key={item.id} item={item} onNavigate={onNavigate} compact />
-                ))}
-              </div>
+            <BlockTitle dot="bg-blue-500">Acompanhamento Geral</BlockTitle>
+            {media.length > 0 ? (
+              <div className="space-y-3">{media.map(item => <PendingItemCard key={item.id} item={item} onNavigate={onNavigate} compact />)}</div>
             ) : (
-              <EmptyState icon={<TrendingUp className="h-8 w-8" />} text="Sem pendências gerais" sub="Todos os prazos em dia" />
+              <EmptyState icon={<TrendingUp className="h-8 w-8" />} text="Sem pendências gerais" sub="Prazos em dia" />
             )}
 
-            {/* Legenda Lei 13.303 */}
+            {informativa.length > 0 && (
+              <>
+                <BlockTitle dot="bg-slate-400">Preventivo / Informativo</BlockTitle>
+                <div className="space-y-3">{informativa.map(item => <PendingItemCard key={item.id} item={item} onNavigate={onNavigate} compact />)}</div>
+              </>
+            )}
+
             <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-xl mt-4">
               <p className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest mb-2">Lei 13.303/2016 — Limites Legais</p>
               <div className="space-y-1 text-[10px] text-gray-500">
@@ -372,29 +406,48 @@ export function PendingDashboard({ user, onNavigate }: PendingDashboardProps) {
         </div>
       )}
 
-      {/* Sem nada pendente */}
-      {!isLoading && items.length === 0 && pendingAlerts.length === 0 && (
+      {!isLoading && allItems.length === 0 && pendingAlerts.length === 0 && (
         <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-10 text-center">
           <CheckCircle className="h-12 w-12 text-emerald-500 mx-auto mb-4" />
           <h3 className="text-sm font-semibold text-gray-900 mb-1">Tudo em dia</h3>
-          <p className="text-xs text-gray-500">Nenhuma pendência crítica identificada no momento.</p>
+          <p className="text-xs text-gray-500">Nenhuma pendência de fiscalização identificada no momento.</p>
         </div>
       )}
     </div>
   );
 }
 
-// ── Cards auxiliares ───────────────────────────────────────────────────────────
+// ── Auxiliares ─────────────────────────────────────────────────────────────────
 
-function SummaryCard({ label, value, color, icon, accent }: { label: string; value: number; color: string; icon: React.ReactNode; accent: string }) {
+function BlockTitle({ dot, pulse, children }: { dot: string; pulse?: boolean; children: React.ReactNode }) {
   return (
-    <div className="bg-gray-100/30 border border-gray-200 p-4 rounded-xl flex items-center gap-3">
-      <div className={`p-2 rounded-lg border ${accent} ${color}`}>{icon}</div>
+    <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+      <span className={`h-2 w-2 rounded-full inline-block ${dot} ${pulse ? 'animate-pulse' : ''}`} />
+      {children}
+    </h3>
+  );
+}
+
+const toneMap: Record<string, { wrap: string; text: string }> = {
+  red: { wrap: 'bg-red-500/10 border-red-500/20', text: 'text-red-500' },
+  amber: { wrap: 'bg-amber-500/10 border-amber-500/20', text: 'text-amber-600' },
+  blue: { wrap: 'bg-blue-500/10 border-blue-500/20', text: 'text-blue-500' },
+  slate: { wrap: 'bg-slate-100 border-slate-200', text: 'text-slate-500' },
+};
+
+function SummaryCard({ label, value, tone, icon, onClick, active }: {
+  label: string; value: number; tone: string; icon: React.ReactNode; onClick?: () => void; active?: boolean;
+}) {
+  const c = toneMap[tone] ?? toneMap.slate;
+  return (
+    <button onClick={onClick} disabled={!onClick}
+      className={`bg-gray-100/30 border p-4 rounded-xl flex items-center gap-3 text-left transition-all ${onClick ? 'cursor-pointer hover:border-gray-300' : 'cursor-default'} ${active ? 'border-gray-400 ring-1 ring-gray-300' : 'border-gray-200'}`}>
+      <div className={`p-2 rounded-lg border ${c.wrap} ${c.text}`}>{icon}</div>
       <div>
         <p className="text-xs text-gray-500">{label}</p>
-        <p className={`text-2xl font-bold leading-tight ${color}`}>{value}</p>
+        <p className={`text-2xl font-bold leading-tight ${c.text}`}>{value}</p>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -418,49 +471,39 @@ function AlertCard({ alert }: { alert: ContractAlert }) {
   );
 }
 
-function PendingItemCard({ item, onNavigate, compact }: { item: PendingItem; onNavigate: (view: any, cId?: string, pId?: string) => void; compact?: boolean }) {
+function PendingItemCard({ item, onNavigate, compact }: {
+  item: FiscalPendingItem; onNavigate: (view: any, cId?: string, pId?: string) => void; compact?: boolean;
+}) {
   const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState(false);
   const [showRejectForm, setShowRejectForm] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
+  const isAditivo = item.category === 'ADITIVO' && !!item.originId;
 
   const approveMutation = useMutation({
-    mutationFn: () => api.alterations.approve(item.id),
+    mutationFn: () => api.alterations.approve(item.originId!),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['pending-dashboard'] }),
     onError: (err: any) => alert(`Erro ao aprovar: ${err.message}`),
   });
-
   const rejectMutation = useMutation({
-    mutationFn: () => api.alterations.reject(item.id, rejectReason),
+    mutationFn: () => api.alterations.reject(item.originId!, rejectReason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pending-dashboard'] });
-      setShowRejectForm(false);
-      setRejectReason('');
-      setExpanded(false);
+      setShowRejectForm(false); setRejectReason(''); setExpanded(false);
     },
     onError: (err: any) => alert(`Erro ao reprovar: ${err.message}`),
   });
 
   const handleClick = () => {
-    if (item.type === 'ALTERATION') {
-      setExpanded(e => !e);
-    } else if (item.contractId) {
-      onNavigate('details', item.contractId);
-    } else if (item.processId) {
-      onNavigate('processes');
-    } else if (item.type === 'MEASUREMENT' || item.type === 'OCCURRENCE') {
-      onNavigate('contracts');
-    } else {
-      onNavigate('processes');
-    }
+    if (isAditivo) { setExpanded(e => !e); return; }
+    if (item.contractId) onNavigate('details', item.contractId);
+    else if (item.processId) onNavigate('processes');
   };
 
   const urgencyText = () => {
-    if (item.daysLate) return `${item.daysLate}d em atraso`;
-    if (item.daysPending) return `${item.daysPending}d pendente`;
-    if (item.daysOpen) return `${item.daysOpen}d em aberto`;
-    if (item.daysUntil !== undefined) return `${item.daysUntil}d restantes`;
-    return null;
+    if (item.daysReference === undefined) return null;
+    if (item.daysReference < 0) return `${Math.abs(item.daysReference)}d em atraso`;
+    return `${item.daysReference}d restantes`;
   };
 
   return (
@@ -468,27 +511,27 @@ function PendingItemCard({ item, onNavigate, compact }: { item: PendingItem; onN
       <button onClick={handleClick}
         className={`w-full text-left p-3 hover:bg-gray-100/30 transition-colors group cursor-pointer ${compact ? 'py-2.5' : ''}`}>
         <div className="flex items-start gap-3">
-          <div className={`p-1.5 rounded-lg border text-[11px] shrink-0 ${priorityColor[item.priority]}`}>
-            {itemIcon[item.type]}
+          <div className={`p-1.5 rounded-lg border shrink-0 ${priorityAccent[item.priority]}`}>
+            {categoryIcon[item.category]}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 mb-0.5">
-              <span className={`text-[9px] font-bold uppercase tracking-wider ${priorityColor[item.priority].split(' ').pop()}`}>
-                {itemLabel[item.type]}
+            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+              <span className={`text-[9px] font-bold uppercase tracking-wider ${priorityText[item.priority]}`}>
+                {CATEGORY_LABEL[item.category]}
               </span>
               <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${priorityDot[item.priority]}`} />
-              <span className="text-[9px] text-gray-500">{priorityLabel[item.priority]}</span>
+              <span className="text-[9px] text-gray-500">{PRIORITY_LABEL[item.priority]}</span>
             </div>
-            <p className={`text-gray-700 font-medium leading-snug truncate ${compact ? 'text-[10px]' : 'text-[11px]'}`}>{item.title}</p>
-            {item.detail && <p className="text-[10px] text-gray-500 mt-0.5">{item.detail}</p>}
+            <p className={`text-gray-800 font-medium leading-snug ${compact ? 'text-[10px]' : 'text-[11px]'}`}>{item.title}</p>
+            {/* Explicação do porquê da prioridade (spec §3) */}
+            <p className="text-[10px] text-gray-500 mt-1 leading-snug">{item.reason}</p>
+            {item.contractNumber && <p className="text-[10px] text-gray-400 mt-0.5">Contrato {item.contractNumber}</p>}
           </div>
           <div className="shrink-0 text-right">
             {urgencyText() && (
-              <span className={`text-[9px] font-bold block ${item.priority === 'CRITICAL' ? 'text-red-400' : item.priority === 'HIGH' ? 'text-amber-400' : 'text-blue-400'}`}>
-                {urgencyText()}
-              </span>
+              <span className={`text-[9px] font-bold block ${priorityText[item.priority]}`}>{urgencyText()}</span>
             )}
-            {item.type === 'ALTERATION' ? (
+            {isAditivo ? (
               <ChevronDown className={`h-3.5 w-3.5 text-gray-400 transition-transform mt-1 ml-auto ${expanded ? 'rotate-180' : ''}`} />
             ) : (
               <ChevronRight className="h-3.5 w-3.5 text-gray-400 group-hover:text-gray-500 transition-colors mt-1 ml-auto" />
@@ -497,7 +540,7 @@ function PendingItemCard({ item, onNavigate, compact }: { item: PendingItem; onN
         </div>
       </button>
 
-      {expanded && item.type === 'ALTERATION' && (
+      {expanded && isAditivo && (
         <div className="border-t border-gray-200 p-3 space-y-2">
           {!showRejectForm ? (
             <div className="flex gap-2">
@@ -509,10 +552,12 @@ function PendingItemCard({ item, onNavigate, compact }: { item: PendingItem; onN
                 className="flex-1 bg-red-600/10 hover:bg-red-600/20 border border-red-500/30 text-red-400 rounded-lg py-1.5 text-[10px] font-semibold transition-colors cursor-pointer">
                 Reprovar
               </button>
-              <button onClick={() => onNavigate('details', item.contractId)}
-                className="flex-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-600 rounded-lg py-1.5 text-[10px] font-semibold transition-colors cursor-pointer">
-                Ver Contrato
-              </button>
+              {item.contractId && (
+                <button onClick={() => onNavigate('details', item.contractId)}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-600 rounded-lg py-1.5 text-[10px] font-semibold transition-colors cursor-pointer">
+                  Ver Contrato
+                </button>
+              )}
             </div>
           ) : (
             <div className="space-y-2">
