@@ -686,7 +686,10 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
   const isGestor = user.role === 'GESTOR' || user.role === 'ADMIN';
 
   // Stats rápidos para vigência
-  const toContractDate = (d: string) => new Date(d.length === 10 ? d + 'T12:00:00Z' : d);
+  // Datas de contrato são de calendário (sem hora). Ancoramos sempre ao
+  // meio-dia UTC da porção Y-M-D — seja ela 'YYYY-MM-DD' ou o ISO completo
+  // que o backend devolve — para o cálculo de prazo não oscilar por fuso.
+  const toContractDate = (d: string) => new Date(String(d).slice(0, 10) + 'T12:00:00Z');
   const daysLeft = Math.ceil((toContractDate(c.endDate).getTime() - Date.now()) / 86400000);
   const daysTotal = Math.ceil((toContractDate(c.endDate).getTime() - toContractDate(c.startDate || c.signingDate).getTime()) / 86400000);
   const progress = Math.max(0, Math.min(100, ((daysTotal - daysLeft) / daysTotal) * 100));
@@ -874,7 +877,8 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs shrink-0">
             <div className="text-right"><span className="text-gray-500 block text-[10px]">Valor Inicial</span><strong className="text-gray-800">{formatCurrency(c.initialValue)}</strong></div>
             <div className="text-right"><span className="text-gray-500 block text-[10px]">Valor Atual</span><strong className="text-emerald-400">{formatCurrency(c.currentValue)}</strong></div>
-            <div className="text-right">
+            <button type="button" onClick={() => setActiveTab('fiscalizacoes')}
+              className="text-right cursor-pointer group" title="Abrir a aba Fiscalizações">
               <span className="flex items-center justify-end gap-1 text-gray-500 text-[10px]">
                 Tx. Execução
                 <Tooltip side="bottom" interactive content={
@@ -884,15 +888,21 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                       Cálculo: {formatCurrency(medicoesAprovadas)} ÷ {formatCurrency(Number(c.currentValue))} × 100 = <strong>{executionPct}%</strong>
                     </span>
                     <span className="block text-white/70">{FINANCIAL_TOOLTIPS.medicoesAprovadas}</span>
+                    <span className="block text-white/70 border-t border-white/15 pt-1.5">
+                      Evolui com a <strong>homologação</strong> de medições (aba Fiscalizações): o fiscal registra a medição do período e o gestor/admin homologa. Pagamento não altera esta taxa.
+                    </span>
                   </span>
                 }>
                   <Info className="h-3 w-3 shrink-0" />
                 </Tooltip>
               </span>
-              <strong className={executionOverrun ? 'text-red-400' : 'text-blue-400'}>
+              <strong className={`block group-hover:underline ${executionOverrun ? 'text-red-400' : 'text-blue-400'}`}>
                 {executionPct}%{executionOverrun && <span className="ml-0.5 text-[9px]">⚠</span>}
               </strong>
-            </div>
+              {(c.measurements || []).length === 0 && (
+                <span className="block text-[9px] text-gray-400 leading-tight">sem medições homologadas</span>
+              )}
+            </button>
             <div className="text-right"><span className="text-gray-500 block text-[10px]">{daysLeft > 0 ? 'Dias restantes' : 'Dias vencido'}</span><strong className={daysLeft <= 90 ? 'text-red-400' : daysLeft <= 180 ? 'text-amber-400' : 'text-gray-700'}>{Math.abs(daysLeft)}</strong></div>
           </div>
         </div>
@@ -1450,7 +1460,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
             <div className="flex justify-between items-center">
               <div>
                 <h4 className="text-xs font-semibold text-gray-700">Medições de Fiscalização</h4>
-                <p className="text-[10px] text-gray-500 mt-0.5">Medições aprovadas: {formatCurrency(medicoesAprovadas)} de {formatCurrency(c.currentValue)} (valor contratual atual)</p>
+                <p className="text-[10px] text-gray-500 mt-0.5">Medições homologadas: {formatCurrency(medicoesAprovadas)} de {formatCurrency(c.currentValue)} (valor contratual atual) · Tx. Execução {executionPct}%</p>
                 <p className="text-[9px] text-gray-400 mt-0.5">{FINANCIAL_TOOLTIPS.medicoesAprovadas}</p>
               </div>
               {(user.role === 'FISCAL' || isGestor) && (
@@ -1459,6 +1469,16 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                   <Plus className="h-3.5 w-3.5" /> Nova Medição
                 </button>
               )}
+            </div>
+
+            {/* Fluxo da medição — deixa explícito de onde vem a Tx. Execução */}
+            <div className="flex flex-wrap items-center gap-2 bg-blue-50/50 border border-blue-100 rounded-xl px-3 py-2 text-[10px] text-gray-600">
+              <span className="font-semibold text-gray-700">Fluxo:</span>
+              <span className="px-2 py-0.5 rounded-full bg-white border border-gray-200">1. Fiscal registra a medição do período</span>
+              <span className="text-gray-400">→</span>
+              <span className="px-2 py-0.5 rounded-full bg-white border border-gray-200">2. Gestor/Admin homologa ou devolve</span>
+              <span className="text-gray-400">→</span>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700">3. Medição homologada entra na Taxa de Execução</span>
             </div>
 
             {showMeasurementForm && (

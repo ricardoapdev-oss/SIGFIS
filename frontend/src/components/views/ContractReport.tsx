@@ -16,7 +16,11 @@ const fmt = (v: number) =>
 
 const fmtDate = (d?: string) => {
   if (!d) return '—';
-  try { return new Date(d.length === 10 ? d + 'T12:00:00Z' : d).toLocaleDateString('pt-BR'); }
+  // Datas de calendário: usa só a porção Y-M-D (seja 'YYYY-MM-DD' ou o ISO
+  // completo do backend) para não recuar um dia pelo fuso.
+  const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+  try { return new Date(d).toLocaleDateString('pt-BR'); }
   catch { return d; }
 };
 

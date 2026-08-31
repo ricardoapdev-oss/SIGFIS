@@ -124,13 +124,19 @@ export function formatCurrency(value: number | string): string {
 
 export function formatDate(dateStr: string | Date): string {
   if (!dateStr) return '—';
-  // Datas "puras" (YYYY-MM-DD) são interpretadas pelo JS como meia-noite UTC;
-  // em fusos negativos (Brasil, UTC-3) isso recuava o dia exibido. Fixa ao
-  // meio-dia local para exibir sempre a data cadastrada.
-  if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-    return new Date(`${dateStr}T12:00:00`).toLocaleDateString('pt-BR');
+  // Colunas de calendário (Postgres `date`) chegam como 'YYYY-MM-DD' ou
+  // 'YYYY-MM-DDT00:00:00.000Z'. Renderizar isso com o fuso local (Brasil,
+  // UTC-3) recua um dia, porque a meia-noite UTC vira 21h do dia anterior.
+  // Para essas datas, formatamos a partir dos componentes Y-M-D literais,
+  // sem qualquer conversão de fuso — assim a data exibida é exatamente a
+  // data cadastrada. Timestamps com hora do dia (ex.: createdAt) seguem o
+  // caminho normal e respeitam o fuso.
+  if (typeof dateStr === 'string') {
+    const m = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})(?:T00:00(?::00)?(?:\.0+)?Z?)?$/);
+    if (m) return `${m[3]}/${m[2]}/${m[1]}`;
   }
-  return new Date(dateStr).toLocaleDateString('pt-BR');
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? '—' : d.toLocaleDateString('pt-BR');
 }
 
 export function formatDateTime(dateStr: string | Date): string {
