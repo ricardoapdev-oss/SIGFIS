@@ -124,6 +124,12 @@ export function formatCurrency(value: number | string): string {
 
 export function formatDate(dateStr: string | Date): string {
   if (!dateStr) return '—';
+  // Datas "puras" (YYYY-MM-DD) são interpretadas pelo JS como meia-noite UTC;
+  // em fusos negativos (Brasil, UTC-3) isso recuava o dia exibido. Fixa ao
+  // meio-dia local para exibir sempre a data cadastrada.
+  if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    return new Date(`${dateStr}T12:00:00`).toLocaleDateString('pt-BR');
+  }
   return new Date(dateStr).toLocaleDateString('pt-BR');
 }
 

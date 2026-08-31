@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { PhaseStatus, ProcessStatus, UserRole } from '@prisma/client';
+import { BiddingModality, PhaseStatus, ProcessStatus, UserRole } from '@prisma/client';
 
 interface ChecklistItem { id: string; texto: string; concluido: boolean; }
 
@@ -342,6 +342,7 @@ export class ProcessesService {
     const dateFields = ['dataSolicitacao', 'dataLimiteProcesso'];
 
     if (data.status) updateData.status = data.status as ProcessStatus;
+    if (data.modality) updateData.modality = data.modality as BiddingModality;
     if (data.estimatedValue !== undefined) updateData.estimatedValue = data.estimatedValue;
     strFields.forEach(f => { if (data[f] !== undefined) updateData[f] = data[f]; });
     boolFields.forEach(f => { if (data[f] !== undefined) updateData[f] = data[f]; });

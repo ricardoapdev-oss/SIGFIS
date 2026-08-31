@@ -6,28 +6,45 @@ import { cn } from "@/lib/utils"
 /**
  * Tooltip leve, sem dependência externa. Mostra ao hover/focus, com pequeno
  * atraso para não "piscar" em passagens rápidas do mouse.
+ *
+ * `interactive` mantém o balão aberto enquanto o mouse estiver sobre ele
+ * (permite ler textos longos e rolar), fechando com um pequeno atraso ao
+ * sair. Use com `side="bottom"` para explicações compridas, que ficam
+ * sobrepostas ao conteúdo logo abaixo do gatilho.
  */
 function Tooltip({
   content,
   children,
   side = "top",
   className,
+  interactive = false,
 }: {
   content: React.ReactNode
   children: React.ReactElement
   side?: "top" | "bottom" | "left" | "right"
   className?: string
+  interactive?: boolean
 }) {
   const [open, setOpen] = React.useState(false)
-  const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const showTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const hideTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  const clearTimers = () => {
+    if (showTimer.current) clearTimeout(showTimer.current)
+    if (hideTimer.current) clearTimeout(hideTimer.current)
+  }
   const show = () => {
-    timer.current = setTimeout(() => setOpen(true), 250)
+    if (hideTimer.current) clearTimeout(hideTimer.current)
+    showTimer.current = setTimeout(() => setOpen(true), 200)
   }
   const hide = () => {
-    if (timer.current) clearTimeout(timer.current)
-    setOpen(false)
+    if (showTimer.current) clearTimeout(showTimer.current)
+    // Com `interactive`, dá tempo do mouse cruzar o vão entre o gatilho e o
+    // balão sem fechá-lo.
+    hideTimer.current = setTimeout(() => setOpen(false), interactive ? 260 : 0)
   }
+
+  React.useEffect(() => clearTimers, [])
 
   const sideClasses: Record<string, string> = {
     top: "bottom-full left-1/2 -translate-x-1/2 mb-1.5",
@@ -48,8 +65,13 @@ function Tooltip({
       {open && (
         <span
           role="tooltip"
+          onMouseEnter={interactive ? show : undefined}
+          onMouseLeave={interactive ? hide : undefined}
           className={cn(
-            "sigfis-fade-in pointer-events-none absolute z-50 whitespace-nowrap rounded-lg bg-brand-navy px-2.5 py-1.5 text-[11px] font-medium text-white shadow-popover",
+            "sigfis-fade-in absolute z-50 rounded-lg bg-brand-navy px-2.5 py-1.5 text-[11px] font-medium leading-relaxed text-white shadow-popover",
+            interactive
+              ? "pointer-events-auto max-w-[280px] whitespace-normal"
+              : "pointer-events-none whitespace-nowrap",
             sideClasses[side],
             className
           )}

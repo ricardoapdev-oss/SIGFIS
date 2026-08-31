@@ -15,7 +15,7 @@ import {
   contractStatusLabel, contractStatusColor, occurrenceSeverityLabel, occurrenceSeverityColor,
   occurrenceStatusLabel, occurrenceStatusColor, measurementStatusLabel, measurementStatusColor,
   alterationTypeLabel, alterationStatusLabel, alterationStatusColor, fiscalRoleLabel,
-  formatCurrency, formatDate, formatDateTime,
+  modalityLabel, formatCurrency, formatDate, formatDateTime,
 } from '@/lib/labels';
 import {
   sumApprovedMeasurements, contractualBalanceNotExecuted, executionRateByMeasurement,
@@ -66,7 +66,7 @@ const infoRow = (label: string, value: React.ReactNode, tooltip?: string) => (
     <span className="flex items-center gap-1 text-[10px] font-medium text-gray-500 uppercase tracking-widest">
       {label}
       {tooltip && (
-        <Tooltip content={<span className="whitespace-normal block max-w-[220px]">{tooltip}</span>}>
+        <Tooltip side="bottom" interactive content={<span className="block">{tooltip}</span>}>
           <Info className="h-3 w-3 shrink-0" />
         </Tooltip>
       )}
@@ -376,6 +376,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
   const [gestorAlertFiscal, setGestorAlertFiscal] = useState<{ id: string; name: string } | null>(null);
   const [editingDados, setEditingDados] = useState(false);
   const [dadosEdits, setDadosEdits] = useState<Record<string, any>>({});
+  const [savingDados, setSavingDados] = useState(false);
   const [editingEmpresa, setEditingEmpresa] = useState(false);
   const [empresaEdits, setEmpresaEdits] = useState<Record<string, any>>({});
   const [editingVigencia, setEditingVigencia] = useState(false);
@@ -437,6 +438,40 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['contract', contractId] }); setEditingDados(false); setDadosEdits({}); },
     onError: (e: any) => alert(`Erro: ${e.message}`),
   });
+
+  // Lista de processos — usada para reatribuir o "Processo de Origem" do
+  // contrato na edição de Dados Gerais.
+  const { data: processesList } = useQuery<any[]>({
+    queryKey: ['processes-list'],
+    queryFn: () => api.processes.list(),
+    enabled: editingDados,
+    staleTime: 120_000,
+  });
+
+  // Salvamento de Dados Gerais: a Modalidade pertence ao processo vinculado,
+  // não ao contrato — quando alterada, atualiza o processo; os demais campos
+  // seguem para o contrato.
+  const handleSaveDados = async () => {
+    const { modality, ...contractFields } = dadosEdits;
+    const cur = contract as any;
+    setSavingDados(true);
+    try {
+      if (modality !== undefined && modality !== cur.process?.modality) {
+        if (!cur.processId) { alert('Este contrato não tem processo de origem vinculado — não é possível definir a modalidade.'); setSavingDados(false); return; }
+        await api.processes.update(cur.processId, { modality });
+      }
+      if (Object.keys(contractFields).length > 0) {
+        await api.contracts.updateData(contractId, contractFields);
+      }
+      await queryClient.invalidateQueries({ queryKey: ['contract', contractId] });
+      queryClient.invalidateQueries({ queryKey: ['contracts-list'] });
+      setEditingDados(false); setDadosEdits({});
+    } catch (e: any) {
+      alert(`Erro: ${e.message}`);
+    } finally {
+      setSavingDados(false);
+    }
+  };
 
   const deleteMeasurementMutation = useMutation({
     mutationFn: (id: string) => api.measurements.delete(id),
@@ -816,7 +851,15 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
             <div className="text-right">
               <span className="flex items-center justify-end gap-1 text-gray-500 text-[10px]">
                 Tx. Execução
-                <Tooltip content={<span className="whitespace-normal block max-w-[220px]">{FINANCIAL_TOOLTIPS.taxaExecucaoMedicoes} {FINANCIAL_TOOLTIPS.medicoesAprovadas}</span>}>
+                <Tooltip side="bottom" interactive content={
+                  <span className="block space-y-1.5">
+                    <span className="block">{FINANCIAL_TOOLTIPS.taxaExecucaoMedicoes}</span>
+                    <span className="block text-white/85 border-t border-white/15 pt-1.5">
+                      Cálculo: {formatCurrency(medicoesAprovadas)} ÷ {formatCurrency(Number(c.currentValue))} × 100 = <strong>{executionPct}%</strong>
+                    </span>
+                    <span className="block text-white/70">{FINANCIAL_TOOLTIPS.medicoesAprovadas}</span>
+                  </span>
+                }>
                   <Info className="h-3 w-3 shrink-0" />
                 </Tooltip>
               </span>
@@ -865,10 +908,10 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                       className="flex items-center gap-1.5 text-[11px] bg-gray-100 hover:bg-gray-200 border border-gray-300 px-3 py-1.5 rounded-lg text-gray-700 cursor-pointer">
                       <X className="h-3.5 w-3.5" /> Cancelar
                     </button>
-                    <button onClick={() => updateDadosMutation.mutate(dadosEdits)}
-                      disabled={updateDadosMutation.isPending || Object.keys(dadosEdits).length === 0}
+                    <button onClick={handleSaveDados}
+                      disabled={savingDados || Object.keys(dadosEdits).length === 0}
                       className="flex items-center gap-1.5 text-[11px] bg-emerald-500 hover:bg-emerald-400 px-3 py-1.5 rounded-lg text-zinc-950 font-semibold cursor-pointer disabled:opacity-50">
-                      <Save className="h-3.5 w-3.5" /> {updateDadosMutation.isPending ? 'Salvando...' : 'Salvar'}
+                      <Save className="h-3.5 w-3.5" /> {savingDados ? 'Salvando...' : 'Salvar'}
                     </button>
                   </div>
                 ) : (
@@ -886,9 +929,32 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                   <textarea value={dadosEdits.objectDescription ?? c.objectDescription} onChange={e => setDadosEdits(p => ({ ...p, objectDescription: e.target.value }))} rows={2} className={inputCls} />
                 </div>
                 <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Número do Contrato</span>
+                  <input type="text" value={dadosEdits.contractNumber ?? c.contractNumber} onChange={e => setDadosEdits(p => ({ ...p, contractNumber: e.target.value }))} className={inputCls} />
+                </div>
+                <div className="flex flex-col gap-0.5">
                   <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Status</span>
                   <select value={dadosEdits.status ?? c.status} onChange={e => setDadosEdits(p => ({ ...p, status: e.target.value }))} className={inputCls}>
                     {Object.entries(contractStatusLabel).map(([k, v]) => <option key={k} value={k}>{v as string}</option>)}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Modalidade</span>
+                  <select value={dadosEdits.modality ?? (c.process?.modality || '')} onChange={e => setDadosEdits(p => ({ ...p, modality: e.target.value }))} disabled={!c.processId} className={inputCls}>
+                    {!c.processId && <option value="">— Sem processo vinculado —</option>}
+                    {Object.entries(modalityLabel).map(([k, v]) => <option key={k} value={k}>{v as string}</option>)}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Processo de Origem</span>
+                  <select value={dadosEdits.processId ?? (c.processId || '')} onChange={e => setDadosEdits(p => ({ ...p, processId: e.target.value || null }))} className={inputCls}>
+                    <option value="">— Nenhum —</option>
+                    {(processesList ?? []).map((p: any) => (
+                      <option key={p.id} value={p.id}>{p.processNumber}{p.subject ? ` — ${String(p.subject).slice(0, 40)}` : ''}</option>
+                    ))}
+                    {c.processId && !(processesList ?? []).some((p: any) => p.id === c.processId) && (
+                      <option value={c.processId}>{c.process?.processNumber || c.processId}</option>
+                    )}
                   </select>
                 </div>
                 <div className="flex flex-col gap-0.5">
@@ -919,12 +985,25 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                   <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Observações</span>
                   <textarea value={dadosEdits.observations ?? (c.observations || '')} onChange={e => setDadosEdits(p => ({ ...p, observations: e.target.value }))} rows={2} className={inputCls} />
                 </div>
+                <div className="col-span-2 md:col-span-3 grid grid-cols-2 md:grid-cols-3 gap-5 border-t border-gray-200 pt-4">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Medições Aprovadas</span>
+                    <span className="text-xs text-gray-500">{formatCurrency(medicoesAprovadas)} <span className="text-[10px] text-gray-400">— calculado das medições aprovadas</span></span>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Saldo Contratual Não Executado</span>
+                    <span className="text-xs text-gray-500">{formatCurrency(saldoContratualNaoExecutado)} <span className="text-[10px] text-gray-400">— Valor Atual − Medições Aprovadas</span></span>
+                  </div>
+                  <p className="col-span-2 md:col-span-3 text-[10px] text-gray-400">
+                    Estes dois valores são derivados automaticamente — ajuste as medições na aba Fiscalizações e o Valor Atual acima.
+                  </p>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
                 {infoRow('Número do Contrato', c.contractNumber)}
                 {infoRow('Status', <span className={badgeCls(contractStatusColor[c.status] || '')}>{contractStatusLabel[c.status]}</span>)}
-                {infoRow('Modalidade', c.process?.modality || '—')}
+                {infoRow('Modalidade', (c.process?.modality && (modalityLabel[c.process.modality] || c.process.modality)) || '—')}
                 {infoRow('Data de Assinatura', formatDate(c.signingDate))}
                 {infoRow('Início da Vigência', formatDate(c.startDate))}
                 {infoRow('Fim da Vigência', formatDate(c.endDate))}
@@ -1640,7 +1719,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
               <div className="bg-gray-100/40 border border-gray-200 p-4 rounded-xl text-center">
                 <p className="flex items-center justify-center gap-1 text-[10px] text-gray-500">
                   Total Pago (NFs)
-                  <Tooltip content={<span className="whitespace-normal block max-w-[240px]">Dados financeiros incompletos: os registros de pagamento não têm status, estorno/cancelamento, glosa, retenção nem valor líquido. Este total bruto ({formatCurrency(totalPago)}) não deve ser tratado como indicador financeiro oficial de pagamento efetivo.</span>}>
+                  <Tooltip side="bottom" interactive content={<span className="block">Dados financeiros incompletos: os registros de pagamento não têm status, estorno/cancelamento, glosa, retenção nem valor líquido. Este total bruto ({formatCurrency(totalPago)}) não deve ser tratado como indicador financeiro oficial de pagamento efetivo.</span>}>
                     <Info className="h-3 w-3 shrink-0" />
                   </Tooltip>
                 </p>
@@ -1649,7 +1728,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
               <div className="bg-gray-100/40 border border-gray-200 p-4 rounded-xl text-center">
                 <p className="flex items-center justify-center gap-1 text-[10px] text-gray-500">
                   Saldo Liquidado a Pagar
-                  <Tooltip content={<span className="whitespace-normal block max-w-[220px]">{LIQUIDACAO_NAO_DISPONIVEL}</span>}>
+                  <Tooltip side="bottom" interactive content={<span className="block">{LIQUIDACAO_NAO_DISPONIVEL}</span>}>
                     <Info className="h-3 w-3 shrink-0" />
                   </Tooltip>
                 </p>
@@ -1658,7 +1737,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
               <div className="bg-gray-100/40 border border-gray-200 p-4 rounded-xl text-center">
                 <p className="flex items-center justify-center gap-1 text-[10px] text-gray-500">
                   % do Valor Contratual Pago
-                  <Tooltip content={<span className="whitespace-normal block max-w-[240px]">Dados financeiros incompletos — mesma limitação do Total Pago (NFs) ao lado.</span>}>
+                  <Tooltip side="bottom" interactive content={<span className="block">Dados financeiros incompletos — mesma limitação do Total Pago (NFs) ao lado.</span>}>
                     <Info className="h-3 w-3 shrink-0" />
                   </Tooltip>
                 </p>

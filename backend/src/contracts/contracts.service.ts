@@ -262,6 +262,10 @@ export class ContractsService {
     const updateData: any = {};
     if (data.currentValue !== undefined)
       updateData.currentValue = data.currentValue;
+    if (data.initialValue !== undefined)
+      updateData.initialValue = data.initialValue;
+    if (data.signingDate) updateData.signingDate = new Date(data.signingDate);
+    if (data.startDate) updateData.startDate = new Date(data.startDate);
     if (data.endDate) updateData.endDate = new Date(data.endDate);
     if (data.status) updateData.status = data.status as ContractStatus;
     if (data.observations !== undefined)
@@ -269,6 +273,44 @@ export class ContractsService {
     if (data.department !== undefined) updateData.department = data.department;
     if (data.objectDescription)
       updateData.objectDescription = data.objectDescription;
+
+    // "Processo de Origem" — pode ser desvinculado (null) ou trocado por outro
+    // processo existente.
+    if (data.processId !== undefined) {
+      if (data.processId) {
+        const proc = await this.prisma.procurementProcess.findUnique({
+          where: { id: data.processId },
+          select: { id: true },
+        });
+        if (!proc)
+          throw new BadRequestException('Processo de origem não encontrado.');
+      }
+      updateData.processId = data.processId || null;
+    }
+
+    // Número do contrato — único no schema; valida antes para devolver uma
+    // mensagem clara em vez do erro cru de constraint do banco.
+    if (
+      data.contractNumber !== undefined &&
+      data.contractNumber.trim() &&
+      data.contractNumber.trim() !== contract.contractNumber
+    ) {
+      const dup = await this.prisma.contract.findUnique({
+        where: { contractNumber: data.contractNumber.trim() },
+        select: { id: true },
+      });
+      if (dup)
+        throw new BadRequestException('Já existe um contrato com este número.');
+      updateData.contractNumber = data.contractNumber.trim();
+    }
+
+    // Coerência de vigência: término não pode ser anterior ao início.
+    const finalStart = updateData.startDate ?? contract.startDate;
+    const finalEnd = updateData.endDate ?? contract.endDate;
+    if (finalStart && finalEnd && new Date(finalEnd) < new Date(finalStart))
+      throw new BadRequestException(
+        'O fim da vigência não pode ser anterior ao início da vigência.',
+      );
 
     // Encerramento e rescisão do contrato: além de mudar a situação, arquivam
     // automaticamente (saem da listagem operacional, mas o histórico é
