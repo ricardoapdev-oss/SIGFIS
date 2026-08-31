@@ -448,23 +448,49 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
     staleTime: 120_000,
   });
 
-  // Salvamento de Dados Gerais: a Modalidade pertence ao processo vinculado,
-  // não ao contrato — quando alterada, atualiza o processo; os demais campos
-  // seguem para o contrato.
+  // Salvamento de Dados Gerais: toda alteração é gravada no banco, sobrepondo
+  // o valor anterior. O "Processo de Origem" é digitado/escolhido pelo número
+  // e resolvido para o id do processo cadastrado (ou nenhum). A Modalidade
+  // pertence ao processo vinculado — quando alterada, atualiza o processo.
   const handleSaveDados = async () => {
-    const { modality, ...contractFields } = dadosEdits;
     const cur = contract as any;
+    const { modality, _processOrigin, ...contractFields } = dadosEdits;
+
+    // Resolve o processo de origem digitado/selecionado.
+    let targetProcessId: string | null = cur.processId ?? null;
+    if (_processOrigin !== undefined) {
+      const term = String(_processOrigin).trim();
+      if (!term) {
+        targetProcessId = null;
+      } else {
+        const hit = (processesList ?? []).find(
+          (p: any) => String(p.processNumber).toLowerCase() === term.toLowerCase(),
+        );
+        if (!hit) {
+          alert(`Nenhum processo cadastrado com o número "${term}". Selecione um processo da lista ou deixe o campo vazio para "nenhum".`);
+          return;
+        }
+        targetProcessId = hit.id;
+      }
+      if (targetProcessId !== (cur.processId ?? null)) contractFields.processId = targetProcessId;
+    }
+
+    if (modality !== undefined && modality !== cur.process?.modality && !targetProcessId) {
+      alert('Sem processo de origem vinculado — não é possível definir a modalidade.');
+      return;
+    }
+
     setSavingDados(true);
     try {
-      if (modality !== undefined && modality !== cur.process?.modality) {
-        if (!cur.processId) { alert('Este contrato não tem processo de origem vinculado — não é possível definir a modalidade.'); setSavingDados(false); return; }
-        await api.processes.update(cur.processId, { modality });
+      if (modality !== undefined && modality !== cur.process?.modality && targetProcessId) {
+        await api.processes.update(targetProcessId, { modality });
       }
       if (Object.keys(contractFields).length > 0) {
         await api.contracts.updateData(contractId, contractFields);
       }
       await queryClient.invalidateQueries({ queryKey: ['contract', contractId] });
       queryClient.invalidateQueries({ queryKey: ['contracts-list'] });
+      queryClient.invalidateQueries({ queryKey: ['processes-list'] });
       setEditingDados(false); setDadosEdits({});
     } catch (e: any) {
       alert(`Erro: ${e.message}`);
@@ -940,22 +966,24 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Modalidade</span>
-                  <select value={dadosEdits.modality ?? (c.process?.modality || '')} onChange={e => setDadosEdits(p => ({ ...p, modality: e.target.value }))} disabled={!c.processId} className={inputCls}>
-                    {!c.processId && <option value="">— Sem processo vinculado —</option>}
+                  <select value={dadosEdits.modality ?? (c.process?.modality || '')} onChange={e => setDadosEdits(p => ({ ...p, modality: e.target.value }))}
+                    disabled={!c.processId && !(dadosEdits._processOrigin ?? '').trim()} className={inputCls}>
+                    {!c.process?.modality && !dadosEdits.modality && <option value="">—</option>}
                     {Object.entries(modalityLabel).map(([k, v]) => <option key={k} value={k}>{v as string}</option>)}
                   </select>
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Processo de Origem</span>
-                  <select value={dadosEdits.processId ?? (c.processId || '')} onChange={e => setDadosEdits(p => ({ ...p, processId: e.target.value || null }))} className={inputCls}>
-                    <option value="">— Nenhum —</option>
+                  <input type="text" list="proc-origin-list"
+                    value={dadosEdits._processOrigin ?? (c.process?.processNumber || '')}
+                    onChange={e => setDadosEdits(p => ({ ...p, _processOrigin: e.target.value }))}
+                    placeholder="Digite ou selecione — vazio = nenhum"
+                    className={inputCls} />
+                  <datalist id="proc-origin-list">
                     {(processesList ?? []).map((p: any) => (
-                      <option key={p.id} value={p.id}>{p.processNumber}{p.subject ? ` — ${String(p.subject).slice(0, 40)}` : ''}</option>
+                      <option key={p.id} value={p.processNumber}>{p.subject ? String(p.subject).slice(0, 60) : ''}</option>
                     ))}
-                    {c.processId && !(processesList ?? []).some((p: any) => p.id === c.processId) && (
-                      <option value={c.processId}>{c.process?.processNumber || c.processId}</option>
-                    )}
-                  </select>
+                  </datalist>
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Unidade Administrativa</span>
@@ -1011,7 +1039,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                 {infoRow('Valor Atual', formatCurrency(c.currentValue))}
                 {infoRow('Medições Aprovadas', formatCurrency(medicoesAprovadas), FINANCIAL_TOOLTIPS.medicoesAprovadas)}
                 {infoRow('Saldo Contratual Não Executado', formatCurrency(saldoContratualNaoExecutado), FINANCIAL_TOOLTIPS.saldoContratualNaoExecutado)}
-                {c.processId && infoRow('Processo de Origem', c.process?.processNumber || c.processId)}
+                {infoRow('Processo de Origem', c.processId ? (c.process?.processNumber || c.processId) : '—')}
                 {c.department && infoRow('Unidade Administrativa', c.department)}
                 {c.observations && infoRow('Observação', <span className="text-amber-400 font-medium">{c.observations}</span>)}
                 {infoRow('Objeto', c.objectDescription)}

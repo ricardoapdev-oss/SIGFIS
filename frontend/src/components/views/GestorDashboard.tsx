@@ -241,7 +241,7 @@ export function GestorDashboard({ user, onNavigate }: Props) {
           tooltip="Medições que o fiscal já enviou e que aguardam a homologação do gestor. Não conta medições ainda em preenchimento pelo fiscal." />
         <ExecutiveKpiCard icon={AlertTriangle} title="Alertas Críticos" value={rs?.critical ?? '—'} tone="red" onClick={() => onNavigate('risk')}
           tooltip={'Contratos ativos em risco crítico: pontuação de risco igual ou acima de 60, somando prazo, ocorrências abertas, medições pendentes e alertas ativos. É mais restrito que o “Alto risco” do Painel de Risco, que começa em 40 — por isso os números podem ser diferentes.'} />
-        <ExecutiveKpiCard icon={Clock} title="Contratos a Vencer (90d)" description="Próx. 90 dias" value={k?.expiringIn90 ?? '—'} tone="amber" onClick={() => onNavigate('contracts', undefined, 'expiring90')} tooltipAlign="right"
+        <ExecutiveKpiCard icon={Clock} title="Contratos a Vencer" description="Próx. 90 dias" value={k?.expiringIn90 ?? '—'} tone="amber" onClick={() => onNavigate('contracts', undefined, 'expiring90')} tooltipAlign="right"
           tooltip="Contratos ativos que encerram nos próximos 90 dias. Serve para começar a tempo a análise de continuidade ou de uma nova contratação, quando cabível." />
         <ExecutiveKpiCard icon={DollarSign} title="Valor Contratual Atual" value={f ? formatCurrency(f.valorContratualAtual) : '—'} tone="purple" tooltipAlign="right"
           tooltip="Soma do valor atual de todos os contratos ativos, já com os aditivos de acréscimo e de supressão aprovados. Não é valor pago nem empenhado." />
