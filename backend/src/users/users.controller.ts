@@ -46,7 +46,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.ADMIN, UserRole.ALTA_GESTAO)
+  @Roles(UserRole.ADMIN, UserRole.ALTA_GESTAO, UserRole.GESTOR)
   delete(@Param('id') id: string, @Req() req) {
     return this.usersService.delete(id, req.user);
   }

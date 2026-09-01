@@ -36,6 +36,7 @@ export function UsersView({ user }: UsersViewProps) {
   const [eName, setEName] = useState('');
   const [eEmail, setEEmail] = useState('');
   const [eRegistration, setERegistration] = useState('');
+  const [ePassword, setEPassword] = useState('');
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<UserRole | ''>('');
   const [statusFilter, setStatusFilter] = useState<'ACTIVE' | 'INACTIVE' | ''>('');
@@ -80,6 +81,7 @@ export function UsersView({ user }: UsersViewProps) {
     setEName(u.name || '');
     setEEmail(u.email || '');
     setERegistration(u.registrationNumber || '');
+    setEPassword('');
   };
 
   const toggleStatusMutation = useMutation({
@@ -95,15 +97,19 @@ export function UsersView({ user }: UsersViewProps) {
     onError: (err: any) => alert(`Erro: ${err.message}`),
   });
 
+  // ADMIN exclui qualquer um; GESTOR e ALTA_GESTAO excluem qualquer não-ADMIN.
+  // Ninguém exclui o próprio usuário.
   const canDelete = (target: any) => {
+    if (target.id === user.id) return false;
     if (user.role === 'ADMIN') return true;
-    if (user.role === 'ALTA_GESTAO') return target.role !== 'ADMIN';
+    if (user.role === 'ALTA_GESTAO' || user.role === 'GESTOR') return target.role !== 'ADMIN';
     return false;
   };
 
   const canToggleStatus = (target: any) => {
+    if (target.id === user.id) return false;
     if (user.role === 'ADMIN') return true;
-    if (user.role === 'GESTOR') return target.role !== 'ADMIN' && target.id !== user.id;
+    if (user.role === 'GESTOR') return target.role !== 'ADMIN';
     return false;
   };
 
@@ -243,7 +249,7 @@ export function UsersView({ user }: UsersViewProps) {
                           {canEditUser(u) && (
                             <button
                               onClick={() => openEdit(u)}
-                              title="Editar e-mail e matrícula"
+                              title={user.role === 'ADMIN' ? 'Editar usuário' : 'Editar nome, e-mail e matrícula'}
                               className="p-1.5 rounded-lg transition-colors cursor-pointer hover:bg-blue-500/10 text-gray-400 hover:text-blue-600"
                             >
                               <Pencil className="h-4 w-4" />
@@ -269,12 +275,12 @@ export function UsersView({ user }: UsersViewProps) {
                           {canDelete(u) && (
                             <button
                               onClick={() => {
-                                if (window.confirm(`Excluir ${u.name}? Esta ação não pode ser desfeita.`)) {
+                                if (window.confirm(`Excluir ${u.name} definitivamente do banco de dados? Esta ação não pode ser desfeita.`)) {
                                   deleteMutation.mutate(u.id);
                                 }
                               }}
                               disabled={deleteMutation.isPending}
-                              title="Excluir usuário"
+                              title="Excluir definitivamente do banco de dados"
                               className="p-1.5 rounded-lg transition-colors cursor-pointer hover:bg-red-500/10 text-gray-400 hover:text-red-500 disabled:opacity-40"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -385,10 +391,13 @@ export function UsersView({ user }: UsersViewProps) {
               onSubmit={(e) => {
                 e.preventDefault();
                 if (!eName.trim() || !eEmail.trim()) { alert('Nome e e-mail são obrigatórios.'); return; }
-                updateMutation.mutate({
-                  id: editUser.id,
-                  data: { name: eName.trim(), email: eEmail.trim(), registrationNumber: eRegistration.trim() },
-                });
+                const data: any = { name: eName.trim(), email: eEmail.trim(), registrationNumber: eRegistration.trim() };
+                // Só o ADMIN pode redefinir a senha de outro usuário.
+                if (user.role === 'ADMIN' && ePassword.trim()) {
+                  if (ePassword.trim().length < 6) { alert('A senha deve ter ao menos 6 caracteres.'); return; }
+                  data.password = ePassword.trim();
+                }
+                updateMutation.mutate({ id: editUser.id, data });
               }}
               className="space-y-4"
             >
@@ -410,6 +419,19 @@ export function UsersView({ user }: UsersViewProps) {
                     className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500/50" />
                 </div>
               </div>
+
+              {user.role === 'ADMIN' ? (
+                <div>
+                  <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">
+                    Nova Senha <span className="text-gray-400 normal-case font-normal">(opcional — deixe em branco para manter)</span>
+                  </label>
+                  <input type="password" value={ePassword} onChange={(e) => setEPassword(e.target.value)} minLength={6} autoComplete="new-password"
+                    placeholder="Mínimo 6 caracteres"
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500/50" />
+                </div>
+              ) : (
+                <p className="text-[10px] text-gray-400">Como Gestor de Contratos, você pode alterar nome, e-mail e matrícula. A redefinição de senha é exclusiva do Administrador.</p>
+              )}
 
               <div className="flex gap-3">
                 <button type="button" onClick={() => setEditUser(null)}

@@ -150,6 +150,9 @@ export class UsersService {
   async delete(id: string, caller: any) {
     const target = await this.prisma.user.findUnique({ where: { id } });
     if (!target) throw new NotFoundException('Usuário não encontrado');
+    if (caller.id === id) {
+      throw new ForbiddenException('Você não pode excluir o próprio usuário.');
+    }
     // Apenas ADMIN pode excluir outro ADMIN
     if (target.role === UserRole.ADMIN && caller.role !== 'ADMIN') {
       throw new ForbiddenException('Apenas o ADMIN pode excluir outro ADMIN');
