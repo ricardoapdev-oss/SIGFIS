@@ -11,6 +11,7 @@ import {
 import { api, User, Contract, ContractAlert } from '@/lib/api';
 import { CurrencyInput } from '@/components/ui/currency-input';
 import { Tooltip } from '@/components/ui/tooltip';
+import { SeiProcessLink } from '@/components/ui/sei-link';
 import {
   contractStatusLabel, contractStatusColor, occurrenceSeverityLabel, occurrenceSeverityColor,
   occurrenceStatusLabel, occurrenceStatusColor, measurementStatusLabel, measurementStatusColor,
@@ -1049,7 +1050,13 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                 {infoRow('Valor Atual', formatCurrency(c.currentValue))}
                 {infoRow('Medições Aprovadas', formatCurrency(medicoesAprovadas), FINANCIAL_TOOLTIPS.medicoesAprovadas)}
                 {infoRow('Saldo Contratual Não Executado', formatCurrency(saldoContratualNaoExecutado), FINANCIAL_TOOLTIPS.saldoContratualNaoExecutado)}
-                {infoRow('Processo de Origem', c.processId ? (c.process?.processNumber || c.processId) : '—')}
+                {infoRow(
+                  'Processo de Origem',
+                  c.process?.processNumber
+                    ? <SeiProcessLink processNumber={c.process.processNumber} />
+                    : (c.processId || '—'),
+                  'Clique no número para copiá-lo e abrir o SEI — cole no campo Pesquisar (Ctrl+V) e tecle Enter.',
+                )}
                 {c.department && infoRow('Unidade Administrativa', c.department)}
                 {c.observations && infoRow('Observação', <span className="text-amber-400 font-medium">{c.observations}</span>)}
                 {infoRow('Objeto', c.objectDescription)}

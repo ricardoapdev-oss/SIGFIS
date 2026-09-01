@@ -12,6 +12,7 @@ import { processStatusLabel, processStatusColor, modalityLabel, formatCurrency, 
 import { StatCard } from '@/components/ui/stat-card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { CurrencyInput } from '@/components/ui/currency-input';
+import { SeiProcessLink } from '@/components/ui/sei-link';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -566,6 +567,11 @@ function ProcessDetail({ processId, processSummary, user, onBack }: {
               )}
             </div>
             <h2 className="text-lg font-bold text-gray-900">{proc?.processNumber}</h2>
+            {proc?.processNumber && (
+              <div className="mt-0.5 text-[11px]">
+                <SeiProcessLink processNumber={proc.processNumber} />
+              </div>
+            )}
             <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{proc?.subject}</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
