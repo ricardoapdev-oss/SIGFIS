@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, X, UserCheck, UserX, Trash2, Search, Users as UsersIcon, ShieldCheck, ShieldOff, Clock } from 'lucide-react';
+import { Plus, X, UserCheck, UserX, Trash2, Search, Users as UsersIcon, ShieldCheck, ShieldOff, Clock, Pencil } from 'lucide-react';
 import { api, User, UserRole } from '@/lib/api';
 import { userRoleLabel, formatDateTime } from '@/lib/labels';
 import { StatCard } from '@/components/ui/stat-card';
@@ -32,6 +32,10 @@ const ROLE_PERMISSIONS: Record<string, string> = {
 export function UsersView({ user }: UsersViewProps) {
   const queryClient = useQueryClient();
   const [isNewOpen, setIsNewOpen] = useState(false);
+  const [editUser, setEditUser] = useState<any | null>(null);
+  const [eName, setEName] = useState('');
+  const [eEmail, setEEmail] = useState('');
+  const [eRegistration, setERegistration] = useState('');
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<UserRole | ''>('');
   const [statusFilter, setStatusFilter] = useState<'ACTIVE' | 'INACTIVE' | ''>('');
@@ -60,6 +64,24 @@ export function UsersView({ user }: UsersViewProps) {
     onError: (err: any) => alert(`Erro: ${err.message}`),
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => api.users.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users-all'] });
+      queryClient.invalidateQueries({ queryKey: ['fiscais'] });
+      queryClient.invalidateQueries({ queryKey: ['gestores'] });
+      setEditUser(null);
+    },
+    onError: (err: any) => alert(`Erro: ${err.message}`),
+  });
+
+  const openEdit = (u: any) => {
+    setEditUser(u);
+    setEName(u.name || '');
+    setEEmail(u.email || '');
+    setERegistration(u.registrationNumber || '');
+  };
+
   const toggleStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: 'ACTIVE' | 'INACTIVE' }) =>
       api.users.toggleStatus(id, status),
@@ -82,6 +104,13 @@ export function UsersView({ user }: UsersViewProps) {
   const canToggleStatus = (target: any) => {
     if (user.role === 'ADMIN') return true;
     if (user.role === 'GESTOR') return target.role !== 'ADMIN' && target.id !== user.id;
+    return false;
+  };
+
+  // ADMIN edita qualquer usuário; GESTOR edita qualquer um, exceto ADMIN.
+  const canEditUser = (target: any) => {
+    if (user.role === 'ADMIN') return true;
+    if (user.role === 'GESTOR') return target.role !== 'ADMIN';
     return false;
   };
 
@@ -211,6 +240,15 @@ export function UsersView({ user }: UsersViewProps) {
                     {canManage && (
                       <td className="p-4 text-center">
                         <div className="flex items-center justify-center gap-1">
+                          {canEditUser(u) && (
+                            <button
+                              onClick={() => openEdit(u)}
+                              title="Editar e-mail e matrícula"
+                              className="p-1.5 rounded-lg transition-colors cursor-pointer hover:bg-blue-500/10 text-gray-400 hover:text-blue-600"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </button>
+                          )}
                           {canToggleStatus(u) && (
                             <button
                               onClick={() => toggleStatusMutation.mutate({
@@ -323,6 +361,66 @@ export function UsersView({ user }: UsersViewProps) {
                 className="w-full bg-brand-blue hover:bg-brand-blue-dark text-white font-bold py-2.5 rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-50">
                 {createMutation.isPending ? 'Cadastrando...' : 'Cadastrar Servidor'}
               </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Editar Usuário */}
+      {editUser && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-gray-200 w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
+            <button
+              onClick={() => setEditUser(null)}
+              className="absolute right-4 top-4 p-1 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <h3 className="text-sm font-bold text-gray-900 mb-2">Editar Usuário</h3>
+            <p className="text-xs text-gray-500 mb-5 border-b border-gray-200 pb-3">
+              {editUser.name} · <span className="font-semibold">{userRoleLabel[editUser.role] || editUser.role}</span>
+            </p>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!eName.trim() || !eEmail.trim()) { alert('Nome e e-mail são obrigatórios.'); return; }
+                updateMutation.mutate({
+                  id: editUser.id,
+                  data: { name: eName.trim(), email: eEmail.trim(), registrationNumber: eRegistration.trim() },
+                });
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">Nome Completo</label>
+                <input type="text" value={eName} onChange={(e) => setEName(e.target.value)} required
+                  className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500/50" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">E-mail</label>
+                  <input type="email" value={eEmail} onChange={(e) => setEEmail(e.target.value)} required
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500/50" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">Matrícula</label>
+                  <input type="text" value={eRegistration} onChange={(e) => setERegistration(e.target.value)}
+                    placeholder="IQG-0000"
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500/50" />
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setEditUser(null)}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg text-xs transition-colors cursor-pointer">
+                  Cancelar
+                </button>
+                <button type="submit" disabled={updateMutation.isPending}
+                  className="flex-1 bg-brand-blue hover:bg-brand-blue-dark text-white font-bold py-2.5 rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-50">
+                  {updateMutation.isPending ? 'Salvando...' : 'Salvar'}
+                </button>
+              </div>
             </form>
           </div>
         </div>

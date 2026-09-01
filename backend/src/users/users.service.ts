@@ -73,18 +73,38 @@ export class UsersService {
   }
 
   async updateProfile(id: string, data: any, caller: any) {
-    // Só o próprio usuário ou ADMIN pode atualizar perfil
-    if (caller.role !== 'ADMIN' && caller.id !== id) {
-      throw new ForbiddenException('Sem permissão para editar este perfil');
-    }
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('Usuário não encontrado');
+
+    const isSelf = caller.id === id;
+    const isAdmin = caller.role === 'ADMIN';
+    const isGestor = caller.role === 'GESTOR';
+
+    // Quem pode editar este perfil:
+    //  - o próprio usuário (dados pessoais / senha)
+    //  - ADMIN: qualquer usuário
+    //  - GESTOR: qualquer usuário, EXCETO usuários com perfil ADMIN
+    const canManageTarget = isAdmin || (isGestor && user.role !== 'ADMIN');
+    if (!isSelf && !canManageTarget) {
+      throw new ForbiddenException(
+        isGestor
+          ? 'O Gestor não pode editar o perfil de um Administrador.'
+          : 'Sem permissão para editar este perfil',
+      );
+    }
 
     const updateData: any = {};
     if (data.name) updateData.name = data.name;
     if (data.email) updateData.email = data.email;
     if (data.registrationNumber !== undefined) updateData.registrationNumber = data.registrationNumber || null;
-    if (data.password) updateData.passwordHash = await bcrypt.hash(data.password, 10);
+    // Redefinição de senha: só o próprio usuário ou um ADMIN.
+    if (data.password && (isSelf || isAdmin)) updateData.passwordHash = await bcrypt.hash(data.password, 10);
+
+    // E-mail é único — valida antes para devolver mensagem clara.
+    if (updateData.email && updateData.email !== user.email) {
+      const dup = await this.prisma.user.findUnique({ where: { email: updateData.email } });
+      if (dup) throw new ConflictException('Já existe um usuário com este e-mail');
+    }
 
     const updated = await this.prisma.user.update({
       where: { id },
