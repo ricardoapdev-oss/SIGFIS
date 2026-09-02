@@ -42,19 +42,19 @@ export const modalityLabel: Record<string, string> = {
   LICITACAO_SEMI_INTEGRADA_ART32_II: 'Licitação - Regime de Contratação Semi-Integrada (Art. 32, II)',
   LICITACAO_LEILAO_ART32_III: 'Licitação - Leilão (Art. 32, III)',
   LICITACAO_PREGAO_ART32_IV: 'Licitação - Pregão (Art. 32, IV)',
-  // Não oferecido na seleção (fora de MODALITY_OPTIONS) — rótulo mantido só
-  // para exibir eventual registro que já o tenha.
-  LICITACAO_PREGAO_SRP_ART32_IV: 'Licitação - Pregão Eletrônico / SRP (Art. 32, IV, c/c Arts. 36 a 39)',
+  LICITACAO_PREGAO_SRP_ART32_IV: 'Licitação - Pregão Eletrônico - Ata de Registro de Preços',
   // ── Legado (Lei 13.303/2016) — só para exibir registros antigos ──
   LICITACAO_13303: 'Licitação 13.303/2016 (legado)',
   DISPENSA_13303: 'Dispensa 13.303/2016 (legado)',
   INEXIGIBILIDADE: 'Inexigibilidade (13.303/2016 — legado)',
-  PREGAO_ELETRONICO: 'Pregão Eletrônico (13.303/2016 — legado)',
+  // PREGAO_ELETRONICO (legado): descontinuado; os processos que o usavam
+  // foram migrados para LICITACAO_PREGAO_SRP_ART32_IV. Valor permanece no
+  // enum do banco (não removível), mas sem rótulo próprio aqui.
   OUTROS: 'Outros',
 };
 
-// Modalidades oferecidas nas telas de cadastro/edição (as vigentes). Os
-// valores legado continuam em `modalityLabel` apenas para exibição.
+// Modalidades oferecidas nas telas de cadastro/edição (as vigentes), em
+// ordem alfabética pelo rótulo.
 export const MODALITY_OPTIONS: string[] = [
   'INAPLICABILIDADE_ART28',
   'DISPENSA_ART29_VALOR',
@@ -64,7 +64,8 @@ export const MODALITY_OPTIONS: string[] = [
   'LICITACAO_SEMI_INTEGRADA_ART32_II',
   'LICITACAO_LEILAO_ART32_III',
   'LICITACAO_PREGAO_ART32_IV',
-];
+  'LICITACAO_PREGAO_SRP_ART32_IV',
+].sort((a, b) => modalityLabel[a].localeCompare(modalityLabel[b], 'pt-BR'));
 
 export const measurementStatusLabel: Record<string, string> = {
   PENDING_FISCAL: 'Pendente Fiscal',

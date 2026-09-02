@@ -887,7 +887,7 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
       LICITACAO_13303: 'Licitação', DISPENSA_13303: 'Dispensa', INEXIGIBILIDADE: 'Inexigibilidade', PREGAO_ELETRONICO: 'Pregão', OUTROS: 'Outros',
       INAPLICABILIDADE_ART28: 'Inaplicabilidade', DISPENSA_ART29_VALOR: 'Dispensa (valor)', DISPENSA_ART29_MATERIA: 'Dispensa (matéria)', INEXIGIBILIDADE_ART30: 'Inexigibilidade',
       LICITACAO_INTEGRADA_ART32_I: 'Contratação Integrada', LICITACAO_SEMI_INTEGRADA_ART32_II: 'Semi-Integrada', LICITACAO_LEILAO_ART32_III: 'Leilão',
-      LICITACAO_PREGAO_ART32_IV: 'Pregão', LICITACAO_PREGAO_SRP_ART32_IV: 'Pregão / SRP',
+      LICITACAO_PREGAO_ART32_IV: 'Pregão', LICITACAO_PREGAO_SRP_ART32_IV: 'Pregão Elet. - ARP',
     };
     const byModality = Object.entries(processes.reduce((acc, p) => { const k = modalityMap[p.modality] || p.modality; acc[k] = (acc[k] || 0) + 1; return acc; }, {} as Record<string, number>)).map(([name, value]) => ({ name, value }));
     const statusMap: Record<string, string> = { DRAFT: 'Rascunho', ACTIVE: 'Ativo', SUSPENDED: 'Suspenso', CONCLUDED: 'Concluído', RESCINDED: 'Rescindido' };

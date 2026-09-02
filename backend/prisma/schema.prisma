@@ -405,10 +405,12 @@ enum BiddingModality {
   LICITACAO_13303
   DISPENSA_13303
   INEXIGIBILIDADE
+  // PREGAO_ELETRONICO descontinuado: os processos que o usavam foram migrados
+  // para LICITACAO_PREGAO_SRP_ART32_IV. Valor mantido no enum (não removível).
   PREGAO_ELETRONICO
   OUTROS
   // Modalidades vigentes (Lei 14.133/2021 e Regulamento de Licitações e
-  // Contratos). Rótulos legíveis em frontend/src/lib/labels.ts.
+  // Contratos). Rótulos legíveis em frontend/src/lib/labels.ts (MODALITY_OPTIONS).
   INAPLICABILIDADE_ART28
   DISPENSA_ART29_VALOR
   DISPENSA_ART29_MATERIA
@@ -417,9 +419,7 @@ enum BiddingModality {
   LICITACAO_SEMI_INTEGRADA_ART32_II
   LICITACAO_LEILAO_ART32_III
   LICITACAO_PREGAO_ART32_IV
-  // Mantido só para o Prisma não recusar leitura caso algum registro já o
-  // tenha; NÃO é oferecido na seleção (ver MODALITY_OPTIONS em labels.ts).
-  LICITACAO_PREGAO_SRP_ART32_IV
+  LICITACAO_PREGAO_SRP_ART32_IV // "Pregão Eletrônico - Ata de Registro de Preços"
 }
 
 enum ContractStatus {
