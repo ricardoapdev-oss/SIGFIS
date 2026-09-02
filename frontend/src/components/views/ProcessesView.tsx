@@ -8,7 +8,7 @@ import {
   Ban, ArrowRight, FileText, Building2, ChevronLeft,
 } from 'lucide-react';
 import { api, User, ProcessPhase, ChecklistItem, PhaseStatus } from '@/lib/api';
-import { processStatusLabel, processStatusColor, modalityLabel, formatCurrency, formatDate } from '@/lib/labels';
+import { processStatusLabel, processStatusColor, modalityLabel, MODALITY_OPTIONS, formatCurrency, formatDate } from '@/lib/labels';
 import { StatCard } from '@/components/ui/stat-card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { CurrencyInput } from '@/components/ui/currency-input';
@@ -16,13 +16,8 @@ import { SeiProcessLink } from '@/components/ui/sei-link';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
-const MODALITIES = [
-  { value: 'LICITACAO_13303', label: 'Licitação 13.303/2016' },
-  { value: 'DISPENSA_13303', label: 'Dispensa 13.303/2016' },
-  { value: 'INEXIGIBILIDADE', label: 'Inexigibilidade' },
-  { value: 'PREGAO_ELETRONICO', label: 'Pregão Eletrônico' },
-  { value: 'OUTROS', label: 'Outros' },
-];
+const MODALITIES = MODALITY_OPTIONS.map((value) => ({ value, label: modalityLabel[value] || value }));
+const DEFAULT_MODALITY = 'LICITACAO_PREGAO_ART32_IV';
 
 const TIPOS_CONTRATACAO = [
   { value: 'DISPENSA_VALOR', label: 'Dispensa por Valor (art. 29, §1º, Lei 13.303)' },
@@ -91,7 +86,7 @@ export function ProcessesView({ user, initialFilter }: ProcessesViewProps) {
   const [fNumber, setFNumber] = useState('');
   const [fSubject, setFSubject] = useState('');
   const [fDescription, setFDescription] = useState('');
-  const [fModality, setFModality] = useState('LICITACAO_13303');
+  const [fModality, setFModality] = useState(DEFAULT_MODALITY);
   const [fTipoContratacao, setFTipoContratacao] = useState('');
   const [fFundamentoLegal, setFFundamentoLegal] = useState('');
   // Step 2
@@ -130,7 +125,7 @@ export function ProcessesView({ user, initialFilter }: ProcessesViewProps) {
   });
 
   const resetForm = () => {
-    setFNumber(''); setFSubject(''); setFDescription(''); setFModality('LICITACAO_13303');
+    setFNumber(''); setFSubject(''); setFDescription(''); setFModality(DEFAULT_MODALITY);
     setFTipoContratacao(''); setFFundamentoLegal(''); setFDepartment(''); setFResponsavel('');
     setFDataSolicitacao(''); setFValue(''); setFPrioridade('NORMAL'); setFPrazoCritico(false);
     setFDataLimite(''); setFJustUrgencia(''); setFExigeTR(true); setFExigeParecerJur(true);

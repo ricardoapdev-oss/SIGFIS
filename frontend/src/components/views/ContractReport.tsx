@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api, User } from '@/lib/api';
 import { X, Printer, FileText, AlertCircle } from 'lucide-react';
 import { summarizeReportContracts, PortfolioFinancials } from '@/lib/financial-calculations';
+import { modalityLabel } from '@/lib/labels';
 
 interface Props {
   user: User;
@@ -351,7 +352,7 @@ function ReportContent({ contracts, user, emissionDate, emissionTime, periodLabe
                     {c.process ? (
                       <>
                         <div style={{ fontWeight: 700, color: '#1e3a8a', fontSize: '5.5pt' }}>{c.process.processNumber}</div>
-                        <div style={{ color: '#9ca3af', fontSize: '5pt' }}>{c.process.modality || ''}</div>
+                        <div style={{ color: '#9ca3af', fontSize: '5pt' }}>{modalityLabel[c.process.modality] || c.process.modality || ''}</div>
                       </>
                     ) : <span style={{ color: '#d1d5db' }}>—</span>}
                   </td>

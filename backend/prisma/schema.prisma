@@ -122,6 +122,8 @@ model Contract {
   endDate           DateTime                @db.Date
   status            ContractStatus          @default(DRAFT)
   managerId         String?                 @db.Uuid
+  // Portaria que nomeia o gestor responsável por este contrato.
+  managerAppointmentOrdinance String?        @db.VarChar(255)
   department        String?                 @db.VarChar(150)
   observations      String?
   createdAt         DateTime                @default(now()) @db.Timestamptz(6)
@@ -396,11 +398,23 @@ enum ProcessStatus {
 }
 
 enum BiddingModality {
+  // Legado (Lei 13.303/2016) — mantidos apenas para exibir registros antigos.
   LICITACAO_13303
   DISPENSA_13303
   INEXIGIBILIDADE
   PREGAO_ELETRONICO
   OUTROS
+  // Modalidades vigentes (Lei 14.133/2021 e Regulamento de Licitações e
+  // Contratos). Rótulos legíveis em frontend/src/lib/labels.ts.
+  INAPLICABILIDADE_ART28
+  DISPENSA_ART29_VALOR
+  DISPENSA_ART29_MATERIA
+  INEXIGIBILIDADE_ART30
+  LICITACAO_INTEGRADA_ART32_I
+  LICITACAO_SEMI_INTEGRADA_ART32_II
+  LICITACAO_LEILAO_ART32_III
+  LICITACAO_PREGAO_ART32_IV
+  LICITACAO_PREGAO_SRP_ART32_IV
 }
 
 enum ContractStatus {

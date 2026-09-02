@@ -16,7 +16,7 @@ import {
   contractStatusLabel, contractStatusColor, occurrenceSeverityLabel, occurrenceSeverityColor,
   occurrenceStatusLabel, occurrenceStatusColor, measurementStatusLabel, measurementStatusColor,
   alterationTypeLabel, alterationStatusLabel, alterationStatusColor, fiscalRoleLabel,
-  modalityLabel, formatCurrency, formatDate, formatDateTime,
+  modalityLabel, MODALITY_OPTIONS, formatCurrency, formatDate, formatDateTime,
 } from '@/lib/labels';
 import {
   sumApprovedMeasurements, contractualBalanceNotExecuted, executionRateByMeasurement,
@@ -382,6 +382,9 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
   const [empresaEdits, setEmpresaEdits] = useState<Record<string, any>>({});
   const [editingVigencia, setEditingVigencia] = useState(false);
   const [vigenciaEdits, setVigenciaEdits] = useState<Record<string, any>>({});
+  const [editingGestor, setEditingGestor] = useState(false);
+  const [gestorEdits, setGestorEdits] = useState<Record<string, any>>({});
+  const [savingGestor, setSavingGestor] = useState(false);
   const [editingAltId, setEditingAltId] = useState<string | null>(null);
   const [altEdits, setAltEdits] = useState<Record<string, any>>({});
   const [showPaymentForm, setShowPaymentForm] = useState(false);
@@ -448,6 +451,51 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
     enabled: editingDados,
     staleTime: 120_000,
   });
+
+  // Gestores — para escolher/trocar o gestor responsável pelo contrato.
+  const { data: gestoresList } = useQuery<any[]>({
+    queryKey: ['gestores-list'],
+    queryFn: () => api.utils.getGestores(),
+    enabled: editingGestor,
+    staleTime: 120_000,
+  });
+
+  // Salvamento da aba Gestor: nome/matrícula/e-mail vão para o cadastro do
+  // usuário gestor; o gestor responsável e a portaria de nomeação vão para o
+  // contrato. Toda alteração sobrepõe o valor anterior no banco.
+  const handleSaveGestor = async () => {
+    const cur = contract as any;
+    const targetId = gestorEdits.managerId ?? cur.managerId;
+    const selMgr = (gestoresList ?? []).find((g: any) => g.id === targetId) ?? cur.manager ?? {};
+
+    const userPatch: Record<string, any> = {};
+    if (gestorEdits.name !== undefined && gestorEdits.name !== (selMgr.name ?? '')) userPatch.name = gestorEdits.name;
+    if (gestorEdits.email !== undefined && gestorEdits.email !== (selMgr.email ?? '')) userPatch.email = gestorEdits.email;
+    if (gestorEdits.registrationNumber !== undefined && gestorEdits.registrationNumber !== (selMgr.registrationNumber ?? '')) userPatch.registrationNumber = gestorEdits.registrationNumber;
+
+    const contractPatch: Record<string, any> = {};
+    if (gestorEdits.managerId !== undefined && gestorEdits.managerId !== cur.managerId) contractPatch.managerId = gestorEdits.managerId || null;
+    if (gestorEdits.managerAppointmentOrdinance !== undefined) contractPatch.managerAppointmentOrdinance = gestorEdits.managerAppointmentOrdinance;
+
+    if (Object.keys(userPatch).length && !targetId) {
+      alert('Selecione o gestor responsável antes de editar os dados dele.');
+      return;
+    }
+
+    setSavingGestor(true);
+    try {
+      if (targetId && Object.keys(userPatch).length) await api.users.update(targetId, userPatch);
+      if (Object.keys(contractPatch).length) await api.contracts.updateData(contractId, contractPatch);
+      await queryClient.invalidateQueries({ queryKey: ['contract', contractId] });
+      queryClient.invalidateQueries({ queryKey: ['users-all'] });
+      queryClient.invalidateQueries({ queryKey: ['gestores-list'] });
+      setEditingGestor(false); setGestorEdits({});
+    } catch (e: any) {
+      alert(`Erro: ${e.message}`);
+    } finally {
+      setSavingGestor(false);
+    }
+  };
 
   // Salvamento de Dados Gerais: toda alteração é gravada no banco, sobrepondo
   // o valor anterior. O "Processo de Origem" é digitado/escolhido pelo número
@@ -979,8 +1027,16 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                   <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Modalidade</span>
                   <select value={dadosEdits.modality ?? (c.process?.modality || '')} onChange={e => setDadosEdits(p => ({ ...p, modality: e.target.value }))}
                     disabled={!c.processId && !(dadosEdits._processOrigin ?? '').trim()} className={inputCls}>
-                    {!c.process?.modality && !dadosEdits.modality && <option value="">—</option>}
-                    {Object.entries(modalityLabel).map(([k, v]) => <option key={k} value={k}>{v as string}</option>)}
+                    {(() => {
+                      const curMod = dadosEdits.modality ?? (c.process?.modality || '');
+                      const opts = curMod && !MODALITY_OPTIONS.includes(curMod) ? [curMod, ...MODALITY_OPTIONS] : MODALITY_OPTIONS;
+                      return (
+                        <>
+                          {!curMod && <option value="">—</option>}
+                          {opts.map(k => <option key={k} value={k}>{modalityLabel[k] || k}</option>)}
+                        </>
+                      );
+                    })()}
                   </select>
                 </div>
                 <div className="flex flex-col gap-0.5">
@@ -1222,18 +1278,86 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
         })()}
 
         {/* ── GESTOR ── */}
-        {activeTab === 'gestor' && (
+        {activeTab === 'gestor' && (() => {
+          const targetId = gestorEdits.managerId ?? c.managerId;
+          const selMgr = (gestoresList ?? []).find((g: any) => g.id === targetId) ?? c.manager ?? {};
+          return (
           <div className="space-y-5">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-              {infoRow('Gestor Responsável', c.manager?.name || 'Jairo Vicente de Melo')}
-              {infoRow('Matrícula', c.manager?.registrationNumber || 'IQG-0002')}
-              {infoRow('E-mail', c.manager?.email || 'gestor@sigecontratos.com')}
-              {infoRow('Perfil', 'GESTOR')}
-              {infoRow('Setor', 'Gestão de Contratos — IQUEGO')}
-              {infoRow('Responsável desde', formatDate(c.signingDate))}
-            </div>
+            {isGestor && (
+              <div className="flex justify-end">
+                {editingGestor ? (
+                  <div className="flex gap-2">
+                    <button onClick={() => { setEditingGestor(false); setGestorEdits({}); }}
+                      className="flex items-center gap-1.5 text-[11px] bg-gray-100 hover:bg-gray-200 border border-gray-300 px-3 py-1.5 rounded-lg text-gray-700 cursor-pointer">
+                      <X className="h-3.5 w-3.5" /> Cancelar
+                    </button>
+                    <button onClick={handleSaveGestor}
+                      disabled={savingGestor || Object.keys(gestorEdits).length === 0}
+                      className="flex items-center gap-1.5 text-[11px] bg-emerald-500 hover:bg-emerald-400 px-3 py-1.5 rounded-lg text-zinc-950 font-semibold cursor-pointer disabled:opacity-50">
+                      <Save className="h-3.5 w-3.5" /> {savingGestor ? 'Salvando...' : 'Salvar'}
+                    </button>
+                  </div>
+                ) : (
+                  <button onClick={() => { setEditingGestor(true); setGestorEdits({}); }}
+                    className="flex items-center gap-1.5 text-[11px] bg-white hover:bg-gray-100 border border-gray-300 px-3 py-1.5 rounded-lg text-gray-700 cursor-pointer">
+                    <Pencil className="h-3.5 w-3.5" /> Editar Gestor
+                  </button>
+                )}
+              </div>
+            )}
+            {editingGestor ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+                <div className="flex flex-col gap-0.5 col-span-2 md:col-span-3">
+                  <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Gestor Responsável</span>
+                  <select value={gestorEdits.managerId ?? (c.managerId || '')}
+                    onChange={e => setGestorEdits(p => ({ ...p, managerId: e.target.value || null }))} className={inputCls}>
+                    <option value="">— Selecione —</option>
+                    {(gestoresList ?? []).map((g: any) => (
+                      <option key={g.id} value={g.id}>{g.name}{g.registrationNumber ? ` — ${g.registrationNumber}` : ''}</option>
+                    ))}
+                    {c.managerId && !(gestoresList ?? []).some((g: any) => g.id === c.managerId) && (
+                      <option value={c.managerId}>{c.manager?.name || c.managerId}</option>
+                    )}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Nome do Gestor</span>
+                  <input type="text" value={gestorEdits.name ?? (selMgr.name ?? '')}
+                    onChange={e => setGestorEdits(p => ({ ...p, name: e.target.value }))} className={inputCls} />
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Matrícula</span>
+                  <input type="text" value={gestorEdits.registrationNumber ?? (selMgr.registrationNumber ?? '')}
+                    onChange={e => setGestorEdits(p => ({ ...p, registrationNumber: e.target.value }))} className={inputCls} />
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">E-mail</span>
+                  <input type="email" value={gestorEdits.email ?? (selMgr.email ?? '')}
+                    onChange={e => setGestorEdits(p => ({ ...p, email: e.target.value }))} className={inputCls} />
+                </div>
+                <div className="flex flex-col gap-0.5 col-span-2 md:col-span-3">
+                  <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Portaria de Nomeação</span>
+                  <input type="text" value={gestorEdits.managerAppointmentOrdinance ?? (c.managerAppointmentOrdinance || '')}
+                    onChange={e => setGestorEdits(p => ({ ...p, managerAppointmentOrdinance: e.target.value }))}
+                    placeholder="Ex: Portaria nº 123/2026 — DOE de 10/04/2026" className={inputCls} />
+                </div>
+                <p className="col-span-2 md:col-span-3 text-[10px] text-gray-400">
+                  Nome, matrícula e e-mail alteram o cadastro do usuário gestor (reflete em todo o sistema). O gestor responsável e a portaria são específicos deste contrato.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+                {infoRow('Gestor Responsável', c.manager?.name || '—')}
+                {infoRow('Matrícula', c.manager?.registrationNumber || '—')}
+                {infoRow('E-mail', c.manager?.email || '—')}
+                {infoRow('Perfil', c.manager?.role || 'GESTOR')}
+                {infoRow('Setor', 'Gestão de Contratos — IQUEGO')}
+                {infoRow('Portaria de Nomeação', c.managerAppointmentOrdinance || '—')}
+              </div>
+            )}
           </div>
-        )}
+          );
+        })()}
 
         {/* ── VIGÊNCIA ── */}
         {activeTab === 'vigencia' && (
