@@ -60,7 +60,7 @@ export interface InspectionMeasurement {
 export type AlterationType = 'ADDENDUM_VALUE_INCREASE' | 'ADDENDUM_VALUE_DECREASE' | 'ADDENDUM_TIME_EXTENSION' | 'PRICE_REAJUSTE' | 'PRICE_REPACTUACAO' | 'PRICE_REEQUILIBRIO';
 export type AlterationStatus = 'DRAFT' | 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED';
 export interface ContractAlteration {
-  id: string; contractId: string; type: AlterationType; alterationNumber?: string; valueChange: number;
+  id: string; contractId: string; type: AlterationType; types?: AlterationType[]; alterationNumber?: string; valueChange: number;
   newEndDate?: string; justification: string; status: AlterationStatus; requestedById: string;
   reviewedById?: string; reviewDate?: string; reviewNotes?: string; createdAt: string;
   requester?: { name: string }; reviewer?: { name: string };
@@ -820,7 +820,7 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
         measurementValue: Number(m.measurementValue) || 0, status: m.status, createdAt: m.createdAt,
       })),
       alterations: db.alterations.map(a => ({
-        id: a.id, contractId: a.contractId, type: a.type, status: a.status,
+        id: a.id, contractId: a.contractId, type: a.type, types: (a as any).types ?? undefined, status: a.status,
         newEndDate: a.newEndDate ?? null, createdAt: a.createdAt,
       })),
       viewerId: user.id,

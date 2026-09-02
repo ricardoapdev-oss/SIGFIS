@@ -46,8 +46,24 @@ export class AlterationsService {
 
     const valueChange = Number(data.valueChange || 0);
 
+    // Tipos conjugados: um aditivo pode ter mais de um tipo ao mesmo tempo
+    // (ex.: prorrogação de prazo + acréscimo de valor). `type` guarda o
+    // principal (compatibilidade); `types` guarda todos.
+    const rawTypes: string[] = Array.isArray(data.types) && data.types.length
+      ? data.types
+      : data.type
+        ? [data.type]
+        : [];
+    const types = [...new Set(rawTypes)].filter((t): t is AlterationType =>
+      Object.values(AlterationType).includes(t as AlterationType),
+    );
+    if (types.length === 0) {
+      throw new BadRequestException('Selecione ao menos um tipo de aditivo.');
+    }
+    const primaryType = types[0];
+
     // Validação da Regra R01 (Limite de Aditivos de Valor) para acréscimos
-    if (data.type === AlterationType.ADDENDUM_VALUE_INCREASE) {
+    if (types.includes(AlterationType.ADDENDUM_VALUE_INCREASE)) {
       const isReform =
         contract.objectDescription.toLowerCase().includes('reforma') ||
         contract.objectDescription.toLowerCase().includes('retrofit') ||
@@ -62,7 +78,10 @@ export class AlterationsService {
       const approvedValueIncreases = contract.alterations
         .filter(
           (alt) =>
-            alt.type === AlterationType.ADDENDUM_VALUE_INCREASE &&
+            (alt.type === AlterationType.ADDENDUM_VALUE_INCREASE ||
+              (alt.types ?? []).includes(
+                AlterationType.ADDENDUM_VALUE_INCREASE,
+              )) &&
             alt.status === AlterationStatus.APPROVED,
         )
         .reduce((sum, alt) => sum + Number(alt.valueChange), 0);
@@ -79,7 +98,8 @@ export class AlterationsService {
     const alteration = await this.prisma.contractAlteration.create({
       data: {
         contractId: data.contractId,
-        type: data.type,
+        type: primaryType,
+        types,
         alterationNumber: data.alterationNumber || null,
         valueChange: valueChange,
         newEndDate: data.newEndDate ? new Date(data.newEndDate) : null,
@@ -94,7 +114,7 @@ export class AlterationsService {
       data: {
         contractId: data.contractId,
         type: AlertType.CONTRACT_LIMIT_WARNING,
-        message: `Solicitação de alteração contratual (${data.type}) pendente de aprovação para o contrato ${contract.contractNumber}.`,
+        message: `Solicitação de alteração contratual (${types.join(', ')}) pendente de aprovação para o contrato ${contract.contractNumber}.`,
         targetRole: UserRole.GESTOR,
       },
     });
@@ -219,15 +239,30 @@ export class AlterationsService {
       where: { id },
     });
     if (!alt) throw new NotFoundException('Aditivo não encontrado');
-    const {
-      id: _id,
-      contractId: _cid,
-      requesterId: _rid,
-      reviewerId: _rvid,
-      createdAt,
-      updatedAt,
-      ...updateData
-    } = data;
+
+    const updateData: any = {};
+    if (data.alterationNumber !== undefined)
+      updateData.alterationNumber = data.alterationNumber || null;
+    if (data.justification !== undefined && data.justification.trim())
+      updateData.justification = data.justification;
+    if (data.valueChange !== undefined)
+      updateData.valueChange = Number(data.valueChange) || 0;
+    if (data.newEndDate !== undefined)
+      updateData.newEndDate = data.newEndDate ? new Date(data.newEndDate) : null;
+
+    if (Array.isArray(data.types)) {
+      const types = [...new Set(data.types)].filter((t): t is AlterationType =>
+        Object.values(AlterationType).includes(t as AlterationType),
+      );
+      if (types.length === 0)
+        throw new BadRequestException('Selecione ao menos um tipo de aditivo.');
+      updateData.types = types;
+      updateData.type = types[0];
+    } else if (data.type) {
+      updateData.type = data.type;
+      updateData.types = [data.type];
+    }
+
     return this.prisma.contractAlteration.update({
       where: { id },
       data: updateData,

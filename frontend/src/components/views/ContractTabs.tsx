@@ -61,6 +61,12 @@ interface Props {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const inputCls = 'w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500/50';
+
+// Rótulo combinado dos tipos de um aditivo (conjugação): usa `types` quando
+// houver; senão cai para o `type` único (registros antigos).
+const alterationTypesOf = (a: any): string[] => (a?.types?.length ? a.types : a?.type ? [a.type] : []);
+const alterationTypesSummary = (a: any): string =>
+  alterationTypesOf(a).map((t: string) => alterationTypeLabel[t] || t).join(' + ') || '—';
 const badgeCls = (color: string) => `px-2 py-0.5 rounded text-[10px] font-semibold border ${color}`;
 const infoRow = (label: string, value: React.ReactNode, tooltip?: string) => (
   <div key={label} className="flex flex-col gap-0.5">
@@ -402,7 +408,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
   const [occDesc, setOccDesc] = useState('');
   const [occSeverity, setOccSeverity] = useState('MEDIUM');
   const [showAlterationForm, setShowAlterationForm] = useState(false);
-  const [altType, setAltType] = useState('ADDENDUM_VALUE_INCREASE');
+  const [altTypes, setAltTypes] = useState<string[]>(['ADDENDUM_TIME_EXTENSION']);
   const [altJustification, setAltJustification] = useState('');
   const [altValueChange, setAltValueChange] = useState('');
   const [altNewEndDate, setAltNewEndDate] = useState('');
@@ -662,7 +668,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
   const createAlterationMutation = useMutation({
     mutationFn: (data: any) => api.alterations.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['contract', contractId] }); setShowAlterationForm(false); setAltType('ADDENDUM_VALUE_INCREASE'); setAltJustification(''); setAltValueChange(''); setAltNewEndDate(''); setAltNumber('');
+      queryClient.invalidateQueries({ queryKey: ['contract', contractId] }); setShowAlterationForm(false); setAltTypes(['ADDENDUM_TIME_EXTENSION']); setAltJustification(''); setAltValueChange(''); setAltNewEndDate(''); setAltNumber('');
     },
     onError: (e: any) => alert(`Erro ao criar aditivo: ${e.message}`),
   });
@@ -1451,12 +1457,18 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
               <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-4 space-y-4">
                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Registrar Novo Termo Aditivo</p>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Tipo de Aditivo *</label>
-                    <select value={altType} onChange={e => setAltType(e.target.value)}
-                      className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer">
-                      {Object.entries(alterationTypeLabel).map(([k, v]) => <option key={k} value={k}>{v as string}</option>)}
-                    </select>
+                  <div className="col-span-2 flex flex-col gap-1.5">
+                    <label className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Tipo(s) de Aditivo * <span className="normal-case font-normal text-gray-400">— marque um ou mais (conjugação)</span></label>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5">
+                      {Object.entries(alterationTypeLabel).map(([k, v]) => (
+                        <label key={k} className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[11px] cursor-pointer transition-colors ${altTypes.includes(k) ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-white border-gray-300 text-gray-600 hover:border-gray-400'}`}>
+                          <input type="checkbox" checked={altTypes.includes(k)}
+                            onChange={e => setAltTypes(prev => e.target.checked ? [...prev, k] : prev.filter(x => x !== k))}
+                            className="accent-emerald-500" />
+                          {v as string}
+                        </label>
+                      ))}
+                    </div>
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Número / Identificação</label>
@@ -1488,11 +1500,12 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                   </p>
                 )}
                 <div className="flex gap-3">
-                  <button onClick={() => { setShowAlterationForm(false); setAltType('ADDENDUM_VALUE_INCREASE'); setAltJustification(''); setAltValueChange(''); setAltNewEndDate(''); setAltNumber(''); }}
+                  <button onClick={() => { setShowAlterationForm(false); setAltTypes(['ADDENDUM_TIME_EXTENSION']); setAltJustification(''); setAltValueChange(''); setAltNewEndDate(''); setAltNumber(''); }}
                     className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg py-2 text-xs font-semibold cursor-pointer">Cancelar</button>
                   <button onClick={() => {
+                    if (altTypes.length === 0) { alert('Marque ao menos um tipo de aditivo.'); return; }
                     if (!altJustification.trim()) { alert('Preencha a justificativa.'); return; }
-                    createAlterationMutation.mutate({ contractId, type: altType, alterationNumber: altNumber || undefined, justification: altJustification, valueChange: Number(altValueChange) || 0, newEndDate: altNewEndDate || undefined });
+                    createAlterationMutation.mutate({ contractId, types: altTypes, alterationNumber: altNumber || undefined, justification: altJustification, valueChange: Number(altValueChange) || 0, newEndDate: altNewEndDate || undefined });
                   }}
                     disabled={createAlterationMutation.isPending}
                     className="flex-1 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-white rounded-lg py-2 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
@@ -1509,6 +1522,22 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                     {editingAltId === alt.id ? (
                       <div className="space-y-3">
                         <div className="grid grid-cols-2 gap-3">
+                          <div className="col-span-2 flex flex-col gap-1.5">
+                            <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Tipo(s) de Aditivo * <span className="normal-case font-normal text-gray-400">— marque um ou mais</span></span>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5">
+                              {Object.entries(alterationTypeLabel).map(([k, v]) => {
+                                const sel: string[] = altEdits.types ?? alterationTypesOf(alt);
+                                return (
+                                  <label key={k} className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[11px] cursor-pointer transition-colors ${sel.includes(k) ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-white border-gray-300 text-gray-600 hover:border-gray-400'}`}>
+                                    <input type="checkbox" checked={sel.includes(k)}
+                                      onChange={e => setAltEdits((p: any) => { const cur: string[] = p.types ?? alterationTypesOf(alt); return { ...p, types: e.target.checked ? [...cur, k] : cur.filter((x: string) => x !== k) }; })}
+                                      className="accent-emerald-500" />
+                                    {v as string}
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          </div>
                           <div className="flex flex-col gap-0.5">
                             <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Número/Identificação</span>
                             <input type="text" value={altEdits.alterationNumber ?? (alt.alterationNumber || '')} onChange={e => setAltEdits((p: any) => ({ ...p, alterationNumber: e.target.value }))} className={inputCls} />
@@ -1527,7 +1556,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <button onClick={() => updateAlterationMutation.mutate({ id: alt.id, data: altEdits })}
+                          <button onClick={() => { if (altEdits.types && altEdits.types.length === 0) { alert('Marque ao menos um tipo de aditivo.'); return; } updateAlterationMutation.mutate({ id: alt.id, data: altEdits }); }}
                             disabled={updateAlterationMutation.isPending}
                             className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold py-1.5 rounded-lg text-xs cursor-pointer disabled:opacity-50">
                             {updateAlterationMutation.isPending ? 'Salvando...' : 'Salvar'}
@@ -1542,7 +1571,8 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                       <>
                         <div className="flex justify-between items-start">
                           <div>
-                            <p className="text-xs font-bold text-gray-700">{alt.alterationNumber || alterationTypeLabel[alt.type]}</p>
+                            <p className="text-xs font-bold text-gray-700">{alt.alterationNumber || alterationTypesSummary(alt)}</p>
+                            {alt.alterationNumber && <p className="text-[10px] font-medium text-blue-600 mt-0.5">{alterationTypesSummary(alt)}</p>}
                             <p className="text-[10px] text-gray-500 mt-0.5">{alt.justification}</p>
                           </div>
                           <div className="flex items-center gap-2 shrink-0 ml-4">

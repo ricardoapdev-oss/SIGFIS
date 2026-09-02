@@ -228,7 +228,10 @@ model InspectionMeasurement {
 model ContractAlteration {
   id               String           @id @default(uuid()) @db.Uuid
   contractId       String           @db.Uuid
+  // `type` = tipo principal (compat.); `types` = todos os tipos conjugados
+  // no mesmo aditivo (ex.: prorrogação de prazo + acréscimo de valor).
   type             AlterationType
+  types            AlterationType[]
   alterationNumber String?          @db.VarChar(50)
   valueChange      Decimal          @default(0.00) @db.Decimal(15, 2)
   newEndDate       DateTime?        @db.Date
