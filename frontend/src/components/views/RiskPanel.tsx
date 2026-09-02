@@ -134,9 +134,8 @@ export function RiskPanel({ user, onNavigate }: Props) {
                   {label}
                   <Tooltip
                     side="bottom"
-                    interactive
-                    className="normal-case tracking-normal"
-                    content={<span className="block">{RISK_LEVEL_TOOLTIP[level]}</span>}
+                    className="top-full bottom-auto left-0 right-auto translate-x-0 mb-0 mt-2 z-[60] max-w-[260px] whitespace-normal normal-case tracking-normal"
+                    content={<span className="whitespace-normal block max-w-[240px]">{RISK_LEVEL_TOOLTIP[level]}</span>}
                   >
                     <Info className="h-3 w-3 shrink-0 text-gray-400" />
                   </Tooltip>

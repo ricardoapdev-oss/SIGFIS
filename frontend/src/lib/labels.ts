@@ -33,37 +33,12 @@ export const processStatusColor: Record<string, string> = {
 };
 
 export const modalityLabel: Record<string, string> = {
-  // ── Modalidades vigentes (Lei 14.133/2021 e Regulamento de Licitações) ──
-  INAPLICABILIDADE_ART28: 'Inaplicabilidade de Licitação - Oportunidade de Negócio / Atividade-Fim (Art. 28, § 3º)',
-  DISPENSA_ART29_VALOR: 'Dispensa de Licitação - Em Razão do Valor (Art. 29, I e II)',
-  DISPENSA_ART29_MATERIA: 'Dispensa de Licitação - Em Razão da Matéria (Art. 29, III a XVI)',
-  INEXIGIBILIDADE_ART30: 'Inexigibilidade de Licitação (Art. 30)',
-  LICITACAO_INTEGRADA_ART32_I: 'Licitação - Regime de Contratação Integrada (Art. 32, I)',
-  LICITACAO_SEMI_INTEGRADA_ART32_II: 'Licitação - Regime de Contratação Semi-Integrada (Art. 32, II)',
-  LICITACAO_LEILAO_ART32_III: 'Licitação - Leilão (Art. 32, III)',
-  LICITACAO_PREGAO_ART32_IV: 'Licitação - Pregão (Art. 32, IV)',
-  LICITACAO_PREGAO_SRP_ART32_IV: 'Licitação - Pregão Eletrônico / Sistema de Registro de Preços (Art. 32, IV, c/c Arts. 36 a 39)',
-  // ── Legado (Lei 13.303/2016) — só para exibir registros antigos ──
-  LICITACAO_13303: 'Licitação 13.303/2016 (legado)',
-  DISPENSA_13303: 'Dispensa 13.303/2016 (legado)',
-  INEXIGIBILIDADE: 'Inexigibilidade (13.303/2016 — legado)',
-  PREGAO_ELETRONICO: 'Pregão Eletrônico (13.303/2016 — legado)',
+  LICITACAO_13303: 'Licitação 13.303/2016',
+  DISPENSA_13303: 'Dispensa 13.303/2016',
+  INEXIGIBILIDADE: 'Inexigibilidade',
+  PREGAO_ELETRONICO: 'Pregão Eletrônico',
   OUTROS: 'Outros',
 };
-
-// Modalidades oferecidas nas telas de cadastro/edição (as vigentes). Os
-// valores legado continuam em `modalityLabel` apenas para exibição.
-export const MODALITY_OPTIONS: string[] = [
-  'INAPLICABILIDADE_ART28',
-  'DISPENSA_ART29_VALOR',
-  'DISPENSA_ART29_MATERIA',
-  'INEXIGIBILIDADE_ART30',
-  'LICITACAO_INTEGRADA_ART32_I',
-  'LICITACAO_SEMI_INTEGRADA_ART32_II',
-  'LICITACAO_LEILAO_ART32_III',
-  'LICITACAO_PREGAO_ART32_IV',
-  'LICITACAO_PREGAO_SRP_ART32_IV',
-];
 
 export const measurementStatusLabel: Record<string, string> = {
   PENDING_FISCAL: 'Pendente Fiscal',

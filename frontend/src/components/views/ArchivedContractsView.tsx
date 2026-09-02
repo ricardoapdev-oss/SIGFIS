@@ -230,7 +230,7 @@ function ArchivedContractDetail({ contract, user, onClose, onRestored }: {
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-center">
             <p className="flex items-center justify-center gap-1 text-[10px] text-gray-500">
               Total Pago
-              <Tooltip side="bottom" interactive content={<span className="block">{PAGAMENTOS_INCOMPLETOS_TOOLTIP} (bruto registrado: {formatCurrency((contract.payments || []).reduce((s: number, p: any) => s + Number(p.value), 0))})</span>}>
+              <Tooltip content={<span className="whitespace-normal block max-w-[240px]">{PAGAMENTOS_INCOMPLETOS_TOOLTIP} (bruto registrado: {formatCurrency((contract.payments || []).reduce((s: number, p: any) => s + Number(p.value), 0))})</span>}>
                 <Info className="h-3 w-3 shrink-0" />
               </Tooltip>
             </p>
@@ -380,7 +380,7 @@ export function ArchivedContractsView({ user, onBack }: Props) {
                   <th className="px-4 py-2.5 font-semibold text-left">
                     <span className="inline-flex items-center gap-1">
                       Total Pago
-                      <Tooltip side="bottom" interactive className="normal-case tracking-normal" content={<span className="block">{PAGAMENTOS_INCOMPLETOS_TOOLTIP}</span>}>
+                      <Tooltip content={<span className="whitespace-normal block max-w-[240px] normal-case tracking-normal">{PAGAMENTOS_INCOMPLETOS_TOOLTIP}</span>}>
                         <Info className="h-3 w-3 shrink-0" />
                       </Tooltip>
                     </span>

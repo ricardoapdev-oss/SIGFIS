@@ -157,16 +157,11 @@ export interface EngineMeasurement {
 export interface EngineAlteration {
   id: string;
   contractId: string;
-  type: string; // ADDENDUM_* | PRICE_* (tipo principal)
-  types?: string[]; // todos os tipos conjugados no mesmo aditivo
+  type: string; // ADDENDUM_* | PRICE_*
   status: string; // DRAFT | PENDING_APPROVAL | APPROVED | REJECTED
   newEndDate?: string | null;
   createdAt: string;
 }
-
-/** true se o aditivo é de algum dos tipos dados (checa `type` e `types`). */
-const altIsType = (a: EngineAlteration, wanted: string[]): boolean =>
-  wanted.includes(a.type) || (a.types ?? []).some((t) => wanted.includes(t));
 
 export interface EnginePayment {
   id: string;
@@ -330,7 +325,7 @@ export function deriveFiscalizacaoCentral(
     // ── PRAZO ──────────────────────────────────────────────────────────────
     const d = daysUntil(c.endDate, now);
     const hasExtension = cAlt.some(
-      (a) => altIsType(a, ['ADDENDUM_TIME_EXTENSION']) && a.status !== 'REJECTED',
+      (a) => a.type === 'ADDENDUM_TIME_EXTENSION' && a.status !== 'REJECTED',
     );
     const continuityNote = hasExtension
       ? ''
@@ -581,7 +576,7 @@ export function deriveFiscalizacaoCentral(
     // ── REAJUSTE / REPACTUAÇÃO (informativo) ───────────────────────────────
     const months = monthsSince(c.startDate, now);
     const hasReajuste = cAlt.some(
-      (a) => altIsType(a, REAJUSTE_TYPES) && a.status !== 'REJECTED',
+      (a) => REAJUSTE_TYPES.includes(a.type) && a.status !== 'REJECTED',
     );
     if (c.status === 'ACTIVE' && months >= 12 && !hasReajuste) {
       items.push({
@@ -805,7 +800,7 @@ export function deriveContractDiagnostic(
   // Reajuste
   const months = monthsSince(contract.startDate, now);
   const hasReajuste = cAlt.some(
-    (a) => altIsType(a, REAJUSTE_TYPES) && a.status !== 'REJECTED',
+    (a) => REAJUSTE_TYPES.includes(a.type) && a.status !== 'REJECTED',
   );
   dimensions.push({
     key: 'reajuste',

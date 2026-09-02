@@ -158,15 +158,6 @@ export class ContractsService {
       include: {
         contractor: true,
         process: true,
-        manager: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            role: true,
-            registrationNumber: true,
-          },
-        },
         fiscalAssignments: {
           include: {
             fiscal: {
@@ -282,26 +273,6 @@ export class ContractsService {
     if (data.department !== undefined) updateData.department = data.department;
     if (data.objectDescription)
       updateData.objectDescription = data.objectDescription;
-    if (data.managerAppointmentOrdinance !== undefined)
-      updateData.managerAppointmentOrdinance =
-        data.managerAppointmentOrdinance || null;
-
-    // Gestor responsável pelo contrato — deve ter perfil Gestor ou Admin.
-    if (data.managerId !== undefined) {
-      if (data.managerId) {
-        const mgr = await this.prisma.user.findUnique({
-          where: { id: data.managerId },
-          select: { id: true, role: true },
-        });
-        if (!mgr)
-          throw new BadRequestException('Gestor responsável não encontrado.');
-        if (mgr.role !== 'GESTOR' && mgr.role !== 'ADMIN')
-          throw new BadRequestException(
-            'O responsável pelo contrato deve ter perfil Gestor ou Admin.',
-          );
-      }
-      updateData.managerId = data.managerId || null;
-    }
 
     // "Processo de Origem" — pode ser desvinculado (null) ou trocado por outro
     // processo existente.

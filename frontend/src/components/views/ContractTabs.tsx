@@ -16,7 +16,7 @@ import {
   contractStatusLabel, contractStatusColor, occurrenceSeverityLabel, occurrenceSeverityColor,
   occurrenceStatusLabel, occurrenceStatusColor, measurementStatusLabel, measurementStatusColor,
   alterationTypeLabel, alterationStatusLabel, alterationStatusColor, fiscalRoleLabel,
-  modalityLabel, MODALITY_OPTIONS, formatCurrency, formatDate, formatDateTime,
+  modalityLabel, formatCurrency, formatDate, formatDateTime,
 } from '@/lib/labels';
 import {
   sumApprovedMeasurements, contractualBalanceNotExecuted, executionRateByMeasurement,
@@ -61,12 +61,6 @@ interface Props {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const inputCls = 'w-full bg-blue-50 border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500/50';
-
-// Rótulo combinado dos tipos de um aditivo (conjugação): usa `types` quando
-// houver; senão cai para o `type` único (registros antigos).
-const alterationTypesOf = (a: any): string[] => (a?.types?.length ? a.types : a?.type ? [a.type] : []);
-const alterationTypesSummary = (a: any): string =>
-  alterationTypesOf(a).map((t: string) => alterationTypeLabel[t] || t).join(' + ') || '—';
 const badgeCls = (color: string) => `px-2 py-0.5 rounded text-[10px] font-semibold border ${color}`;
 const infoRow = (label: string, value: React.ReactNode, tooltip?: string) => (
   <div key={label} className="flex flex-col gap-0.5">
@@ -388,9 +382,6 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
   const [empresaEdits, setEmpresaEdits] = useState<Record<string, any>>({});
   const [editingVigencia, setEditingVigencia] = useState(false);
   const [vigenciaEdits, setVigenciaEdits] = useState<Record<string, any>>({});
-  const [editingGestor, setEditingGestor] = useState(false);
-  const [gestorEdits, setGestorEdits] = useState<Record<string, any>>({});
-  const [savingGestor, setSavingGestor] = useState(false);
   const [editingAltId, setEditingAltId] = useState<string | null>(null);
   const [altEdits, setAltEdits] = useState<Record<string, any>>({});
   const [showPaymentForm, setShowPaymentForm] = useState(false);
@@ -408,7 +399,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
   const [occDesc, setOccDesc] = useState('');
   const [occSeverity, setOccSeverity] = useState('MEDIUM');
   const [showAlterationForm, setShowAlterationForm] = useState(false);
-  const [altTypes, setAltTypes] = useState<string[]>(['ADDENDUM_TIME_EXTENSION']);
+  const [altType, setAltType] = useState('ADDENDUM_VALUE_INCREASE');
   const [altJustification, setAltJustification] = useState('');
   const [altValueChange, setAltValueChange] = useState('');
   const [altNewEndDate, setAltNewEndDate] = useState('');
@@ -457,51 +448,6 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
     enabled: editingDados,
     staleTime: 120_000,
   });
-
-  // Gestores — para escolher/trocar o gestor responsável pelo contrato.
-  const { data: gestoresList } = useQuery<any[]>({
-    queryKey: ['gestores-list'],
-    queryFn: () => api.utils.getGestores(),
-    enabled: editingGestor,
-    staleTime: 120_000,
-  });
-
-  // Salvamento da aba Gestor: nome/matrícula/e-mail vão para o cadastro do
-  // usuário gestor; o gestor responsável e a portaria de nomeação vão para o
-  // contrato. Toda alteração sobrepõe o valor anterior no banco.
-  const handleSaveGestor = async () => {
-    const cur = contract as any;
-    const targetId = gestorEdits.managerId ?? cur.managerId;
-    const selMgr = (gestoresList ?? []).find((g: any) => g.id === targetId) ?? cur.manager ?? {};
-
-    const userPatch: Record<string, any> = {};
-    if (gestorEdits.name !== undefined && gestorEdits.name !== (selMgr.name ?? '')) userPatch.name = gestorEdits.name;
-    if (gestorEdits.email !== undefined && gestorEdits.email !== (selMgr.email ?? '')) userPatch.email = gestorEdits.email;
-    if (gestorEdits.registrationNumber !== undefined && gestorEdits.registrationNumber !== (selMgr.registrationNumber ?? '')) userPatch.registrationNumber = gestorEdits.registrationNumber;
-
-    const contractPatch: Record<string, any> = {};
-    if (gestorEdits.managerId !== undefined && gestorEdits.managerId !== cur.managerId) contractPatch.managerId = gestorEdits.managerId || null;
-    if (gestorEdits.managerAppointmentOrdinance !== undefined) contractPatch.managerAppointmentOrdinance = gestorEdits.managerAppointmentOrdinance;
-
-    if (Object.keys(userPatch).length && !targetId) {
-      alert('Selecione o gestor responsável antes de editar os dados dele.');
-      return;
-    }
-
-    setSavingGestor(true);
-    try {
-      if (targetId && Object.keys(userPatch).length) await api.users.update(targetId, userPatch);
-      if (Object.keys(contractPatch).length) await api.contracts.updateData(contractId, contractPatch);
-      await queryClient.invalidateQueries({ queryKey: ['contract', contractId] });
-      queryClient.invalidateQueries({ queryKey: ['users-all'] });
-      queryClient.invalidateQueries({ queryKey: ['gestores-list'] });
-      setEditingGestor(false); setGestorEdits({});
-    } catch (e: any) {
-      alert(`Erro: ${e.message}`);
-    } finally {
-      setSavingGestor(false);
-    }
-  };
 
   // Salvamento de Dados Gerais: toda alteração é gravada no banco, sobrepondo
   // o valor anterior. O "Processo de Origem" é digitado/escolhido pelo número
@@ -668,7 +614,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
   const createAlterationMutation = useMutation({
     mutationFn: (data: any) => api.alterations.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['contract', contractId] }); setShowAlterationForm(false); setAltTypes(['ADDENDUM_TIME_EXTENSION']); setAltJustification(''); setAltValueChange(''); setAltNewEndDate(''); setAltNumber('');
+      queryClient.invalidateQueries({ queryKey: ['contract', contractId] }); setShowAlterationForm(false); setAltType('ADDENDUM_VALUE_INCREASE'); setAltJustification(''); setAltValueChange(''); setAltNewEndDate(''); setAltNumber('');
     },
     onError: (e: any) => alert(`Erro ao criar aditivo: ${e.message}`),
   });
@@ -1033,16 +979,8 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                   <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Modalidade</span>
                   <select value={dadosEdits.modality ?? (c.process?.modality || '')} onChange={e => setDadosEdits(p => ({ ...p, modality: e.target.value }))}
                     disabled={!c.processId && !(dadosEdits._processOrigin ?? '').trim()} className={inputCls}>
-                    {(() => {
-                      const curMod = dadosEdits.modality ?? (c.process?.modality || '');
-                      const opts = curMod && !MODALITY_OPTIONS.includes(curMod) ? [curMod, ...MODALITY_OPTIONS] : MODALITY_OPTIONS;
-                      return (
-                        <>
-                          {!curMod && <option value="">—</option>}
-                          {opts.map(k => <option key={k} value={k}>{modalityLabel[k] || k}</option>)}
-                        </>
-                      );
-                    })()}
+                    {!c.process?.modality && !dadosEdits.modality && <option value="">—</option>}
+                    {Object.entries(modalityLabel).map(([k, v]) => <option key={k} value={k}>{v as string}</option>)}
                   </select>
                 </div>
                 <div className="flex flex-col gap-0.5">
@@ -1284,86 +1222,18 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
         })()}
 
         {/* ── GESTOR ── */}
-        {activeTab === 'gestor' && (() => {
-          const targetId = gestorEdits.managerId ?? c.managerId;
-          const selMgr = (gestoresList ?? []).find((g: any) => g.id === targetId) ?? c.manager ?? {};
-          return (
+        {activeTab === 'gestor' && (
           <div className="space-y-5">
-            {isGestor && (
-              <div className="flex justify-end">
-                {editingGestor ? (
-                  <div className="flex gap-2">
-                    <button onClick={() => { setEditingGestor(false); setGestorEdits({}); }}
-                      className="flex items-center gap-1.5 text-[11px] bg-gray-100 hover:bg-gray-200 border border-gray-300 px-3 py-1.5 rounded-lg text-gray-700 cursor-pointer">
-                      <X className="h-3.5 w-3.5" /> Cancelar
-                    </button>
-                    <button onClick={handleSaveGestor}
-                      disabled={savingGestor || Object.keys(gestorEdits).length === 0}
-                      className="flex items-center gap-1.5 text-[11px] bg-emerald-500 hover:bg-emerald-400 px-3 py-1.5 rounded-lg text-zinc-950 font-semibold cursor-pointer disabled:opacity-50">
-                      <Save className="h-3.5 w-3.5" /> {savingGestor ? 'Salvando...' : 'Salvar'}
-                    </button>
-                  </div>
-                ) : (
-                  <button onClick={() => { setEditingGestor(true); setGestorEdits({}); }}
-                    className="flex items-center gap-1.5 text-[11px] bg-white hover:bg-gray-100 border border-gray-300 px-3 py-1.5 rounded-lg text-gray-700 cursor-pointer">
-                    <Pencil className="h-3.5 w-3.5" /> Editar Gestor
-                  </button>
-                )}
-              </div>
-            )}
-            {editingGestor ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-                <div className="flex flex-col gap-0.5 col-span-2 md:col-span-3">
-                  <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Gestor Responsável</span>
-                  <select value={gestorEdits.managerId ?? (c.managerId || '')}
-                    onChange={e => setGestorEdits(p => ({ ...p, managerId: e.target.value || null }))} className={inputCls}>
-                    <option value="">— Selecione —</option>
-                    {(gestoresList ?? []).map((g: any) => (
-                      <option key={g.id} value={g.id}>{g.name}{g.registrationNumber ? ` — ${g.registrationNumber}` : ''}</option>
-                    ))}
-                    {c.managerId && !(gestoresList ?? []).some((g: any) => g.id === c.managerId) && (
-                      <option value={c.managerId}>{c.manager?.name || c.managerId}</option>
-                    )}
-                  </select>
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Nome do Gestor</span>
-                  <input type="text" value={gestorEdits.name ?? (selMgr.name ?? '')}
-                    onChange={e => setGestorEdits(p => ({ ...p, name: e.target.value }))} className={inputCls} />
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Matrícula</span>
-                  <input type="text" value={gestorEdits.registrationNumber ?? (selMgr.registrationNumber ?? '')}
-                    onChange={e => setGestorEdits(p => ({ ...p, registrationNumber: e.target.value }))} className={inputCls} />
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">E-mail</span>
-                  <input type="email" value={gestorEdits.email ?? (selMgr.email ?? '')}
-                    onChange={e => setGestorEdits(p => ({ ...p, email: e.target.value }))} className={inputCls} />
-                </div>
-                <div className="flex flex-col gap-0.5 col-span-2 md:col-span-3">
-                  <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Portaria de Nomeação</span>
-                  <input type="text" value={gestorEdits.managerAppointmentOrdinance ?? (c.managerAppointmentOrdinance || '')}
-                    onChange={e => setGestorEdits(p => ({ ...p, managerAppointmentOrdinance: e.target.value }))}
-                    placeholder="Ex: Portaria nº 123/2026 — DOE de 10/04/2026" className={inputCls} />
-                </div>
-                <p className="col-span-2 md:col-span-3 text-[10px] text-gray-400">
-                  Nome, matrícula e e-mail alteram o cadastro do usuário gestor (reflete em todo o sistema). O gestor responsável e a portaria são específicos deste contrato.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-                {infoRow('Gestor Responsável', c.manager?.name || '—')}
-                {infoRow('Matrícula', c.manager?.registrationNumber || '—')}
-                {infoRow('E-mail', c.manager?.email || '—')}
-                {infoRow('Perfil', c.manager?.role || 'GESTOR')}
-                {infoRow('Setor', 'Gestão de Contratos — IQUEGO')}
-                {infoRow('Portaria de Nomeação', c.managerAppointmentOrdinance || '—')}
-              </div>
-            )}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+              {infoRow('Gestor Responsável', c.manager?.name || 'Jairo Vicente de Melo')}
+              {infoRow('Matrícula', c.manager?.registrationNumber || 'IQG-0002')}
+              {infoRow('E-mail', c.manager?.email || 'gestor@sigecontratos.com')}
+              {infoRow('Perfil', 'GESTOR')}
+              {infoRow('Setor', 'Gestão de Contratos — IQUEGO')}
+              {infoRow('Responsável desde', formatDate(c.signingDate))}
+            </div>
           </div>
-          );
-        })()}
+        )}
 
         {/* ── VIGÊNCIA ── */}
         {activeTab === 'vigencia' && (
@@ -1457,18 +1327,12 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
               <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-4 space-y-4">
                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Registrar Novo Termo Aditivo</p>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2 flex flex-col gap-1.5">
-                    <label className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Tipo(s) de Aditivo * <span className="normal-case font-normal text-gray-400">— marque um ou mais (conjugação)</span></label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5">
-                      {Object.entries(alterationTypeLabel).map(([k, v]) => (
-                        <label key={k} className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[11px] cursor-pointer transition-colors ${altTypes.includes(k) ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-white border-gray-300 text-gray-600 hover:border-gray-400'}`}>
-                          <input type="checkbox" checked={altTypes.includes(k)}
-                            onChange={e => setAltTypes(prev => e.target.checked ? [...prev, k] : prev.filter(x => x !== k))}
-                            className="accent-emerald-500" />
-                          {v as string}
-                        </label>
-                      ))}
-                    </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Tipo de Aditivo *</label>
+                    <select value={altType} onChange={e => setAltType(e.target.value)}
+                      className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500/50 cursor-pointer">
+                      {Object.entries(alterationTypeLabel).map(([k, v]) => <option key={k} value={k}>{v as string}</option>)}
+                    </select>
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Número / Identificação</label>
@@ -1500,12 +1364,11 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                   </p>
                 )}
                 <div className="flex gap-3">
-                  <button onClick={() => { setShowAlterationForm(false); setAltTypes(['ADDENDUM_TIME_EXTENSION']); setAltJustification(''); setAltValueChange(''); setAltNewEndDate(''); setAltNumber(''); }}
+                  <button onClick={() => { setShowAlterationForm(false); setAltType('ADDENDUM_VALUE_INCREASE'); setAltJustification(''); setAltValueChange(''); setAltNewEndDate(''); setAltNumber(''); }}
                     className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg py-2 text-xs font-semibold cursor-pointer">Cancelar</button>
                   <button onClick={() => {
-                    if (altTypes.length === 0) { alert('Marque ao menos um tipo de aditivo.'); return; }
                     if (!altJustification.trim()) { alert('Preencha a justificativa.'); return; }
-                    createAlterationMutation.mutate({ contractId, types: altTypes, alterationNumber: altNumber || undefined, justification: altJustification, valueChange: Number(altValueChange) || 0, newEndDate: altNewEndDate || undefined });
+                    createAlterationMutation.mutate({ contractId, type: altType, alterationNumber: altNumber || undefined, justification: altJustification, valueChange: Number(altValueChange) || 0, newEndDate: altNewEndDate || undefined });
                   }}
                     disabled={createAlterationMutation.isPending}
                     className="flex-1 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-white rounded-lg py-2 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
@@ -1522,22 +1385,6 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                     {editingAltId === alt.id ? (
                       <div className="space-y-3">
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="col-span-2 flex flex-col gap-1.5">
-                            <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Tipo(s) de Aditivo * <span className="normal-case font-normal text-gray-400">— marque um ou mais</span></span>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5">
-                              {Object.entries(alterationTypeLabel).map(([k, v]) => {
-                                const sel: string[] = altEdits.types ?? alterationTypesOf(alt);
-                                return (
-                                  <label key={k} className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[11px] cursor-pointer transition-colors ${sel.includes(k) ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-white border-gray-300 text-gray-600 hover:border-gray-400'}`}>
-                                    <input type="checkbox" checked={sel.includes(k)}
-                                      onChange={e => setAltEdits((p: any) => { const cur: string[] = p.types ?? alterationTypesOf(alt); return { ...p, types: e.target.checked ? [...cur, k] : cur.filter((x: string) => x !== k) }; })}
-                                      className="accent-emerald-500" />
-                                    {v as string}
-                                  </label>
-                                );
-                              })}
-                            </div>
-                          </div>
                           <div className="flex flex-col gap-0.5">
                             <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Número/Identificação</span>
                             <input type="text" value={altEdits.alterationNumber ?? (alt.alterationNumber || '')} onChange={e => setAltEdits((p: any) => ({ ...p, alterationNumber: e.target.value }))} className={inputCls} />
@@ -1556,7 +1403,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <button onClick={() => { if (altEdits.types && altEdits.types.length === 0) { alert('Marque ao menos um tipo de aditivo.'); return; } updateAlterationMutation.mutate({ id: alt.id, data: altEdits }); }}
+                          <button onClick={() => updateAlterationMutation.mutate({ id: alt.id, data: altEdits })}
                             disabled={updateAlterationMutation.isPending}
                             className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold py-1.5 rounded-lg text-xs cursor-pointer disabled:opacity-50">
                             {updateAlterationMutation.isPending ? 'Salvando...' : 'Salvar'}
@@ -1571,8 +1418,7 @@ export function ContractTabs({ contractId, user, onBack, onNavigate, onOpenMeasu
                       <>
                         <div className="flex justify-between items-start">
                           <div>
-                            <p className="text-xs font-bold text-gray-700">{alt.alterationNumber || alterationTypesSummary(alt)}</p>
-                            {alt.alterationNumber && <p className="text-[10px] font-medium text-blue-600 mt-0.5">{alterationTypesSummary(alt)}</p>}
+                            <p className="text-xs font-bold text-gray-700">{alt.alterationNumber || alterationTypeLabel[alt.type]}</p>
                             <p className="text-[10px] text-gray-500 mt-0.5">{alt.justification}</p>
                           </div>
                           <div className="flex items-center gap-2 shrink-0 ml-4">

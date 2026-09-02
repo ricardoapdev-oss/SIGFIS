@@ -15,13 +15,7 @@ export interface Contractor {
   stateInscription?: string; municipalInscription?: string;
 }
 export type ProcessStatus = 'PLANNING' | 'LEGAL_REVIEW' | 'BIDDING' | 'CONTRACT_PREP' | 'CONCLUDED' | 'CANCELED';
-export type BiddingModality =
-  // Legado (Lei 13.303/2016)
-  | 'LICITACAO_13303' | 'DISPENSA_13303' | 'INEXIGIBILIDADE' | 'PREGAO_ELETRONICO' | 'OUTROS'
-  // Vigentes (Lei 14.133/2021 / RLCC)
-  | 'INAPLICABILIDADE_ART28' | 'DISPENSA_ART29_VALOR' | 'DISPENSA_ART29_MATERIA' | 'INEXIGIBILIDADE_ART30'
-  | 'LICITACAO_INTEGRADA_ART32_I' | 'LICITACAO_SEMI_INTEGRADA_ART32_II' | 'LICITACAO_LEILAO_ART32_III'
-  | 'LICITACAO_PREGAO_ART32_IV' | 'LICITACAO_PREGAO_SRP_ART32_IV';
+export type BiddingModality = 'LICITACAO_13303' | 'DISPENSA_13303' | 'INEXIGIBILIDADE' | 'PREGAO_ELETRONICO' | 'OUTROS';
 export interface ProcurementProcess {
   id: string; processNumber: string; subject: string; description?: string; status: ProcessStatus;
   modality: BiddingModality; estimatedValue: number; requesterDepartment: string; requesterId: string;
@@ -31,9 +25,8 @@ export interface Contract {
   id: string; contractNumber: string; processId?: string; contractorId: string;
   objectDescription: string; initialValue: number; currentValue: number;
   signingDate: string; startDate: string; endDate: string; status: ContractStatus; managerId?: string;
-  managerAppointmentOrdinance?: string;
   department?: string; observations?: string;
-  contractor?: Contractor; process?: ProcurementProcess; manager?: User; fiscalAssignments?: FiscalAssignment[];
+  contractor?: Contractor; process?: ProcurementProcess; fiscalAssignments?: FiscalAssignment[];
   occurrences?: Occurrence[]; measurements?: InspectionMeasurement[]; alterations?: ContractAlteration[];
   communications?: Communication[];
 }
@@ -60,7 +53,7 @@ export interface InspectionMeasurement {
 export type AlterationType = 'ADDENDUM_VALUE_INCREASE' | 'ADDENDUM_VALUE_DECREASE' | 'ADDENDUM_TIME_EXTENSION' | 'PRICE_REAJUSTE' | 'PRICE_REPACTUACAO' | 'PRICE_REEQUILIBRIO';
 export type AlterationStatus = 'DRAFT' | 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED';
 export interface ContractAlteration {
-  id: string; contractId: string; type: AlterationType; types?: AlterationType[]; alterationNumber?: string; valueChange: number;
+  id: string; contractId: string; type: AlterationType; alterationNumber?: string; valueChange: number;
   newEndDate?: string; justification: string; status: AlterationStatus; requestedById: string;
   reviewedById?: string; reviewDate?: string; reviewNotes?: string; createdAt: string;
   requester?: { name: string }; reviewer?: { name: string };
@@ -820,7 +813,7 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
         measurementValue: Number(m.measurementValue) || 0, status: m.status, createdAt: m.createdAt,
       })),
       alterations: db.alterations.map(a => ({
-        id: a.id, contractId: a.contractId, type: a.type, types: (a as any).types ?? undefined, status: a.status,
+        id: a.id, contractId: a.contractId, type: a.type, status: a.status,
         newEndDate: a.newEndDate ?? null, createdAt: a.createdAt,
       })),
       viewerId: user.id,
@@ -883,12 +876,7 @@ async function handleLocalFallback(endpoint: string, options: RequestInit = {}, 
     const pendRenewals = (db.contractAlerts || []).filter(a => a.type === 'RENEWAL_REQUESTED' && a.status === 'PENDING').length;
     const pendComms = (db.communications || []).filter(c => c.isMandatory && !(c.readBy || []).includes('usr-gestor')).length;
 
-    const modalityMap: Record<string, string> = {
-      LICITACAO_13303: 'Licitação', DISPENSA_13303: 'Dispensa', INEXIGIBILIDADE: 'Inexigibilidade', PREGAO_ELETRONICO: 'Pregão', OUTROS: 'Outros',
-      INAPLICABILIDADE_ART28: 'Inaplicabilidade', DISPENSA_ART29_VALOR: 'Dispensa (valor)', DISPENSA_ART29_MATERIA: 'Dispensa (matéria)', INEXIGIBILIDADE_ART30: 'Inexigibilidade',
-      LICITACAO_INTEGRADA_ART32_I: 'Contratação Integrada', LICITACAO_SEMI_INTEGRADA_ART32_II: 'Semi-Integrada', LICITACAO_LEILAO_ART32_III: 'Leilão',
-      LICITACAO_PREGAO_ART32_IV: 'Pregão', LICITACAO_PREGAO_SRP_ART32_IV: 'Pregão / SRP',
-    };
+    const modalityMap: Record<string, string> = { LICITACAO_13303: 'Licitação', DISPENSA_13303: 'Dispensa', INEXIGIBILIDADE: 'Inexigibilidade', PREGAO_ELETRONICO: 'Pregão', OUTROS: 'Outros' };
     const byModality = Object.entries(processes.reduce((acc, p) => { const k = modalityMap[p.modality] || p.modality; acc[k] = (acc[k] || 0) + 1; return acc; }, {} as Record<string, number>)).map(([name, value]) => ({ name, value }));
     const statusMap: Record<string, string> = { DRAFT: 'Rascunho', ACTIVE: 'Ativo', SUSPENDED: 'Suspenso', CONCLUDED: 'Concluído', RESCINDED: 'Rescindido' };
     const byStatus = Object.entries(contracts.reduce((acc, c) => { const k = statusMap[c.status] || c.status; acc[k] = (acc[k] || 0) + 1; return acc; }, {} as Record<string, number>)).map(([name, value]) => ({ name, value }));
