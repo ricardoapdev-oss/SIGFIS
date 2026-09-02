@@ -417,6 +417,8 @@ enum BiddingModality {
   LICITACAO_SEMI_INTEGRADA_ART32_II
   LICITACAO_LEILAO_ART32_III
   LICITACAO_PREGAO_ART32_IV
+  // Mantido só para o Prisma não recusar leitura caso algum registro já o
+  // tenha; NÃO é oferecido na seleção (ver MODALITY_OPTIONS em labels.ts).
   LICITACAO_PREGAO_SRP_ART32_IV
 }
 

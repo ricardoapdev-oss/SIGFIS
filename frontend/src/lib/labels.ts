@@ -42,7 +42,9 @@ export const modalityLabel: Record<string, string> = {
   LICITACAO_SEMI_INTEGRADA_ART32_II: 'Licitação - Regime de Contratação Semi-Integrada (Art. 32, II)',
   LICITACAO_LEILAO_ART32_III: 'Licitação - Leilão (Art. 32, III)',
   LICITACAO_PREGAO_ART32_IV: 'Licitação - Pregão (Art. 32, IV)',
-  LICITACAO_PREGAO_SRP_ART32_IV: 'Licitação - Pregão Eletrônico / Sistema de Registro de Preços (Art. 32, IV, c/c Arts. 36 a 39)',
+  // Não oferecido na seleção (fora de MODALITY_OPTIONS) — rótulo mantido só
+  // para exibir eventual registro que já o tenha.
+  LICITACAO_PREGAO_SRP_ART32_IV: 'Licitação - Pregão Eletrônico / SRP (Art. 32, IV, c/c Arts. 36 a 39)',
   // ── Legado (Lei 13.303/2016) — só para exibir registros antigos ──
   LICITACAO_13303: 'Licitação 13.303/2016 (legado)',
   DISPENSA_13303: 'Dispensa 13.303/2016 (legado)',
@@ -62,7 +64,6 @@ export const MODALITY_OPTIONS: string[] = [
   'LICITACAO_SEMI_INTEGRADA_ART32_II',
   'LICITACAO_LEILAO_ART32_III',
   'LICITACAO_PREGAO_ART32_IV',
-  'LICITACAO_PREGAO_SRP_ART32_IV',
 ];
 
 export const measurementStatusLabel: Record<string, string> = {
